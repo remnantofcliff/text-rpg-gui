@@ -1,0 +1,11 @@
+@TEXT 0
+You were a @profession_description@ in your past. However,
+  few memories remain of your former self.
+This area you are travelling in is called the Drylands.
+It is to the east of the city of Peccatum, otherwise surrounded by the ocean.
+As the name suggests, the climate is very dry.
+There's not much else to be seen but sand.
+Every now and then some lizards or scorpions pass by while travelling in addition to a few travellers.
+@TEXT 0
+You see a lizard observing you with keen eyes.
+The lizard lunges toward you.
