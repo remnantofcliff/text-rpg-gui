@@ -3,6 +3,6 @@ package main;
 /**
  * Enum for different gamestates.
  */
-public enum GameStates {
+public enum TextStates {
   CHOOSING, TEXT
 }

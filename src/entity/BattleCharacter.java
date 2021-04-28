@@ -1,6 +1,5 @@
 package entity;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,18 +8,46 @@ import java.util.List;
  */
 public abstract class BattleCharacter extends Entity {
   protected Armor armor;
-  protected BigDecimal hp;
-  protected BigDecimal mp;
-  protected BigDecimal sp;
-  protected BigDecimal speed;
   protected List<String> statusEffects = new ArrayList<>();
   protected Weapon weapon;
+  protected double hp;
+  protected double mp;
+  protected double sp;
+  protected double speed;
   protected int maxHp;
   protected int maxMp;
   protected int maxSp;
   
   public Armor getArmor() {
     return armor;
+  }
+
+  /**
+   * Adds the parameter amount of hp. If larger than maxHp, sets hp to maxHp.
+
+   * @param add Hp to be added (double)
+   */
+  public boolean addHp(double add) {
+    if (hp == maxHp) {
+      return false;
+    }
+    hp += add;
+    if (hp >= maxHp) {
+      hp = maxHp;
+    }
+    return true;
+  }
+
+  /**
+   * Removes the parameter amount of hp. If smaller than 0, sets hp to 0.
+
+   * @param remove Hp to be removed (double)
+   */
+  public void removeHp(double remove) {
+    hp -= remove;
+    if (hp <= 0) {
+      hp = 0;
+    }
   }
 
   public void setArmor(Armor armor) {
@@ -47,19 +74,19 @@ public abstract class BattleCharacter extends Entity {
   protected int strength;
   protected int magic;
 
-  public BigDecimal getHp() {
+  public double getHp() {
     return hp;
   }
 
-  public BigDecimal getMp() {
+  public double getMp() {
     return mp;
   }
 
-  public BigDecimal getSp() {
+  public double getSp() {
     return sp;
   }
 
-  public BigDecimal getSpeed() {
+  public double getSpeed() {
     return speed;
   }
 
@@ -87,19 +114,19 @@ public abstract class BattleCharacter extends Entity {
     return magic;
   }
 
-  public void setHp(BigDecimal hp) {
+  public void setHp(double hp) {
     this.hp = hp;
   }
 
-  public void setMp(BigDecimal mp) {
+  public void setMp(double mp) {
     this.mp = mp;
   }
 
-  public void setSp(BigDecimal sp) {
+  public void setSp(double sp) {
     this.sp = sp;
   }
 
-  public void setSpeed(BigDecimal speed) {
+  public void setSpeed(double speed) {
     this.speed = speed;
   }
 

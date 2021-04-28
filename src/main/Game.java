@@ -1,7 +1,6 @@
 package main;
 
 import entity.characters.Player;
-import items.Items;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import utilities.FileHandler;
@@ -77,12 +76,12 @@ public class Game extends Thread {
   }
 
   private void event(String[] text) {
-    GameStates mode = GameStates.TEXT;
+    TextStates mode = TextStates.TEXT;
     int i = 0;
     int startingLine = 0;
     for (String string : text) {
       if (string.startsWith("@")) {
-        mode = GameStates.valueOf(string.substring(1, string.indexOf(" ")));
+        mode = TextStates.valueOf(string.substring(1, string.indexOf(" ")));
         i = 0;
         startingLine = Character.getNumericValue(string.charAt(string.length() - 1)) - 1;
       } else {
@@ -141,7 +140,7 @@ public class Game extends Thread {
     event(FileHandler.readText("data/text/new_game4.txt"));
   }
 
-  private void textToDisplay(int i, int startingLine, GameStates mode, String string) {
+  private void textToDisplay(int i, int startingLine, TextStates mode, String string) {
     if (i == 0) {
       display.setText(string, mode, startingLine);
     } else {
@@ -161,18 +160,4 @@ public class Game extends Thread {
   public synchronized void setInput(int input) {
     this.input = input;
   }
-
-  /**
-   * Uses the item.
-
-   * @param item (Item)
-   */
-  public void useItem(Items item) {
-    switch (item) {
-    default:
-      break;
-
-    }
-  }
-
 }

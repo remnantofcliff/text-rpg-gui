@@ -1,16 +1,14 @@
 package entity;
 
-import java.math.BigDecimal;
-
 /**
  * Abstract weapon class.
  */
-public abstract class Weapon extends Entity {
-  protected BigDecimal baseDamage;
-  protected BigDecimal dexterityModifier;
-  protected BigDecimal magicModifier;
-  protected BigDecimal strengthModifier;
-  protected BigDecimal range;
+public abstract class Weapon extends Item {
+  protected double baseDamage;
+  protected double dexterityModifier;
+  protected double magicModifier;
+  protected double strengthModifier;
+  protected double range;
 
   /**
    * Calculates the damage that the weapon does given player stats.
@@ -18,12 +16,24 @@ public abstract class Weapon extends Entity {
    * @param dexterity (int)
    * @param magic (int)
    * @param strength (int)
-   * @return (BigDecimal)
+   * @return (double)
    */
-  public BigDecimal calculateDamage(int dexterity, int magic, int strength) {
-    return baseDamage
-    .add(dexterityModifier.multiply(BigDecimal.valueOf(dexterity)))
-    .add(magicModifier.multiply(BigDecimal.valueOf(magic)))
-    .add(strengthModifier.multiply(BigDecimal.valueOf(strength)));
+  public double calculateDamage(int dexterity, int magic, int strength) {
+    return Math.floor(
+      baseDamage 
+      + dexterityModifier * dexterity 
+      + magicModifier * magic 
+      + strengthModifier * strength
+    );
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj);
+  }
+  
+  @Override
+  public int hashCode() {
+    return super.hashCode();
   }
 }

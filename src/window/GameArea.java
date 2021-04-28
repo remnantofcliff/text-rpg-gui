@@ -1,34 +1,37 @@
 package window;
 
 import entity.characters.Player;
-import items.Items;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import javax.swing.JTextArea;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import main.App;
-import main.Game;
-import main.GameStates;
+import main.TextStates;
 
 /**
  * Game screen where graphics and text gets drawn.
  */
 public class GameArea extends JTextArea {
   private DisplayStates displayState = DisplayStates.DEFAULT;
-  private GameStates gameState = GameStates.TEXT;
+  private TextStates textState = TextStates.TEXT;
+  private boolean invMiniPanel = false;
   private int startingLine;
   private int selectedLine;
-  private int invStartingIndex = 0;
+  private int invCategory = 1;
+  private int invItems;
   private int invSelectedIndex = 0;
   private int invSelectedLine = 0;
-  private int invLastIndex = 0;
+  private int invStartingIndex = 0;
   private static final Color CHOOSING_RECT_COLOR = new Color(100, 100, 100, 40);
   private static final int LINE_BORDER_WIDTH = 20;
   private static final int EMPTY_BORDER_WIDTH_LEFT = 10;
@@ -36,6 +39,7 @@ public class GameArea extends JTextArea {
   private static final int CHOOSING_RECT_X = LINE_BORDER_WIDTH + EMPTY_BORDER_WIDTH_LEFT;
   private static final int CHOOSING_RECT_WIDTH_REDUCTION = 
       LINE_BORDER_WIDTH * 2 + EMPTY_BORDER_WIDTH_LEFT + EMPTY_BORDER_WIDTH_RIGHT;
+  private transient List<String> itemNameList = new ArrayList<>();
 
   /**
    * Gameplay area.
@@ -77,6 +81,7 @@ public class GameArea extends JTextArea {
       int panelY = height / 10;
       int panelWidth = panelX * 7;
       int panelHeight = panelY * 7;
+      Player player = App.getMainWindow().getGame().getPlayer();
       g.setColor(Color.BLACK);
       g.fillRect(panelX, panelY, panelWidth, panelHeight);
       g.setColor(Color.GREEN);
@@ -87,52 +92,66 @@ public class GameArea extends JTextArea {
           RenderingHints.VALUE_TEXT_ANTIALIAS_ON
       );
       FontMetrics fontMetrics = g.getFontMetrics();
-      fontHeight = fontMetrics.getHeight();
       int stringX = panelX + fontMetrics.getMaxAdvance();
+      int secondRowX = stringX + panelWidth / 2;
+      fontHeight = fontMetrics.getHeight();
       int stringY = (int) (panelY + fontHeight * 1.5);
-      Player player = App.getMainWindow().getGame().getPlayer();
       switch (displayState) {
         case CHARACTER:
           for (int i = 0; i < 11; i++) {
             int textHeight = stringY + fontHeight * i;
             g.drawString(getPlayerStatString(i), stringX, textHeight);
-            g.drawString(getPlayerStat(i, player), stringX + panelWidth / 2, textHeight);
+            g.drawString(getPlayerStat(i, player), secondRowX, textHeight);
           }
           break;
         case EQUIPMENT:
-          g.drawString("Equipment: ", stringX, stringY);
-          g.drawString("Weapon: " + player.getWeapon().getName(), stringX, stringY + fontHeight);
-          g.drawString(" Armor: " + player.getArmor().getName(), stringX, stringY + fontHeight * 2);
+          g.drawString(getPlayerStatString(0), stringX, stringY);
+          g.drawString(getPlayerStat(0, player), secondRowX, stringY);
+          g.drawString(
+              "Weapon:  " + player.getWeapon().getName(), 
+              stringX, 
+              stringY + fontHeight * 2
+          );
+          g.drawString(
+              "Armor:   " + player.getArmor().getName(),
+              stringX,
+              stringY + fontHeight * 3
+          );
           break;
         case INVENTORY:
-          String inventoryString = "Inventory:";
-          int underlineHeight = stringY + 8;
-          g.drawString(inventoryString, stringX, stringY);
-          g.drawLine(
-              stringX,
-              underlineHeight,
-              stringX + g.getFontMetrics().stringWidth(inventoryString),
-              underlineHeight
-          );
-          List<Items> items = player.getItems();
-          invLastIndex = items.size() - 1;
-          for (int i = invStartingIndex; i < invStartingIndex + 10; i++) {
-            Items item = items.get(i);
-            int textHeight = stringY + fontHeight * (i + 1 - invStartingIndex);
-            g.drawString(item.toString(), stringX, textHeight);
-            g.drawString(
-                Integer.toString(player.getItemAmount(item)),
-                stringX + panelWidth / 2,
-                textHeight
-            );
+          itemNameList.clear();
+          int maxAdvance = fontMetrics.getMaxAdvance();
+          int category2X = stringX + (panelWidth - maxAdvance) / 3;
+          int category3X = stringX + (panelWidth - maxAdvance) / 3 * 2;
+          g.drawString("Items", stringX, stringY);
+          g.drawString("Weapons", category2X, stringY);
+          g.drawString("Armors", category3X, stringY);
+          switch (invCategory) {
+            case 1:
+              showInv(
+                  player.getInventory().getItems().entrySet(), "Items", stringX,
+                  g, panelWidth, stringX, stringY
+              );
+              break;
+            case 2:
+              showInv(
+                  player.getInventory().getWeapons().entrySet(), "Weapons", category2X,
+                  g, panelWidth, stringX, stringY
+              );
+              break;
+            case 3:
+              showInv(
+                  player.getInventory().getArmors().entrySet(), "Armors", category3X,
+                  g, panelWidth, stringX, stringY
+              );
+              break;
+            default:
+              break;
           }
-          g.setColor(CHOOSING_RECT_COLOR);
-          g.fillRect(
-              stringX,
-              stringY + 10 + invSelectedLine * fontHeight,
-              panelWidth - fontMetrics.getMaxAdvance(),
-              fontHeight
-          );
+          if (invMiniPanel) {
+            g.setColor(Color.GREEN);
+            g.fillRect(secondRowX, stringY + fontHeight * (selectedLine + 3), 100, 100);
+          }
           break;
         case MAP:
           break;
@@ -140,6 +159,45 @@ public class GameArea extends JTextArea {
           break;
       }
     }
+  }
+
+  private void showInv(Set<Entry<String, Integer>> entrySet, String category, int categoryX,
+      Graphics g, int panelWidth, int stringX, int stringY
+  ) {
+    FontMetrics fontMetrics = g.getFontMetrics();
+    int fontHeight = fontMetrics.getHeight();
+    int i = 0;
+    invItems = entrySet.size() - 1;
+    for (Entry<String, Integer> entry : entrySet) {
+      itemNameList.add(entry.getKey());
+      if (i >= invStartingIndex) {
+        if (i == invStartingIndex + 9) {
+          break;
+        }
+        g.drawString(
+            entry.getKey(),
+            stringX,
+            stringY + fontHeight * ((i - invStartingIndex) + 2)
+        );
+        String numberString = entry.getValue().toString();
+        g.drawString(
+            numberString,
+            panelWidth - fontMetrics.stringWidth(numberString),
+            stringY + fontHeight * ((i - invStartingIndex) + 2)
+        );
+      }
+      i++;
+    }
+    g.setColor(CHOOSING_RECT_COLOR);
+    int choosingY = fontMetrics.getDescent() + stringY;
+    g.fillRect(categoryX, choosingY - fontHeight, fontMetrics.stringWidth(category), fontHeight);
+    int maxAdvance = fontMetrics.getMaxAdvance();
+    g.fillRect(
+        stringX,
+        choosingY + fontHeight * (invSelectedLine + 1),
+        panelWidth - maxAdvance * 3,
+        fontHeight
+    );
   }
 
   public DisplayStates getDisplayState() {
@@ -163,7 +221,7 @@ public class GameArea extends JTextArea {
       case 8:
         return Integer.toString(player.getStrength());
       case 10:
-        return player.getSpeed().toString();
+        return String.valueOf(player.getSpeed());
       default:
         return "";
     }
@@ -203,9 +261,9 @@ public class GameArea extends JTextArea {
    * @param state State to set gamearea to. Use constants contained in class.
    * @param startingLine Line to start selection from.
    */
-  public void setText(String text, GameStates state, int startingLine) {
+  public void setText(String text, TextStates state, int startingLine) {
     setText(text);
-    this.gameState = state;
+    this.textState = state;
     this.startingLine = startingLine;
     selectedLine = startingLine;
   }
@@ -213,51 +271,49 @@ public class GameArea extends JTextArea {
   /**
    * Moves selection.
 
-   * @param b false == up, true = down.
+   * @param dir 'u' == up, 'd' == down, 'l' == left, 'r' == right (char)
    */
-  public void moveSelection(boolean b) {
-    if (b) {
-      if (displayState == DisplayStates.DEFAULT) {
-        if (selectedLine <= getLineCount() - 2) {
-          selectedLine++;
-        }
-      } else {
-        moveInventoryDown();
-      }
-    } else {
-      if (displayState == DisplayStates.DEFAULT) {
-        if (selectedLine > startingLine) {
+  public void moveSelection(char dir) {
+    switch (dir) {
+      case 'u':
+        if (displayState == DisplayStates.DEFAULT && selectedLine > startingLine) {
           selectedLine--;
+        } else if (displayState == DisplayStates.INVENTORY && invSelectedIndex != 0) {
+          moveInvItems(-1, 0);
         }
-      } else {
-        moveInventoryUp();
-      }
+        break;
+      case 'd':
+        if (displayState == DisplayStates.DEFAULT && selectedLine <= getLineCount() - 2) {
+          selectedLine++;
+        } else if (displayState == DisplayStates.INVENTORY && invSelectedIndex != invItems) {
+          moveInvItems(1, 8);
+        }
+        break;
+      case 'l':
+        moveInvCategory(-1, 1);
+        break;
+      case 'r':
+        moveInvCategory(1, 3);
+        break;
+      default:
+        break;
     }
     updateUI();
   }
 
-  private void moveInventoryDown() {
-    if (invSelectedLine != 9) {
-      invSelectedLine++;
-    } else {
-      if (invLastIndex == invSelectedIndex) {
-        return;
-      }
-      invStartingIndex++;
+  private void moveInvCategory(int dir, int check) {
+    if (displayState == DisplayStates.INVENTORY && invCategory != check) {
+      invCategory = invCategory + dir;
     }
-    invSelectedIndex++;
   }
 
-  private void moveInventoryUp() {
-    if (invSelectedLine != 0) {
-      invSelectedLine--;
+  private void moveInvItems(int dir, int check) {
+    if (invSelectedLine != check) {
+      invSelectedLine = invSelectedLine + dir;
     } else {
-      if (invStartingIndex == 0) {
-        return;
-      }
-      invStartingIndex--;
+      invStartingIndex = invStartingIndex + dir;
     }
-    invSelectedIndex--;
+    invSelectedIndex = invStartingIndex + invSelectedLine;
   }
 
   /**
@@ -267,15 +323,17 @@ public class GameArea extends JTextArea {
    */
   public int select() {
     if (displayState == DisplayStates.INVENTORY) {
-      Game game = App.getMainWindow().getGame();
-      game.useItem(game.getPlayer().getItems().get(invSelectedIndex));
-      return - 1;
+      if (invMiniPanel) {
+        invMiniPanel = false;
+      } else {
+        invMiniPanel = true;
+      }
+      updateUI();
     }
-    if (gameState == GameStates.CHOOSING) {
+    if (textState == TextStates.CHOOSING) {
       return selectedLine - startingLine + 1;
-    } else {
-      return 0;
-    }    
+    }
+    return 0; 
   }
 
   /**
@@ -290,5 +348,9 @@ public class GameArea extends JTextArea {
       this.displayState = displayState;
     }
     updateUI();
+  }
+
+  public int getInvCategory() {
+    return invCategory;
   }
 }

@@ -161,19 +161,35 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
   public void keyPressed(KeyEvent e) {
     switch (e.getKeyCode()) {
       case KeyEvent.VK_W:
-        gameArea.moveSelection(false);
-        break;
-      case KeyEvent.VK_S:
-        gameArea.moveSelection(true);
+        gameArea.moveSelection('u');
         break;
       case KeyEvent.VK_UP:
-        gameArea.moveSelection(false);
+        gameArea.moveSelection('u');
+        break;
+      case KeyEvent.VK_S:
+        gameArea.moveSelection('d');
         break;
       case KeyEvent.VK_DOWN:
-        gameArea.moveSelection(true);
+        gameArea.moveSelection('d');
+        break;
+      case KeyEvent.VK_A:
+        gameArea.moveSelection('l');
+        break;
+      case KeyEvent.VK_LEFT:
+        gameArea.moveSelection('l');
+        break;
+      case KeyEvent.VK_D:
+        gameArea.moveSelection('r');
+        break;
+      case KeyEvent.VK_RIGHT:
+        gameArea.moveSelection('r');
         break;
       case KeyEvent.VK_ENTER:
-        game.setInput(gameArea.select());
+        if (gameArea.getDisplayState() == DisplayStates.INVENTORY) {
+          gameArea.select();
+        } else {
+          game.setInput(gameArea.select());
+        }
         break;
       default:
         break;
