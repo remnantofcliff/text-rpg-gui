@@ -1,7 +1,7 @@
 package entity.items;
 
+import entity.BattleCharacter;
 import entity.Weapon;
-import entity.characters.Player;
 import entity.interfaces.Equippable;
 
 /**
@@ -22,7 +22,7 @@ public class Fists extends Weapon implements Equippable {
   }
 
   @Override
-  public void equip(Player player) {
-    player.setWeapon(this);
+  public void equip(BattleCharacter battleCharacter) {
+    battleCharacter.setWeapon(this);
   }
 }

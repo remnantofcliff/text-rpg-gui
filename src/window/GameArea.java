@@ -1,6 +1,10 @@
 package window;
 
+import entity.Item;
 import entity.characters.Player;
+import entity.interfaces.Droppable;
+import entity.interfaces.Equippable;
+import entity.interfaces.Usable;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -23,23 +27,40 @@ import main.TextStates;
  */
 public class GameArea extends JTextArea {
   private DisplayStates displayState = DisplayStates.DEFAULT;
+  private String message = "";
   private TextStates textState = TextStates.TEXT;
   private boolean invMiniPanel = false;
-  private int startingLine;
-  private int selectedLine;
   private int invCategory = 1;
   private int invItems;
   private int invSelectedIndex = 0;
-  private int invSelectedLine = 0;
   private int invStartingIndex = 0;
+  private int invSelectedLine = 0;
+  private int miniSelectedLine = 0;
+  private int startingLine;
+  private int selectedLine;
   private static final Color CHOOSING_RECT_COLOR = new Color(100, 100, 100, 40);
+  private static final String[] PLAYER_STAT_STRINGS = { 
+      "Name:",
+      "",
+      "Hit Points:",
+      "Mana Points:",
+      "Stamina Points:",
+      "",
+      "Dexterity:",
+      "Magic:",
+      "Strength:",
+      "",
+      "Speed:"
+  };
   private static final int LINE_BORDER_WIDTH = 20;
   private static final int EMPTY_BORDER_WIDTH_LEFT = 10;
   private static final int EMPTY_BORDER_WIDTH_RIGHT = 5;
   private static final int CHOOSING_RECT_X = LINE_BORDER_WIDTH + EMPTY_BORDER_WIDTH_LEFT;
   private static final int CHOOSING_RECT_WIDTH_REDUCTION = 
       LINE_BORDER_WIDTH * 2 + EMPTY_BORDER_WIDTH_LEFT + EMPTY_BORDER_WIDTH_RIGHT;
+  private transient Item item;
   private transient List<String> itemNameList = new ArrayList<>();
+  private transient Player player;
 
   /**
    * Gameplay area.
@@ -62,103 +83,81 @@ public class GameArea extends JTextArea {
     setWrapStyleWord(true);
   }
 
-  @Override
-  public void paintComponent(Graphics g) {
-    super.paintComponent(g);
-    int fontHeight = g.getFontMetrics().getHeight();
-    int width = getWidth();
-    int choosingRectWidth = width - CHOOSING_RECT_WIDTH_REDUCTION;
-    g.setColor(CHOOSING_RECT_COLOR);
-    g.fillRect(
-        CHOOSING_RECT_X,
-        LINE_BORDER_WIDTH + fontHeight * selectedLine,
-        choosingRectWidth,
-        fontHeight
-    );
-    if (displayState != DisplayStates.DEFAULT) {
-      int height = getHeight();
-      int panelX = width / 10;
-      int panelY = height / 10;
-      int panelWidth = panelX * 7;
-      int panelHeight = panelY * 7;
-      Player player = App.getMainWindow().getGame().getPlayer();
-      g.setColor(Color.BLACK);
-      g.fillRect(panelX, panelY, panelWidth, panelHeight);
-      g.setColor(Color.GREEN);
-      g.drawRect(panelX, panelY, panelWidth, panelHeight);
-      g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 30));
-      ((Graphics2D) g).setRenderingHint(
-          RenderingHints.KEY_TEXT_ANTIALIASING,
-          RenderingHints.VALUE_TEXT_ANTIALIAS_ON
-      );
-      FontMetrics fontMetrics = g.getFontMetrics();
-      int stringX = panelX + fontMetrics.getMaxAdvance();
-      int secondRowX = stringX + panelWidth / 2;
-      fontHeight = fontMetrics.getHeight();
-      int stringY = (int) (panelY + fontHeight * 1.5);
-      switch (displayState) {
-        case CHARACTER:
-          for (int i = 0; i < 11; i++) {
-            int textHeight = stringY + fontHeight * i;
-            g.drawString(getPlayerStatString(i), stringX, textHeight);
-            g.drawString(getPlayerStat(i, player), secondRowX, textHeight);
-          }
-          break;
-        case EQUIPMENT:
-          g.drawString(getPlayerStatString(0), stringX, stringY);
-          g.drawString(getPlayerStat(0, player), secondRowX, stringY);
-          g.drawString(
-              "Weapon:  " + player.getWeapon().getName(), 
-              stringX, 
-              stringY + fontHeight * 2
-          );
-          g.drawString(
-              "Armor:   " + player.getArmor().getName(),
-              stringX,
-              stringY + fontHeight * 3
-          );
-          break;
-        case INVENTORY:
-          itemNameList.clear();
-          int maxAdvance = fontMetrics.getMaxAdvance();
-          int category2X = stringX + (panelWidth - maxAdvance) / 3;
-          int category3X = stringX + (panelWidth - maxAdvance) / 3 * 2;
-          g.drawString("Items", stringX, stringY);
-          g.drawString("Weapons", category2X, stringY);
-          g.drawString("Armors", category3X, stringY);
-          switch (invCategory) {
-            case 1:
-              showInv(
-                  player.getInventory().getItems().entrySet(), "Items", stringX,
-                  g, panelWidth, stringX, stringY
-              );
-              break;
-            case 2:
-              showInv(
-                  player.getInventory().getWeapons().entrySet(), "Weapons", category2X,
-                  g, panelWidth, stringX, stringY
-              );
-              break;
-            case 3:
-              showInv(
-                  player.getInventory().getArmors().entrySet(), "Armors", category3X,
-                  g, panelWidth, stringX, stringY
-              );
-              break;
-            default:
-              break;
-          }
-          if (invMiniPanel) {
-            g.setColor(Color.GREEN);
-            g.fillRect(secondRowX, stringY + fontHeight * (selectedLine + 3), 100, 100);
-          }
-          break;
-        case MAP:
-          break;
-        default:
-          break;
-      }
+  private String getPlayerStat(int i) {
+    switch (i) {
+      case 0:
+        return player.getName();
+      case 2:
+        return player.getHp() + " / " + player.getMaxHp();  
+      case 3:
+        return player.getMp() + " / " + player.getMaxMp();
+      case 4:
+        return player.getSp() + " / " + player.getMaxSp();
+      case 6:
+        return Integer.toString(player.getDexterity());
+      case 7:
+        return Integer.toString(player.getMagic());
+      case 8:
+        return Integer.toString(player.getStrength());
+      case 10:
+        return String.valueOf(player.getSpeed());
+      default:
+        return "";
     }
+  }
+
+  private void itemOptionCheck(
+      Item item, Class<?> check, String name, int i,
+      Graphics g, int miniStringHeight, int miniStringX
+  ) {
+    FontMetrics fontMetrics = g.getFontMetrics();
+    if (check.isInstance(item)) {
+      g.drawString(
+          name,
+          miniStringX - fontMetrics.stringWidth(name) / 2,
+          miniStringHeight + fontMetrics.getHeight() * i
+      );
+    }
+  }
+
+  private void moveInvCategory(int dir, int check) {
+    resetInventory();
+    if (displayState == DisplayStates.INVENTORY && invCategory != check) {
+      invCategory = invCategory + dir;
+    }
+  }
+
+  private void moveInvItems(int dir, int check) {
+    if (invSelectedLine != check) {
+      invSelectedLine = invSelectedLine + dir;
+    } else {
+      invStartingIndex = invStartingIndex + dir;
+    }
+    invSelectedIndex = invStartingIndex + invSelectedLine;
+  }
+
+  private void moveInventory(int bound, int dir, int check1, int check2) {
+    if (invSelectedIndex != bound && !invMiniPanel) {
+      moveInvItems(dir, check1);
+    } else if (invMiniPanel) {
+      moveMiniSelection(dir, check2);
+    }
+  }
+
+  private void moveMiniSelection(int dir, int check) {
+    if (miniSelectedLine != check) {
+      miniSelectedLine += dir;
+    } else {
+      miniSelectedLine = check - dir * 3;
+    }
+  }
+
+  private void resetInventory() {
+    invMiniPanel = false;
+    invSelectedIndex = 0;
+    invSelectedLine = 0;
+    invStartingIndex = 0;
+    miniSelectedLine = 0;
   }
 
   private void showInv(Set<Entry<String, Integer>> entrySet, String category, int categoryX,
@@ -204,50 +203,8 @@ public class GameArea extends JTextArea {
     return displayState;
   }
 
-  private String getPlayerStat(int i, Player player) {
-    switch (i) {
-      case 0:
-        return player.getName();
-      case 2:
-        return player.getHp() + " / " + player.getMaxHp();
-      case 3:
-        return player.getMp() + " / " + player.getMaxMp();
-      case 4:
-        return player.getSp() + " / " + player.getMaxSp();
-      case 6:
-        return Integer.toString(player.getDexterity());
-      case 7:
-        return Integer.toString(player.getMagic());
-      case 8:
-        return Integer.toString(player.getStrength());
-      case 10:
-        return String.valueOf(player.getSpeed());
-      default:
-        return "";
-    }
-  }
-
-  private String getPlayerStatString(int i) {
-    switch (i) {
-      case 0:
-        return "Name:";
-      case 2:
-        return "Hit Points:";
-      case 3:
-        return "Mana Points:";
-      case 4:
-        return "Stamina Points:";
-      case 6:
-        return "Dexterity:";
-      case 7:
-        return "Magic:";
-      case 8:
-        return "Strength:";
-      case 10:
-        return "Speed:";
-      default:
-        return "";
-    }
+  public int getInvCategory() {
+    return invCategory;
   }
 
   public void addText(String text) {
@@ -255,21 +212,25 @@ public class GameArea extends JTextArea {
   }
 
   /**
-   * Sets text and changes state and the line where selection starts at.
+   * Shows the given displaystate.
 
-   * @param text Text to set. (String)
-   * @param state State to set gamearea to. Use constants contained in class.
-   * @param startingLine Line to start selection from.
+   * @param displayState (DisplayStates)
    */
-  public void setText(String text, TextStates state, int startingLine) {
-    setText(text);
-    this.textState = state;
-    this.startingLine = startingLine;
-    selectedLine = startingLine;
+  public void changeDisplayState(DisplayStates displayState) {
+    if (this.displayState == displayState) {
+      this.displayState = DisplayStates.DEFAULT;
+    } else {
+      this.displayState = displayState;
+      if (displayState == DisplayStates.INVENTORY) {
+        invCategory = 1;
+        resetInventory();
+      }
+    }
+    updateUI();
   }
 
   /**
-   * Moves selection.
+   * Moves selection in GameArea.
 
    * @param dir 'u' == up, 'd' == down, 'l' == left, 'r' == right (char)
    */
@@ -278,15 +239,15 @@ public class GameArea extends JTextArea {
       case 'u':
         if (displayState == DisplayStates.DEFAULT && selectedLine > startingLine) {
           selectedLine--;
-        } else if (displayState == DisplayStates.INVENTORY && invSelectedIndex != 0) {
-          moveInvItems(-1, 0);
+        } else if (displayState == DisplayStates.INVENTORY) {
+          moveInventory(0, -1, 0, 0);
         }
         break;
       case 'd':
         if (displayState == DisplayStates.DEFAULT && selectedLine <= getLineCount() - 2) {
           selectedLine++;
-        } else if (displayState == DisplayStates.INVENTORY && invSelectedIndex != invItems) {
-          moveInvItems(1, 8);
+        } else if (displayState == DisplayStates.INVENTORY) {
+          moveInventory(invItems, 1, 8, 3);
         }
         break;
       case 'l':
@@ -301,19 +262,120 @@ public class GameArea extends JTextArea {
     updateUI();
   }
 
-  private void moveInvCategory(int dir, int check) {
-    if (displayState == DisplayStates.INVENTORY && invCategory != check) {
-      invCategory = invCategory + dir;
+  @Override
+  public void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    int fontHeight = g.getFontMetrics().getHeight();
+    int width = getWidth();
+    int choosingRectWidth = width - CHOOSING_RECT_WIDTH_REDUCTION;
+    g.setColor(CHOOSING_RECT_COLOR);
+    g.fillRect(
+        CHOOSING_RECT_X,
+        LINE_BORDER_WIDTH + fontHeight * selectedLine,
+        choosingRectWidth,
+        fontHeight
+    );
+    if (displayState != DisplayStates.DEFAULT) {
+      int height = getHeight();
+      int panelX = width / 10;
+      int panelY = height / 10;
+      int panelWidth = panelX * 7;
+      int panelHeight = panelY * 7;
+      player = App.getMainWindow().getGame().getPlayer();
+      g.setColor(Color.BLACK);
+      g.fillRect(panelX, panelY, panelWidth, panelHeight);
+      g.setColor(Color.GREEN);
+      g.drawRect(panelX, panelY, panelWidth, panelHeight);
+      g.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 30));
+      ((Graphics2D) g).setRenderingHint(
+          RenderingHints.KEY_TEXT_ANTIALIASING,
+          RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+      );
+      FontMetrics fontMetrics = g.getFontMetrics();
+      int stringX = panelX + fontMetrics.getMaxAdvance();
+      int secondColumnX = stringX + panelWidth / 2;
+      fontHeight = fontMetrics.getHeight();
+      int stringY = (int) (panelY + fontHeight * 1.5);
+      switch (displayState) {
+        case CHARACTER:
+          for (int i = 0; i < 11; i++) {
+            int textHeight = stringY + fontHeight * i;
+            g.drawString(PLAYER_STAT_STRINGS[i], stringX, textHeight);
+            g.drawString(getPlayerStat(i), secondColumnX, textHeight);
+          }
+          break;
+        case EQUIPMENT:
+          g.drawString(PLAYER_STAT_STRINGS[0], stringX, stringY);
+          g.drawString(getPlayerStat(0), secondColumnX, stringY);
+          g.drawString(
+              "Weapon:  " + player.getWeapon().getName(), 
+              stringX, 
+              stringY + fontHeight * 2
+          );
+          g.drawString(
+              "Armor:   " + player.getArmor().getName(),
+              stringX,
+              stringY + fontHeight * 3
+          );
+          break;
+        case INVENTORY:
+          itemNameList.clear();
+          int maxAdvance = fontMetrics.getMaxAdvance();
+          int category2X = stringX + (panelWidth - maxAdvance) / 3;
+          int category3X = stringX + (panelWidth - maxAdvance) / 3 * 2;
+          g.drawString("Items", stringX, stringY);
+          g.drawString("Weapons", category2X, stringY);
+          g.drawString("Armors", category3X, stringY);
+          switch (invCategory) {
+            case 1:
+              showInv(
+                  player.getInventory().getItems().entrySet(), "Items", stringX,
+                  g, panelWidth, stringX, stringY
+              );
+              break;
+            case 2:
+              showInv(
+                  player.getInventory().getWeapons().entrySet(), "Weapons", category2X,
+                  g, panelWidth, stringX, stringY
+              );
+              break;
+            case 3:
+              showInv(
+                  player.getInventory().getArmors().entrySet(), "Armors", category3X,
+                  g, panelWidth, stringX, stringY
+              );
+              break;
+            default:
+              break;
+          }
+          if (invMiniPanel) {
+            int miniWidth = panelWidth / 5;
+            int miniHeight = panelHeight / 3;
+            int miniY = stringY + fontHeight * (invSelectedLine + 2);
+            g.setColor(Color.BLACK);
+            g.fillRect(secondColumnX, miniY, miniWidth, miniHeight);
+            g.setColor(Color.GREEN);
+            g.drawRect(secondColumnX, miniY, miniWidth, miniHeight);
+            item = player.getInventory().getItem(itemNameList.get(invSelectedIndex));
+            int miniStringHeight = miniY + fontMetrics.getMaxDescent() * 3;
+            int miniStringX = secondColumnX + miniWidth / 2;
+            itemOptionCheck(item, Usable.class, "Use", 0, g, miniStringHeight, miniStringX);
+            itemOptionCheck(item, Equippable.class, "Equip", 1, g, miniStringHeight, miniStringX);
+            itemOptionCheck(item, Droppable.class, "Drop", 2, g, miniStringHeight, miniStringX);
+            itemOptionCheck(item, Object.class, "Cancel", 3, g, miniStringHeight, miniStringX);
+            g.setColor(CHOOSING_RECT_COLOR);
+            g.fillRect(secondColumnX, miniY + fontHeight * miniSelectedLine, miniWidth, fontHeight);
+          }
+          break;
+        case MAP:
+          break;
+        case MESSAGE:
+          g.drawString(message, panelX + panelWidth / 2, panelY + panelHeight / 2);
+          break;
+        default:
+          break;
+      }
     }
-  }
-
-  private void moveInvItems(int dir, int check) {
-    if (invSelectedLine != check) {
-      invSelectedLine = invSelectedLine + dir;
-    } else {
-      invStartingIndex = invStartingIndex + dir;
-    }
-    invSelectedIndex = invStartingIndex + invSelectedLine;
   }
 
   /**
@@ -322,35 +384,60 @@ public class GameArea extends JTextArea {
    * @return (int)
    */
   public int select() {
-    if (displayState == DisplayStates.INVENTORY) {
-      if (invMiniPanel) {
-        invMiniPanel = false;
-      } else {
-        invMiniPanel = true;
+    if (displayState != DisplayStates.DEFAULT) {
+      switch (displayState) {
+        case INVENTORY:
+          if (invMiniPanel) {
+            switch (miniSelectedLine) {
+              case 0:
+                ((Usable) item).use(player);
+                showMessage("Used ");
+                break;
+              case 1:
+                ((Equippable) item).equip(player);
+                showMessage("Equipped ");
+                break;
+              case 2:
+                ((Droppable) item).drop(player);
+                break;
+              default:
+                break;
+            }
+            invMiniPanel = false;
+          } else {
+            miniSelectedLine = 0;
+            invMiniPanel = true;
+          }
+          break;
+        case MESSAGE:
+          displayState = DisplayStates.INVENTORY;
+          break;
+        default:
+          break;
       }
       updateUI();
-    }
-    if (textState == TextStates.CHOOSING) {
+    } else if (textState == TextStates.CHOOSING) {
       return selectedLine - startingLine + 1;
     }
-    return 0; 
+    return 0;
+  }
+
+  private void showMessage(String string) {
+    message = string + item.getName();
+    displayState = DisplayStates.MESSAGE;
   }
 
   /**
-   * Shows the given displaystate.
+   * Sets text and changes state and the line where selection starts at.
 
-   * @param displayState (DisplayStates)
+   * @param text Text to set. (String)
+   * @param state State to set gamearea to. Use constants contained in class.
+   * @param startingLine Line to start selection from.
    */
-  public void changeDisplayState(DisplayStates displayState) {
-    if (this.displayState == displayState) {
-      this.displayState = DisplayStates.DEFAULT;
-    } else {
-      this.displayState = displayState;
-    }
-    updateUI();
-  }
-
-  public int getInvCategory() {
-    return invCategory;
+  public void setText(String text, TextStates state, int startingLine) {
+    setText(text);
+    this.textState = state;
+    this.startingLine = startingLine;
+    selectedLine = startingLine;
   }
 }

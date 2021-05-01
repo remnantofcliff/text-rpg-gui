@@ -1,10 +1,10 @@
 package entity.interfaces;
 
-import entity.characters.Player;
+import entity.BattleCharacter;
 
 /**
  * For items that can be equipped.
  */
 public interface Equippable {
-  void equip(Player player);
+  void equip(BattleCharacter battleCharacter);
 }

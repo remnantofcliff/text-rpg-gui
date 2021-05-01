@@ -1,5 +1,6 @@
 package entity;
 
+import inventory.Inventory;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import java.util.List;
 public abstract class BattleCharacter extends Entity {
   protected Armor armor;
   protected List<String> statusEffects = new ArrayList<>();
+  protected Inventory inventory = new Inventory();
   protected Weapon weapon;
   protected double hp;
   protected double mp;
@@ -20,6 +22,10 @@ public abstract class BattleCharacter extends Entity {
   
   public Armor getArmor() {
     return armor;
+  }
+
+  public Inventory getInventory() {
+    return inventory;
   }
 
   /**

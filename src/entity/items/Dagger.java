@@ -1,7 +1,7 @@
 package entity.items;
 
+import entity.BattleCharacter;
 import entity.Weapon;
-import entity.characters.Player;
 import entity.interfaces.Droppable;
 import entity.interfaces.Equippable;
 
@@ -23,12 +23,12 @@ public class Dagger extends Weapon implements Droppable, Equippable {
   }
 
   @Override
-  public void equip(Player player) {
-    player.setWeapon(this);
+  public void equip(BattleCharacter battleCharacter) {
+    battleCharacter.setWeapon(this);
   }
 
   @Override
-  public void drop(Player player) {
-    player.getInventory().remove(this);
+  public void drop(BattleCharacter battleCharacter) {
+    battleCharacter.getInventory().remove(this);
   }
 }

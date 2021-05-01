@@ -185,7 +185,7 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
         gameArea.moveSelection('r');
         break;
       case KeyEvent.VK_ENTER:
-        if (gameArea.getDisplayState() == DisplayStates.INVENTORY) {
+        if (gameArea.getDisplayState() != DisplayStates.DEFAULT) {
           gameArea.select();
         } else {
           game.setInput(gameArea.select());

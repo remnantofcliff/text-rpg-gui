@@ -1,10 +1,10 @@
 package entity.interfaces;
 
-import entity.characters.Player;
+import entity.BattleCharacter;
 
 /**
  * Interface for droppable items.
  */
 public interface Droppable {
-  void drop(Player player);
+  void drop(BattleCharacter battleCharacter);
 }

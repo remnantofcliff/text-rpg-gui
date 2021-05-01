@@ -7,13 +7,11 @@ import entity.items.Antidote;
 import entity.items.Fists;
 import entity.items.HealthPotion;
 import entity.items.Rags;
-import inventory.Inventory;
 
 /**
  * Player character class.
  */
 public class Player extends BattleCharacter {
-  private Inventory inventory = new Inventory();
   private String profession;
 
   /**
@@ -39,10 +37,6 @@ public class Player extends BattleCharacter {
     }
     weapon = (Weapon) inventory.getItem("Fists");
     armor = (Armor) inventory.getItem("Rags");
-  }
-
-  public Inventory getInventory() {
-    return inventory;
   }
 
   public String getProfession() {

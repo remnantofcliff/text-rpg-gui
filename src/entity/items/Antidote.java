@@ -2,7 +2,6 @@ package entity.items;
 
 import entity.BattleCharacter;
 import entity.Item;
-import entity.characters.Player;
 import entity.interfaces.Droppable;
 import entity.interfaces.Usable;
 
@@ -17,11 +16,12 @@ public class Antidote extends Item implements Droppable, Usable {
 
   @Override
   public boolean use(BattleCharacter battleCharacter) {
+    drop(battleCharacter);
     return battleCharacter.getStatusEffects().remove("Poisoned");
   }
 
   @Override
-  public void drop(Player player) {
-    player.getInventory().remove(this);
+  public void drop(BattleCharacter battleCharacter) {
+    battleCharacter.getInventory().remove(this);
   }
 }
