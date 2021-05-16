@@ -1,4 +1,4 @@
-package entity.items;
+package entity.items.weapons;
 
 import entity.BattleCharacter;
 import entity.Weapon;

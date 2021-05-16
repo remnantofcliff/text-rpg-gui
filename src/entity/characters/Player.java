@@ -3,17 +3,15 @@ package entity.characters;
 import entity.Armor;
 import entity.BattleCharacter;
 import entity.Weapon;
-import entity.items.Antidote;
-import entity.items.Fists;
-import entity.items.HealthPotion;
-import entity.items.Rags;
+import entity.items.armors.Rags;
+import entity.items.weapons.Fists;
 
 /**
  * Player character class.
  */
 public class Player extends BattleCharacter {
   private String profession;
-
+  
   /**
    * Creates a new player-object.
    */
@@ -31,10 +29,6 @@ public class Player extends BattleCharacter {
     strength = 1;
     inventory.add(new Fists());
     inventory.add(new Rags());
-    for (int i = 0; i < 20; i++) {
-      inventory.add(new HealthPotion());
-      inventory.add(new Antidote());
-    }
     weapon = (Weapon) inventory.getItem("Fists");
     armor = (Armor) inventory.getItem("Rags");
   }

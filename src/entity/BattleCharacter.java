@@ -27,7 +27,6 @@ public abstract class BattleCharacter extends Entity {
   public Inventory getInventory() {
     return inventory;
   }
-
   /**
    * Adds the parameter amount of hp. If larger than maxHp, sets hp to maxHp.
 
@@ -43,7 +42,6 @@ public abstract class BattleCharacter extends Entity {
     }
     return true;
   }
-
   /**
    * Removes the parameter amount of hp. If smaller than 0, sets hp to 0.
 
@@ -55,7 +53,7 @@ public abstract class BattleCharacter extends Entity {
       hp = 0;
     }
   }
-
+  
   public void setArmor(Armor armor) {
     this.armor = armor;
   }

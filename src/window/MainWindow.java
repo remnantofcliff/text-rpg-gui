@@ -2,14 +2,11 @@ package window;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -21,6 +18,7 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import main.Game;
+import window.GameArea.Directions;
 
 /**
  * The main-game window.
@@ -28,13 +26,12 @@ import main.Game;
 public class MainWindow extends Window implements ActionListener, KeyListener {
   private Color color = new Color(255, 250, 236);
   private GameArea gameArea;
-  private SettingsWindow settingsWindow;
   private int gameFontSize = 34;
   private static final String FONT_STRING = "Constantia";
   private static final String[] buttonNames = { "Start", "Load", "Settings", "Quit" };
-  private static final String[] menuItemNames = 
-    { "Character", "Equipment", "Inventory", "Map", "Menu" };
   private static final String[] menuItemNameKeys = { "C", "E", "I", "M", "ESCAPE" };
+  private static final String[] menuItemNames =
+    { "Character", "Equipment", "Inventory", "Map", "Menu" };
   private transient Game game;
 
   /**
@@ -42,17 +39,8 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
    */
   public MainWindow() {
     super("Main Window", 1024, 768);
-    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    addWindowListener(new WindowAdapter() {
-      @Override
-      public void windowActivated(WindowEvent e) {
-        if (!isEnabled()) {
-          settingsWindow.setState(Frame.NORMAL);
-          settingsWindow.requestFocus();
-        }
-      }
-    });
     addKeyListener(this);
+    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     menuScreen();
   }
 
@@ -90,8 +78,8 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
     Font buttonFont = new Font(FONT_STRING, Font.ITALIC, 20);
     for (int i = 0; i < buttons.length; i++) {
       buttons[i] = new JButton(buttonNames[i]);
-      buttons[i].setActionCommand(buttonNames[i]);
       buttons[i].addActionListener(this);
+      buttons[i].setActionCommand(buttonNames[i]);
       buttons[i].setBackground(color);
       buttons[i].setFocusPainted(false);
       buttons[i].setFont(buttonFont);
@@ -112,16 +100,13 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
   public void actionPerformed(ActionEvent e) {
     switch (e.getActionCommand()) {
       case "Start":
-        reset();
-        gameScreen();
-        game = new Game(gameArea);
-        game.start();
+        startGame(true);
         break;
       case "Load":
+        startGame(false);
         break;
       case "Settings":
-        settingsWindow = new SettingsWindow();
-        setEnabled(false);
+        new SettingsWindow();
         break;
       case "Quit":
         System.exit(1);
@@ -141,7 +126,8 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
       case "Menu":
         if (
             JOptionPane.showConfirmDialog(this, "Quit to main menu?", "", JOptionPane.YES_NO_OPTION)
-            == 0) {
+            == 0
+        ) {
           reset();
           game.interrupt();
           menuScreen();
@@ -150,6 +136,13 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
       default:
         break;
     }
+  }
+
+  private void startGame(boolean newgame) {
+    reset();
+    gameScreen();
+    game = new Game(gameArea, newgame);
+    game.start();
   }
 
   @Override
@@ -161,28 +154,28 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
   public void keyPressed(KeyEvent e) {
     switch (e.getKeyCode()) {
       case KeyEvent.VK_W:
-        gameArea.moveSelection('u');
+        gameArea.moveSelection(Directions.UP);
         break;
       case KeyEvent.VK_UP:
-        gameArea.moveSelection('u');
+        gameArea.moveSelection(Directions.UP);
         break;
       case KeyEvent.VK_S:
-        gameArea.moveSelection('d');
+        gameArea.moveSelection(Directions.DOWN);
         break;
       case KeyEvent.VK_DOWN:
-        gameArea.moveSelection('d');
+        gameArea.moveSelection(Directions.DOWN);
         break;
       case KeyEvent.VK_A:
-        gameArea.moveSelection('l');
+        gameArea.moveSelection(Directions.LEFT);
         break;
       case KeyEvent.VK_LEFT:
-        gameArea.moveSelection('l');
+        gameArea.moveSelection(Directions.LEFT);
         break;
       case KeyEvent.VK_D:
-        gameArea.moveSelection('r');
+        gameArea.moveSelection(Directions.RIGHT);
         break;
       case KeyEvent.VK_RIGHT:
-        gameArea.moveSelection('r');
+        gameArea.moveSelection(Directions.RIGHT);
         break;
       case KeyEvent.VK_ENTER:
         if (gameArea.getDisplayState() != DisplayStates.DEFAULT) {
@@ -200,9 +193,20 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
   public void keyReleased(KeyEvent e) {
     //
   }
+  /**
+   * Sets the font size for the game.
 
-  public void setGameFontSize(int gameFontSize) {
-    this.gameFontSize = gameFontSize;
+   * @param size font size (int)
+   */
+  public void setGameFontSize(int size) {
+    if (gameArea != null) {
+      gameArea.setFont(new Font("Times New Roman", Font.ITALIC, size));
+    }
+    gameFontSize = size;
+  }
+
+  public Color getColor() {
+    return color;
   }
 
   public Game getGame() {

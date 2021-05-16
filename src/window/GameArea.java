@@ -20,7 +20,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import main.App;
-import main.TextStates;
+import main.Game.TextStates;
 
 /**
  * Game screen where graphics and text gets drawn.
@@ -61,7 +61,6 @@ public class GameArea extends JTextArea {
   private transient Item item;
   private transient List<String> itemNameList = new ArrayList<>();
   private transient Player player;
-
   /**
    * Gameplay area.
 
@@ -199,6 +198,11 @@ public class GameArea extends JTextArea {
     );
   }
 
+  private void showMessage(String string) {
+    message = string + item.getName();
+    displayState = DisplayStates.MESSAGE;
+  }
+
   public DisplayStates getDisplayState() {
     return displayState;
   }
@@ -207,8 +211,17 @@ public class GameArea extends JTextArea {
     return invCategory;
   }
 
+  /**
+   * Adds the string to the gameArea.
+
+   * @param text (String)
+   */
   public void addText(String text) {
-    setText(getText() + "\n" + text);
+    if (getText().equals("")) {
+      setText(text);
+    } else {
+      setText(getText() + " " + text);
+    }
   }
 
   /**
@@ -232,28 +245,34 @@ public class GameArea extends JTextArea {
   /**
    * Moves selection in GameArea.
 
-   * @param dir 'u' == up, 'd' == down, 'l' == left, 'r' == right (char)
+   * @param direction (Direction)
    */
-  public void moveSelection(char dir) {
-    switch (dir) {
-      case 'u':
-        if (displayState == DisplayStates.DEFAULT && selectedLine > startingLine) {
+  public void moveSelection(Directions direction) {
+    switch (direction) {
+      case UP:
+        if (displayState == DisplayStates.DEFAULT 
+            && selectedLine > startingLine 
+            && textState != TextStates.TEXT
+        ) {
           selectedLine--;
-        } else if (displayState == DisplayStates.INVENTORY) {
+        } else if (displayState == DisplayStates.INVENTORY && invItems != -1) {
           moveInventory(0, -1, 0, 0);
         }
         break;
-      case 'd':
-        if (displayState == DisplayStates.DEFAULT && selectedLine <= getLineCount() - 2) {
+      case DOWN:
+        if (displayState == DisplayStates.DEFAULT 
+            && selectedLine <= getLineCount() - 2 
+            && textState != TextStates.TEXT
+        ) {
           selectedLine++;
-        } else if (displayState == DisplayStates.INVENTORY) {
+        } else if (displayState == DisplayStates.INVENTORY && invItems != -1) {
           moveInventory(invItems, 1, 8, 3);
         }
         break;
-      case 'l':
+      case LEFT:
         moveInvCategory(-1, 1);
         break;
-      case 'r':
+      case RIGHT:
         moveInvCategory(1, 3);
         break;
       default:
@@ -269,12 +288,14 @@ public class GameArea extends JTextArea {
     int width = getWidth();
     int choosingRectWidth = width - CHOOSING_RECT_WIDTH_REDUCTION;
     g.setColor(CHOOSING_RECT_COLOR);
-    g.fillRect(
-        CHOOSING_RECT_X,
-        LINE_BORDER_WIDTH + fontHeight * selectedLine,
-        choosingRectWidth,
-        fontHeight
-    );
+    if (textState != TextStates.TEXT) {
+      g.fillRect(
+          CHOOSING_RECT_X,
+          LINE_BORDER_WIDTH + fontHeight * selectedLine,
+          choosingRectWidth,
+          fontHeight
+      );
+    }
     if (displayState != DisplayStates.DEFAULT) {
       int height = getHeight();
       int panelX = width / 10;
@@ -295,7 +316,7 @@ public class GameArea extends JTextArea {
       int stringX = panelX + fontMetrics.getMaxAdvance();
       int secondColumnX = stringX + panelWidth / 2;
       fontHeight = fontMetrics.getHeight();
-      int stringY = (int) (panelY + fontHeight * 1.5);
+      int stringY = panelY + fontHeight * 3 / 2;
       switch (displayState) {
         case CHARACTER:
           for (int i = 0; i < 11; i++) {
@@ -320,9 +341,14 @@ public class GameArea extends JTextArea {
           break;
         case INVENTORY:
           itemNameList.clear();
-          int maxAdvance = fontMetrics.getMaxAdvance();
-          int category2X = stringX + (panelWidth - maxAdvance) / 3;
-          int category3X = stringX + (panelWidth - maxAdvance) / 3 * 2;
+          int temp = (panelWidth - fontMetrics.getMaxAdvance()) / 3;
+          int category2X = stringX + temp;
+          int category3X = stringX + temp * 2;
+          g.drawString(
+              "Gold:" + player.getInventory().getGold(),
+              category3X,
+              panelY + fontHeight - fontMetrics.getMaxDescent()
+          );
           g.drawString("Items", stringX, stringY);
           g.drawString("Weapons", category2X, stringY);
           g.drawString("Armors", category3X, stringY);
@@ -370,7 +396,11 @@ public class GameArea extends JTextArea {
         case MAP:
           break;
         case MESSAGE:
-          g.drawString(message, panelX + panelWidth / 2, panelY + panelHeight / 2);
+          g.drawString(
+              message,
+              panelX + panelWidth / 2 - fontMetrics.stringWidth(message) / 2,
+              panelY + panelHeight / 2 - fontHeight / 2
+          );
           break;
         default:
           break;
@@ -422,22 +452,23 @@ public class GameArea extends JTextArea {
     return 0;
   }
 
-  private void showMessage(String string) {
-    message = string + item.getName();
-    displayState = DisplayStates.MESSAGE;
-  }
-
   /**
-   * Sets text and changes state and the line where selection starts at.
+   * Changes the text-state.
 
-   * @param text Text to set. (String)
-   * @param state State to set gamearea to. Use constants contained in class.
-   * @param startingLine Line to start selection from.
+   * @param textState (TextStates)
+   * @param startingLine The line to start selection at, 0 if no selection. (int)
    */
-  public void setText(String text, TextStates state, int startingLine) {
-    setText(text);
-    this.textState = state;
+  public void setTextState(TextStates textState, int startingLine) {
+    this.textState = textState;
     this.startingLine = startingLine;
     selectedLine = startingLine;
+  }
+  
+  public void clear() {
+    setText("");
+  }
+
+  enum Directions {
+    DOWN, LEFT, RIGHT, UP
   }
 }

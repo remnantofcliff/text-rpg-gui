@@ -1,7 +1,0 @@
-@TEXT 0
-Your name is @player_name@.
-@CHOOSING 3
-Your name is @player_name@.
-Is this correct?
--Yes
--No

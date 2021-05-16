@@ -7,7 +7,6 @@ public abstract class Armor extends Item {
   protected int flatAbsorption;
   protected double physicalAbsorption;
   protected double magicAbsorption;
-
   /**
    * Returns damage after calculating negation by armor.
 
@@ -22,7 +21,7 @@ public abstract class Armor extends Item {
     }
     return flat * physicalAbsorption;
   }
-
+  
   @Override
   public boolean equals(Object obj) {
     return super.equals(obj);

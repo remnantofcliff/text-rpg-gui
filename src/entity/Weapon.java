@@ -9,7 +9,6 @@ public abstract class Weapon extends Item {
   protected double magicModifier;
   protected double strengthModifier;
   protected double range;
-
   /**
    * Calculates the damage that the weapon does given player stats.
 

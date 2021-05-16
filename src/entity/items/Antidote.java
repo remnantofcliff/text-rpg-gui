@@ -9,7 +9,6 @@ import entity.interfaces.Usable;
  * Antidote item. Implements Droppable, Usable.
  */
 public class Antidote extends Item implements Droppable, Usable {
-
   public Antidote() {
     name = "Antidote";
   }

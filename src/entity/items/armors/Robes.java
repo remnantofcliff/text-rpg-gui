@@ -1,4 +1,4 @@
-package entity.items;
+package entity.items.armors;
 
 import entity.Armor;
 import entity.BattleCharacter;
@@ -6,18 +6,17 @@ import entity.interfaces.Droppable;
 import entity.interfaces.Equippable;
 
 /**
- * Rags-armor.
+ * Robes-armor.
  */
-public class Rags extends Armor implements Droppable, Equippable {
-  
+public class Robes extends Armor implements Droppable, Equippable {
   /**
-   * Sets initial values.
+   * Sets initial values for robes.
    */
-  public Rags() {
-    name = "Rags";
-    flatAbsorption = 0;
-    physicalAbsorption = 0;
-    magicAbsorption = 0.1;
+  public Robes() {
+    name = "Robes";
+    flatAbsorption = 2;
+    physicalAbsorption = 0.1;
+    magicAbsorption = 0.2;
   }
 
   @Override
@@ -27,6 +26,9 @@ public class Rags extends Armor implements Droppable, Equippable {
 
   @Override
   public void drop(BattleCharacter battleCharacter) {
+    if (battleCharacter.getArmor() == this) {
+      battleCharacter.setArmor(Naked.getInstance());
+    }
     battleCharacter.getInventory().remove(this);
   }
 }

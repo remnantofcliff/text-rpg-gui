@@ -3,6 +3,7 @@ package inventory;
 import entity.Armor;
 import entity.Item;
 import entity.Weapon;
+import entity.items.CustomItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,7 +16,8 @@ import main.App;
  * Player's inventory.
  */
 public class Inventory {
-  List<Item> container = new ArrayList<>();
+  private List<Item> container = new ArrayList<>();
+  private int gold;
 
   public Inventory() {
     //
@@ -47,13 +49,29 @@ public class Inventory {
     return getType(Item.class);
   }
 
+  public boolean hasGold(int gold) {
+    return this.gold >= gold;
+  }
+
+  public int getGold() {
+    return gold;
+  }
+
   public void add(Item item) {
     container.add(item);
     Collections.sort(container);
   }
 
+  public void addGold(int gold) {
+    this.gold += gold;
+  }
+
   public void remove(Item item) {
     container.remove(item);
+  }
+
+  public void removeGold(int gold) {
+    this.gold -= gold;
   }
 
   /**
@@ -63,8 +81,9 @@ public class Inventory {
    * @return (Item)
    */
   public Item getItem(String name) {
+    Item compareItem = new CustomItem(name);
     for (Item item : container) {
-      if (item.getName().equals(name)) {
+      if (item.compareTo(compareItem) == 0) {
         return item;
       }
     }

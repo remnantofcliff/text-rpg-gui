@@ -1,7 +1,0 @@
-@TEXT 0
-Try to remember your profession.
-@CHOOSING 2
-Try to remember your profession.
--Soldier
--Thief
--Mage

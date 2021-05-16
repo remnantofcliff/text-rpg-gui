@@ -10,9 +10,7 @@ import java.util.Scanner;
  * Contains static methods for reading files.
  */
 public class FileHandler {
-
   private FileHandler(){}
-  
   /**
    * Reads text files for the game. Adds the lines to a list and returns it.
 

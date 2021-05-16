@@ -10,7 +10,7 @@ import window.MainWindow;
 public class App {
   private static MainWindow mainWindow;
   public static final Logger LOGGER = Logger.getLogger("Logger");
-
+  
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> mainWindow = new MainWindow());
   }
