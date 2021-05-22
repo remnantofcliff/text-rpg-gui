@@ -14,15 +14,26 @@ import java.util.Map;
 public class DretnosVendor1 extends Entity implements Vendor {
   public DretnosVendor1() {
     name = "Dialys";
+    
   }
 
   @Override
-  public String[] greeting() {
-    return new String[] { "I sell everything I can scavenge from the fields.." };
+  public String greeting() {
+    return "\"I sell everything I can scavenge from the fields..\"";
   }
 
   @Override
-  public Map<Item, Integer> prices() {
-    return Map.of(new HealthPotion(), 10, new Dagger(), 15, new Club(), 20);
+  public Map<String, Integer> prices() {
+    return Map.of("Health Potion", 10, "Dagger", 15, "Club", 20);
+  }
+
+  @Override
+  public Item getItem(String name) {
+    switch (name) {
+      case"Health Potion": return new HealthPotion();
+      case"Dagger": return new Dagger();
+      case"Club": return new Club();
+      default: return null;
+    }
   }
 }

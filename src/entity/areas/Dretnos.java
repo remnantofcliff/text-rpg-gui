@@ -1,7 +1,8 @@
 package entity.areas;
 
-import action.Action;
+import entity.Action;
 import entity.Area;
+import entity.actions.DretnosAction1;
 import entity.characters.DretnosFarmer;
 import entity.characters.DretnosVendor1;
 import entity.characters.DretnosVendor2;
@@ -18,15 +19,18 @@ public class Dretnos extends Area implements Leavable {
    */
   public Dretnos() {
     name = "Dretnos";
-    description =
-        "A small town built in a cavern with a dozen people. "
-      + "There's a some farmland with Girnots growing in them.";
+    description = """
+      A small town built in a cavern with about a dozen people.
+      There's some farmland with girnots growing in them. \
+      A farmer is working the lands.
+      The small cavern has two layers and the people are living in holes in the walls of the cavern.
+      """;
     location = "Western Dereliquerat";
     vendors = new Vendor[] {new DretnosVendor1(), new DretnosVendor2()};
     talkers = new Talker[] {new DretnosFarmer()};
-    actions = new Action[] {};
+    actions = new Action[] {new DretnosAction1()};
   }
-  
+
   @Override
   public String[] getDirections() {
     return new String[] {"Exit to the east"};
@@ -34,6 +38,6 @@ public class Dretnos extends Area implements Leavable {
 
   @Override
   public Area nextLocation(String direction) {
-    return null;
+    return this;
   }
 }

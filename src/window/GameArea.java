@@ -7,7 +7,6 @@ import entity.interfaces.Equippable;
 import entity.interfaces.Usable;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -84,24 +83,15 @@ public class GameArea extends JTextArea {
 
   private String getPlayerStat(int i) {
     switch (i) {
-      case 0:
-        return player.getName();
-      case 2:
-        return player.getHp() + " / " + player.getMaxHp();  
-      case 3:
-        return player.getMp() + " / " + player.getMaxMp();
-      case 4:
-        return player.getSp() + " / " + player.getMaxSp();
-      case 6:
-        return Integer.toString(player.getDexterity());
-      case 7:
-        return Integer.toString(player.getMagic());
-      case 8:
-        return Integer.toString(player.getStrength());
-      case 10:
-        return String.valueOf(player.getSpeed());
-      default:
-        return "";
+      case 0: return player.getName();
+      case 2: return player.getHp() + " / " + player.getMaxHp();
+      case 3: return player.getMp() + " / " + player.getMaxMp();
+      case 4: return player.getSp() + " / " + player.getMaxSp();
+      case 6: return Integer.toString(player.getDexterity());
+      case 7: return Integer.toString(player.getMagic());
+      case 8: return Integer.toString(player.getStrength());
+      case 10: return String.valueOf(player.getSpeed());
+      default: return "";
     }
   }
 
@@ -109,7 +99,7 @@ public class GameArea extends JTextArea {
       Item item, Class<?> check, String name, int i,
       Graphics g, int miniStringHeight, int miniStringX
   ) {
-    FontMetrics fontMetrics = g.getFontMetrics();
+    var fontMetrics = g.getFontMetrics();
     if (check.isInstance(item)) {
       g.drawString(
           name,
@@ -162,9 +152,9 @@ public class GameArea extends JTextArea {
   private void showInv(Set<Entry<String, Integer>> entrySet, String category, int categoryX,
       Graphics g, int panelWidth, int stringX, int stringY
   ) {
-    FontMetrics fontMetrics = g.getFontMetrics();
+    var fontMetrics = g.getFontMetrics();
     int fontHeight = fontMetrics.getHeight();
-    int i = 0;
+    var i = 0;
     invItems = entrySet.size() - 1;
     for (Entry<String, Integer> entry : entrySet) {
       itemNameList.add(entry.getKey());
@@ -177,7 +167,7 @@ public class GameArea extends JTextArea {
             stringX,
             stringY + fontHeight * ((i - invStartingIndex) + 2)
         );
-        String numberString = entry.getValue().toString();
+        var numberString = entry.getValue().toString();
         g.drawString(
             numberString,
             panelWidth - fontMetrics.stringWidth(numberString),
@@ -249,8 +239,7 @@ public class GameArea extends JTextArea {
    */
   public void moveSelection(Directions direction) {
     switch (direction) {
-      case UP:
-        if (displayState == DisplayStates.DEFAULT 
+      case UP: if (displayState == DisplayStates.DEFAULT 
             && selectedLine > startingLine 
             && textState != TextStates.TEXT
         ) {
@@ -259,8 +248,7 @@ public class GameArea extends JTextArea {
           moveInventory(0, -1, 0, 0);
         }
         break;
-      case DOWN:
-        if (displayState == DisplayStates.DEFAULT 
+      case DOWN: if (displayState == DisplayStates.DEFAULT 
             && selectedLine <= getLineCount() - 2 
             && textState != TextStates.TEXT
         ) {
@@ -269,14 +257,11 @@ public class GameArea extends JTextArea {
           moveInventory(invItems, 1, 8, 3);
         }
         break;
-      case LEFT:
-        moveInvCategory(-1, 1);
+      case LEFT:moveInvCategory(-1, 1);
         break;
-      case RIGHT:
-        moveInvCategory(1, 3);
+      case RIGHT:moveInvCategory(1, 3);
         break;
-      default:
-        break;
+      default:break;
     }
     updateUI();
   }
@@ -312,25 +297,23 @@ public class GameArea extends JTextArea {
           RenderingHints.KEY_TEXT_ANTIALIASING,
           RenderingHints.VALUE_TEXT_ANTIALIAS_ON
       );
-      FontMetrics fontMetrics = g.getFontMetrics();
+      var fontMetrics = g.getFontMetrics();
       int stringX = panelX + fontMetrics.getMaxAdvance();
       int secondColumnX = stringX + panelWidth / 2;
       fontHeight = fontMetrics.getHeight();
       int stringY = panelY + fontHeight * 3 / 2;
       switch (displayState) {
-        case CHARACTER:
-          for (int i = 0; i < 11; i++) {
+        case CHARACTER: for (var i = 0; i < 11; i++) {
             int textHeight = stringY + fontHeight * i;
             g.drawString(PLAYER_STAT_STRINGS[i], stringX, textHeight);
             g.drawString(getPlayerStat(i), secondColumnX, textHeight);
           }
           break;
-        case EQUIPMENT:
-          g.drawString(PLAYER_STAT_STRINGS[0], stringX, stringY);
+        case EQUIPMENT:g.drawString(PLAYER_STAT_STRINGS[0], stringX, stringY);
           g.drawString(getPlayerStat(0), secondColumnX, stringY);
           g.drawString(
-              "Weapon:  " + player.getWeapon().getName(), 
-              stringX, 
+              "Weapon:  " + player.getWeapon().getName(),
+              stringX,
               stringY + fontHeight * 2
           );
           g.drawString(
@@ -339,8 +322,7 @@ public class GameArea extends JTextArea {
               stringY + fontHeight * 3
           );
           break;
-        case INVENTORY:
-          itemNameList.clear();
+        case INVENTORY:itemNameList.clear();
           int temp = (panelWidth - fontMetrics.getMaxAdvance()) / 3;
           int category2X = stringX + temp;
           int category3X = stringX + temp * 2;
@@ -353,28 +335,24 @@ public class GameArea extends JTextArea {
           g.drawString("Weapons", category2X, stringY);
           g.drawString("Armors", category3X, stringY);
           switch (invCategory) {
-            case 1:
-              showInv(
-                  player.getInventory().getItems().entrySet(), "Items", stringX,
-                  g, panelWidth, stringX, stringY
-              );
+            case 1:showInv(
+                player.getInventory().getItems().entrySet(), "Items", stringX,
+                g, panelWidth, stringX, stringY
+            );
               break;
-            case 2:
-              showInv(
-                  player.getInventory().getWeapons().entrySet(), "Weapons", category2X,
-                  g, panelWidth, stringX, stringY
-              );
+            case 2:showInv(
+                player.getInventory().getWeapons().entrySet(), "Weapons", category2X,
+                g, panelWidth, stringX, stringY
+            );
               break;
-            case 3:
-              showInv(
-                  player.getInventory().getArmors().entrySet(), "Armors", category3X,
-                  g, panelWidth, stringX, stringY
-              );
+            case 3:showInv(
+                player.getInventory().getArmors().entrySet(), "Armors", category3X,
+                g, panelWidth, stringX, stringY
+            );
               break;
-            default:
-              break;
+            default:break;
           }
-          if (invMiniPanel) {
+          if (invMiniPanel && !itemNameList.isEmpty()) {
             int miniWidth = panelWidth / 5;
             int miniHeight = panelHeight / 3;
             int miniY = stringY + fontHeight * (invSelectedLine + 2);
@@ -393,17 +371,14 @@ public class GameArea extends JTextArea {
             g.fillRect(secondColumnX, miniY + fontHeight * miniSelectedLine, miniWidth, fontHeight);
           }
           break;
-        case MAP:
+        case MAP:break;
+        case MESSAGE:g.drawString(
+            message,
+            panelX + panelWidth / 2 - fontMetrics.stringWidth(message) / 2,
+            panelY + panelHeight / 2 - fontHeight / 2
+        );
           break;
-        case MESSAGE:
-          g.drawString(
-              message,
-              panelX + panelWidth / 2 - fontMetrics.stringWidth(message) / 2,
-              panelY + panelHeight / 2 - fontHeight / 2
-          );
-          break;
-        default:
-          break;
+        default:break;
       }
     }
   }
@@ -416,40 +391,43 @@ public class GameArea extends JTextArea {
   public int select() {
     if (displayState != DisplayStates.DEFAULT) {
       switch (displayState) {
-        case INVENTORY:
-          if (invMiniPanel) {
-            switch (miniSelectedLine) {
-              case 0:
-                ((Usable) item).use(player);
-                showMessage("Used ");
-                break;
-              case 1:
-                ((Equippable) item).equip(player);
-                showMessage("Equipped ");
-                break;
-              case 2:
-                ((Droppable) item).drop(player);
-                break;
-              default:
-                break;
-            }
+        case INVENTORY: if (invMiniPanel) {
+            miniPanelSelect();
             invMiniPanel = false;
           } else {
             miniSelectedLine = 0;
             invMiniPanel = true;
           }
           break;
-        case MESSAGE:
-          displayState = DisplayStates.INVENTORY;
+        case MESSAGE:displayState = DisplayStates.INVENTORY;
           break;
-        default:
-          break;
+        default:break;
       }
       updateUI();
     } else if (textState == TextStates.CHOOSING) {
-      return selectedLine - startingLine + 1;
+      return selectedLine - startingLine;
     }
     return 0;
+  }
+
+  private void miniPanelSelect() {
+    switch (miniSelectedLine) {
+      case 0: if (item instanceof Usable u) {
+          u.use(player);
+          showMessage("Used ");
+        }
+        break;
+      case 1: if (item instanceof Equippable e) {
+          e.equip(player);
+          showMessage("Equipped ");
+        }
+        break;
+      case 2: if (item instanceof Droppable d) {
+          d.drop(player);
+        }
+        break;
+      default:break;
+    }
   }
 
   /**
@@ -463,7 +441,7 @@ public class GameArea extends JTextArea {
     this.startingLine = startingLine;
     selectedLine = startingLine;
   }
-  
+
   public void clear() {
     setText("");
   }

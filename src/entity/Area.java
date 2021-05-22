@@ -1,6 +1,5 @@
 package entity;
 
-import action.Action;
 import entity.interfaces.Talker;
 import entity.interfaces.Vendor;
 
@@ -18,6 +17,10 @@ public abstract class Area extends Entity {
     return actions;
   }
   
+  private boolean checkIfEmpty(Object[] objects) {
+    return objects.length != 0;
+  }
+  
   public String getDescription() {
     return description;
   }
@@ -32,5 +35,17 @@ public abstract class Area extends Entity {
 
   public Vendor[] getVendors() {
     return vendors;
+  }
+
+  public boolean hasActions() {
+    return checkIfEmpty(actions);
+  }
+
+  public boolean hasTalkers() {
+    return checkIfEmpty(talkers);
+  }
+
+  public boolean hasVendors() {
+    return checkIfEmpty(vendors);
   }
 }

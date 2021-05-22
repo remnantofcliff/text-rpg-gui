@@ -19,10 +19,6 @@ public class Inventory {
   private List<Item> container = new ArrayList<>();
   private int gold;
 
-  public Inventory() {
-    //
-  }
-
   private Map<String, Integer> getType(Class<?> classToGet) {
     Map<String, Integer> tempMap = new TreeMap<>();
     for (Item item : container) {

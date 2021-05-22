@@ -46,10 +46,10 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
 
   private void gameScreen() {
     setFocusable(true);
-    Font buttonFont = new Font(FONT_STRING, Font.ITALIC, 18);
-    JMenuItem[] menuItems = new JMenuItem[menuItemNames.length];
-    JMenuBar menuBar = new JMenuBar();
-    for (int i = 0; i < menuItems.length; i++) {
+    var buttonFont = new Font(FONT_STRING, Font.ITALIC, 18);
+    var menuItems = new JMenuItem[menuItemNames.length];
+    var menuBar = new JMenuBar();
+    for (var i = 0; i < menuItems.length; i++) {
       menuItems[i] = new JMenuItem(menuItemNames[i]);
       menuItems[i].setActionCommand(menuItemNames[i]);
       menuItems[i].addActionListener(this);
@@ -67,16 +67,16 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
 
   private void menuScreen() {
     setLayout(new GridLayout(0, 1));
-    JLabel title = new JLabel("Game");
-    Font titleFont = new Font(FONT_STRING, Font.ITALIC, 200);
+    var title = new JLabel("Game");
+    var titleFont = new Font(FONT_STRING, Font.ITALIC, 200);
     title.setFont(titleFont);
     title.setHorizontalAlignment(SwingConstants.CENTER);
     title.setBorder(new EmptyBorder(200, 0, 0, 0));
-    JPanel buttonPanel = new JPanel(new GridLayout(0, 1));
+    var buttonPanel = new JPanel(new GridLayout(0, 1));
     buttonPanel.setBorder(new EmptyBorder(60, 400, 100, 400));
-    JButton[] buttons = new JButton[4];
-    Font buttonFont = new Font(FONT_STRING, Font.ITALIC, 20);
-    for (int i = 0; i < buttons.length; i++) {
+    var buttons = new JButton[4];
+    var buttonFont = new Font(FONT_STRING, Font.ITALIC, 20);
+    for (var i = 0; i < buttons.length; i++) {
       buttons[i] = new JButton(buttonNames[i]);
       buttons[i].addActionListener(this);
       buttons[i].setActionCommand(buttonNames[i]);
@@ -99,32 +99,23 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
   @Override
   public void actionPerformed(ActionEvent e) {
     switch (e.getActionCommand()) {
-      case "Start":
-        startGame(true);
+      case "Start":startGame(true);
         break;
-      case "Load":
-        startGame(false);
+      case "Load":startGame(false);
         break;
-      case "Settings":
-        new SettingsWindow();
+      case "Settings":new SettingsWindow();
         break;
-      case "Quit":
-        System.exit(1);
+      case "Quit":System.exit(1);
         break;
-      case "Character":
-        gameArea.changeDisplayState(DisplayStates.CHARACTER);
+      case "Character":gameArea.changeDisplayState(DisplayStates.CHARACTER);
         break;
-      case "Equipment":
-        gameArea.changeDisplayState(DisplayStates.EQUIPMENT);
+      case "Equipment":gameArea.changeDisplayState(DisplayStates.EQUIPMENT);
         break;
-      case "Inventory":
-        gameArea.changeDisplayState(DisplayStates.INVENTORY);
+      case "Inventory":gameArea.changeDisplayState(DisplayStates.INVENTORY);
         break;
-      case "Map":
-        gameArea.changeDisplayState(DisplayStates.MAP);
+      case "Map":gameArea.changeDisplayState(DisplayStates.MAP);
         break;
-      case "Menu":
-        if (
+      case "Menu": if (
             JOptionPane.showConfirmDialog(this, "Quit to main menu?", "", JOptionPane.YES_NO_OPTION)
             == 0
         ) {
@@ -153,39 +144,29 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
   @Override
   public void keyPressed(KeyEvent e) {
     switch (e.getKeyCode()) {
-      case KeyEvent.VK_W:
-        gameArea.moveSelection(Directions.UP);
+      case KeyEvent.VK_W:gameArea.moveSelection(Directions.UP);
         break;
-      case KeyEvent.VK_UP:
-        gameArea.moveSelection(Directions.UP);
+      case KeyEvent.VK_UP:gameArea.moveSelection(Directions.UP);
         break;
-      case KeyEvent.VK_S:
-        gameArea.moveSelection(Directions.DOWN);
+      case KeyEvent.VK_S:gameArea.moveSelection(Directions.DOWN);
         break;
-      case KeyEvent.VK_DOWN:
-        gameArea.moveSelection(Directions.DOWN);
+      case KeyEvent.VK_DOWN:gameArea.moveSelection(Directions.DOWN);
         break;
-      case KeyEvent.VK_A:
-        gameArea.moveSelection(Directions.LEFT);
+      case KeyEvent.VK_A:gameArea.moveSelection(Directions.LEFT);
         break;
-      case KeyEvent.VK_LEFT:
-        gameArea.moveSelection(Directions.LEFT);
+      case KeyEvent.VK_LEFT:gameArea.moveSelection(Directions.LEFT);
         break;
-      case KeyEvent.VK_D:
-        gameArea.moveSelection(Directions.RIGHT);
+      case KeyEvent.VK_D:gameArea.moveSelection(Directions.RIGHT);
         break;
-      case KeyEvent.VK_RIGHT:
-        gameArea.moveSelection(Directions.RIGHT);
+      case KeyEvent.VK_RIGHT:gameArea.moveSelection(Directions.RIGHT);
         break;
-      case KeyEvent.VK_ENTER:
-        if (gameArea.getDisplayState() != DisplayStates.DEFAULT) {
+      case KeyEvent.VK_ENTER: if (gameArea.getDisplayState() != DisplayStates.DEFAULT) {
           gameArea.select();
         } else {
           game.setInput(gameArea.select());
         }
         break;
-      default:
-        break;
+      default:break;
     }
   }
 

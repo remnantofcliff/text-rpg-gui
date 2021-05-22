@@ -1,8 +1,13 @@
 package main;
 
+import entity.Action;
 import entity.Area;
+import entity.Entity;
 import entity.areas.Dretnos;
 import entity.characters.Player;
+import entity.interfaces.Leavable;
+import java.util.ArrayList;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
 import window.GameArea;
@@ -16,15 +21,21 @@ public class Game extends Thread {
   private boolean newgame;
   private int input = -1;
   
+  /**
+   * Constructor for game.
+
+   * @param gameArea The display. (GameArea)
+   * @param newgame Whether to start a new game or load a game. (boolean)
+   */
   public Game(GameArea gameArea, boolean newgame) {
+    setName("Game");
     this.newgame = newgame;
     display = gameArea;
   }
 
   private int waitForInput() {
     //Input is the selected option number. 
-    //1, 2, 3... if option selected
-    //0 if no option to choose
+    //0, 1, 2, 3... if option selected
     //-1 does nothing
     //-2 stops thread
     while (input == -1) {
@@ -72,7 +83,10 @@ public class Game extends Thread {
     clear();
     addText("\"Be careful out there\"");
     addText(
-        "\n\"There's nothing worse than seeing the people I save just die a gruelsome death..,"
+        """
+        
+        There's nothing worse than seeing the people I save just die a gruelsome death..,
+        """
     );
     addText("as many have...\"");
     clear();
@@ -92,7 +106,9 @@ public class Game extends Thread {
     addText("and just as many have failed.\"");
     clear();
     addText(
-        "\"This place is where criminals, fugitives, and heretics of Nilium are left to die.\""
+        """
+        "This place is where criminals, fugitives, and heretics of Nilium are left to die."
+        """
     );
     clear();
     addText("You see a large cave out of the door.");
@@ -117,30 +133,147 @@ public class Game extends Thread {
 
   private void area(Area area) {
     clear();
-    addText(
-        area.getName() 
-        + " | " + area.getLocation() 
+    display.setTextState(TextStates.CHOOSING, 1);
+    int temp = addText(
+        area.getName()
+        + " | "
+        + area.getLocation()
         + "\n-Action\n-Description\n-Talk\n-Shop\n-Leave"
     );
+    var nextArea = area;
+    switch (temp) {
+      case 0: if (area.hasActions()) {
+          displayChoosing(1);
+          var stringBuilder = new StringBuilder("What do you want to do?");
+          for (Action action : area.getActions()) {
+            stringBuilder.append("\n-" + action.getName());
+          }
+          area.getActions()[addText(stringBuilder.toString())].event(this);
+        } else {
+          displayText();
+          addText("No actions available in this location.");
+        }
+        break;
+      case 1:displayText();
+        addText(area.getDescription());
+        break;
+      case 2:areaTalk(area);
+        break;
+      case 3:areaShop(area);
+        break;
+      case 4: if (area instanceof Leavable l) {
+          var stringBuilder = new StringBuilder("Where do you want to go next?");
+          ArrayList<String> directionList = new ArrayList<>();
+          for (String string : l.getDirections()) {
+            directionList.add(string);
+            stringBuilder.append("\n-" + string);
+          }
+          displayChoosing(1);
+          nextArea = l.nextLocation(directionList.get(addText(stringBuilder.toString())));
+        } else {
+          displayText();
+          addText("Unable to leave area...");
+        }
+        break;
+      default:App.LOGGER.log(Level.SEVERE, "Wrong input in area: {0}", temp);
+        break;
+    }
+    if (input != -2) {
+      area(nextArea);
+    }
+  }
+
+  private void areaTalk(Area area) {
+    if (area.hasTalkers()) {
+      int index = addText(
+          getChoosingStrings(area.getTalkers(), "Who do you want to talk to?")
+      );
+      displayText();
+      for (String string : area.getTalkers()[index].getText()) {
+        addText(string);
+      }
+    } else {
+      displayText();
+      addText("No one to talk to in this location.");
+    }
+  }
+
+  private void areaShop(Area area) {
+    if (area.hasVendors()) {
+      displayChoosing(1);
+      var vendor = area.getVendors()[
+          addText(getChoosingStrings(area.getVendors(), "Who would you like to barter with?"))
+          ];
+      displayChoosing(1);
+      var stringBuilder = new StringBuilder(vendor.greeting());
+      ArrayList<String> nameList = new ArrayList<>();
+      for (Entry<String, Integer> entry : vendor.prices().entrySet()) {
+        String key = entry.getKey();
+        nameList.add(key);
+        stringBuilder.append("\n-" + key + ": " + entry.getValue().toString());
+      }
+      var selectedString = nameList.get(addText(stringBuilder.toString()));
+      var inventory = player.getInventory();
+      int itemPrice = vendor.prices().get(selectedString);
+      if (inventory.hasGold(itemPrice)) {
+        var item = vendor.getItem(selectedString);
+        inventory.removeGold(itemPrice);
+        inventory.add(item);
+        displayText();
+        addText("Bought one " + item.getName());
+      } else {
+        displayText();
+        addText("Not enough gold.");
+      }
+    } else {
+      displayText();
+      addText("No vendors in this location.");
+    }
+  }
+
+  public void displayText() {
+    clear();
+    display.setTextState(TextStates.TEXT, 0);
+  }
+
+  public void displayChoosing(int startingLine) {
+    clear();
+    display.setTextState(TextStates.CHOOSING, startingLine);
+  }
+
+  private String getChoosingStrings(Object[] objects, String string) {
+    displayChoosing(1);
+    var stringBuilder = new StringBuilder(string);
+    for (Object vendor : objects) {
+      stringBuilder.append("\n-" + ((Entity) vendor).getName());
+    }
+    return stringBuilder.toString();
   }
 
   private void changeName() {
     while (input != -2) {
-      clear();
       String newName = 
           JOptionPane.showInputDialog(App.getMainWindow(), "What is your name?", player.getName());
       if (newName != null) {
         player.setName(newName);
       }
+      displayText();
       addText("Your name is " + player.getName() + ".");
       display.setTextState(TextStates.CHOOSING, 2);
-      if (addText("\nIs this correct?\n-Yes\n-No") == 1) {
+      if (addText("\nIs this correct?\n-Yes\n-No") == 0) {
         break;
       }
     }
+    display.setTextState(TextStates.TEXT, 0);
   }
 
-  private int addText(String text) {
+  /**
+   * Adds text to the display and waits for input.
+
+   * @param text Text to be added (String)
+   * @return The input (int)
+   */
+  public int addText(String text) {
     if (input == -2) {
       return -2;
     }
@@ -148,7 +281,10 @@ public class Game extends Thread {
     return waitForInput();
   }
 
-  private void clear() {
+  /**
+   * Clears the display.
+   */
+  public void clear() {
     if (input == -2) {
       return;
     }
@@ -160,7 +296,7 @@ public class Game extends Thread {
     if (newgame) {
       newGame();
     } else {
-
+      //
     }
   }
   

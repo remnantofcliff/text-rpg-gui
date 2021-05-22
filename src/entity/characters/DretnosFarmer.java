@@ -12,9 +12,9 @@ public class DretnosFarmer extends Entity implements Talker {
   }
 
   @Override
-  public String[] talk() {
+  public String[] getText() {
     return new String[] { 
-      "The only crop that grows here in the dark is mallyun", 
+      "The only crop that grows here in the dark is girnot.", 
       "But even it is very slow to grow..." 
     };
   }

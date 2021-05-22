@@ -16,13 +16,21 @@ public class DretnosVendor2 extends Entity implements Vendor {
   }
 
   @Override
-  public String[] greeting() {
-    return new String[] {"\"You should take a look at my wares.", "I craft them all by hand.\""};
+  public String greeting() {
+    return "\"You should take a look at my wares. I craft them all by hand.\"";
   }
 
   @Override
-  public Map<Item, Integer> prices() {
-    return Map.of(new Robes(), 25, new LeatherArmor(), 50);
+  public Map<String, Integer> prices() {
+    return Map.of("Robes", 25, "Leather Armor", 50);
   }
-    
+
+  @Override
+  public Item getItem(String name) {
+    switch (name) {
+      case"Robes": return new Robes();
+      case"Leather Armor": return new LeatherArmor();
+      default: return null;
+    }
+  }
 }

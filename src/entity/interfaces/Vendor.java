@@ -7,7 +7,9 @@ import java.util.Map;
  * For npc vendors. talk() to bring up greeting, prices() for Map of items and prices.
  */
 public interface Vendor {
-  String[] greeting();
+  String greeting();
 
-  Map<Item, Integer> prices();
+  Map<String, Integer> prices();
+
+  Item getItem(String name);
 }
