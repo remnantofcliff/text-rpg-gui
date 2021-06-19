@@ -1,6 +1,5 @@
 package entity;
 
-import entity.characters.Player;
 import main.Game;
 
 /**

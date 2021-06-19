@@ -17,8 +17,8 @@ public class SettingsWindow extends Window implements ActionListener {
   private JComboBox<String> fontBox = new JComboBox<>(FONT_SIZES);
   private JButton applyButton = new JButton(APPLY_STRING);
   private static final String APPLY_STRING = "Apply";
-  private static final String[] FONT_SIZES = { "20", "22", "24", "26", "28", "30", "32", "34", "36",
-    "38", "40", "42", "44", "46", "48", "50" };
+  private static final String[] FONT_SIZES = {"20", "22", "24", "26", "28", "30", "32", "34", "36",
+    "38", "40", "42", "44", "46", "48", "50"};
   private static final EmptyBorder EMPTY_BORDER = new EmptyBorder(0, 0, 0, 0);
   
   /**
@@ -31,7 +31,7 @@ public class SettingsWindow extends Window implements ActionListener {
     fontBox.setBorder(new TitledBorder(EMPTY_BORDER, "Font Size"));
     fontBox.setSelectedIndex(7);
     add(fontBox);
-    applyButton.setBackground(App.getMainWindow().getColor());
+    applyButton.setBackground(App.getMainWindow().getUiColor());
     applyButton.addActionListener(this);
     applyButton.setActionCommand(APPLY_STRING);
     add(applyButton);

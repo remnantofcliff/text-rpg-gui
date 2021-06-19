@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import javax.swing.JOptionPane;
-import window.GameArea;
+import window.Display;
 
 /**
  * Game-class handles what gets displayed on the GameArea display.
  */
 public class Game extends Thread {
-  private GameArea display;
+  private Display display;
   private Player player;
   private boolean newgame;
   private int input = -1;
@@ -24,13 +24,13 @@ public class Game extends Thread {
   /**
    * Constructor for game.
 
-   * @param gameArea The display. (GameArea)
+   * @param display The display. (GameArea)
    * @param newgame Whether to start a new game or load a game. (boolean)
    */
-  public Game(GameArea gameArea, boolean newgame) {
+  public Game(Display display, boolean newgame) {
     setName("Game");
     this.newgame = newgame;
-    display = gameArea;
+    this.display = display;
   }
 
   private int waitForInput() {
@@ -40,7 +40,7 @@ public class Game extends Thread {
     //-2 stops thread
     while (input == -1) {
       try {
-        Thread.sleep(100);
+        Thread.sleep(6, 944444);
       } catch (InterruptedException e) {
         interrupt();
         App.LOGGER.log(
@@ -59,81 +59,80 @@ public class Game extends Thread {
 
   private void newGame() {
     player = new Player();
-    addText("You wake up...");
-    addText("The last thing you remember is that you were captured by the guards of Nilium.");
+    addText("You wake up... ");
+    addText("The last thing you remember is that you were captured by the guards of Nilium. ");
     addText("Your memory otherwise feels hazy.");
     clear();
-    addText("You are in a dark room.");
+    addText("You are in a dark room. ");
     addText("You can't really see anything.");
     clear();
-    addText("It's cold and damp in the room.");
-    addText("You are wearing rags that you don't recognize.");
-    addText("None of your possessions are on you.");
+    addText("It's cold and damp in the room. ");
+    addText("You are wearing rags that you don't recognize. ");
+    addText("None of your possessions are on you. ");
     addText("There is a small amount of light coming through one part of the door.");
     clear();
-    addText("As you get closer to the light,");
-    addText("you realize that it is shining through the decrepit doorframes.");
+    addText("As you get closer to the light, ");
+    addText("you realize that it is shining through the decrepit doorframes. ");
     addText("You open the door and see an outline of a person.");
     clear();
-    addText("The person begins talking:");
-    addText("\"Oh, you woke up already..?");
-    addText("I've been keeping watch on you while you were out.");
-    addText("You are just like the others...");
+    addText("The person begins talking: ");
+    addText("\"Oh, you woke up already..? ");
+    addText("I've been keeping watch on you while you were out. ");
+    addText("You are just like the others... ");
     addText("Thrown in here, and left to die...\"");
     clear();
-    addText("\"Be careful out there\"");
+    addText("\"Be careful out there\" ");
     addText(
         """
         
-        There's nothing worse than seeing the people I save just die a gruelsome death..,
+        There's nothing worse than seeing the people I save just die a gruelsome death.., 
         """
     );
     addText("as many have...\"");
     clear();
-    addText("The man lights up a candle.");
-    addText("You can now see his face.");
+    addText("The man lights up a candle. ");
+    addText("You can now see his face. ");
     addText("It is scarred and he has a stoic expression.");
     clear();
-    addText("\"You need to leave.");
+    addText("\"You need to leave. ");
     addText("I don't have anything else for you.\"");
     clear();
-    addText("You can't quite tell how old the man is due to the scars and damage he's suffered.");
+    addText("You can't quite tell how old the man is due to the scars and damage he's suffered. ");
     addText("He shows you the way to the door that leads you to the outside.");
     clear();
-    addText("He opens the door and says in a calming manner:");
-    addText("\"There might be no getting out.");
-    addText("Many have tried,");
+    addText("He opens the door and says in a calming manner: ");
+    addText("\"There might be no getting out. ");
+    addText("Many have tried, ");
     addText("and just as many have failed.\"");
     clear();
     addText(
         """
-        "This place is where criminals, fugitives, and heretics of Nilium are left to die."
+        "This place is where criminals, fugitives, and heretics of Nilium are left to die." 
         """
     );
     clear();
-    addText("You see a large cave out of the door.");
+    addText("You see a large cave out of the door. ");
     addText("The place is lit up by torches and you see a few people standing around.");
     clear();
-    addText("\"This is our little community here in the western corner of Dereliquerat.");
-    addText("All these people are too stubborn to die.");
-    addText("However,");
-    addText("we can't sustain any more people living here.");
+    addText("\"This is our little community here in the western corner of Dereliquerat. ");
+    addText("All these people are too stubborn to die. ");
+    addText("However, ");
+    addText("we can't sustain any more people living here. ");
     addText("Crops don't do too well down here...\", he finishes with a smirk.");
     clear();
-    addText("\"See ya.\", He says with a smile and, in one swift motion,");
-    addText("waves goodbye,");
-    addText("turns around,");
+    addText("\"See ya.\", He says with a smile and, in one swift motion, ");
+    addText("waves goodbye, ");
+    addText("turns around, ");
     addText("and closes the door.");
     clear();
-    addText("You can't remember your name...");
-    addText("How should you introduce yourself?");
+    addText("You can't remember your name... ");
+    addText("How should you introduce yourself? ");
     changeName();
     area(new Dretnos());
   }
 
   private void area(Area area) {
     clear();
-    display.setTextState(TextStates.CHOOSING, 1);
     int temp = addText(
         area.getName()
         + " | "
@@ -141,21 +140,19 @@ public class Game extends Thread {
         + "\n-Action\n-Description\n-Talk\n-Shop\n-Leave"
     );
     var nextArea = area;
+    clear();
     switch (temp) {
       case 0: if (area.hasActions()) {
-          displayChoosing(1);
           var stringBuilder = new StringBuilder("What do you want to do?");
           for (Action action : area.getActions()) {
             stringBuilder.append("\n-" + action.getName());
           }
           area.getActions()[addText(stringBuilder.toString())].event(this);
         } else {
-          displayText();
           addText("No actions available in this location.");
         }
         break;
-      case 1:displayText();
-        addText(area.getDescription());
+      case 1:addText(area.getDescription());
         break;
       case 2:areaTalk(area);
         break;
@@ -168,10 +165,8 @@ public class Game extends Thread {
             directionList.add(string);
             stringBuilder.append("\n-" + string);
           }
-          displayChoosing(1);
           nextArea = l.nextLocation(directionList.get(addText(stringBuilder.toString())));
         } else {
-          displayText();
           addText("Unable to leave area...");
         }
         break;
@@ -184,27 +179,26 @@ public class Game extends Thread {
   }
 
   private void areaTalk(Area area) {
+    clear();
     if (area.hasTalkers()) {
       int index = addText(
           getChoosingStrings(area.getTalkers(), "Who do you want to talk to?")
       );
-      displayText();
+      clear();
       for (String string : area.getTalkers()[index].getText()) {
         addText(string);
       }
     } else {
-      displayText();
       addText("No one to talk to in this location.");
     }
   }
 
   private void areaShop(Area area) {
+    clear();
     if (area.hasVendors()) {
-      displayChoosing(1);
       var vendor = area.getVendors()[
           addText(getChoosingStrings(area.getVendors(), "Who would you like to barter with?"))
           ];
-      displayChoosing(1);
       var stringBuilder = new StringBuilder(vendor.greeting());
       ArrayList<String> nameList = new ArrayList<>();
       for (Entry<String, Integer> entry : vendor.prices().entrySet()) {
@@ -212,37 +206,25 @@ public class Game extends Thread {
         nameList.add(key);
         stringBuilder.append("\n-" + key + ": " + entry.getValue().toString());
       }
+      clear();
       var selectedString = nameList.get(addText(stringBuilder.toString()));
       var inventory = player.getInventory();
       int itemPrice = vendor.prices().get(selectedString);
+      clear();
       if (inventory.hasGold(itemPrice)) {
         var item = vendor.getItem(selectedString);
         inventory.removeGold(itemPrice);
         inventory.add(item);
-        displayText();
         addText("Bought one " + item.getName());
       } else {
-        displayText();
         addText("Not enough gold.");
       }
     } else {
-      displayText();
       addText("No vendors in this location.");
     }
   }
 
-  public void displayText() {
-    clear();
-    display.setTextState(TextStates.TEXT, 0);
-  }
-
-  public void displayChoosing(int startingLine) {
-    clear();
-    display.setTextState(TextStates.CHOOSING, startingLine);
-  }
-
   private String getChoosingStrings(Object[] objects, String string) {
-    displayChoosing(1);
     var stringBuilder = new StringBuilder(string);
     for (Object vendor : objects) {
       stringBuilder.append("\n-" + ((Entity) vendor).getName());
@@ -257,14 +239,12 @@ public class Game extends Thread {
       if (newName != null) {
         player.setName(newName);
       }
-      displayText();
       addText("Your name is " + player.getName() + ".");
-      display.setTextState(TextStates.CHOOSING, 2);
       if (addText("\nIs this correct?\n-Yes\n-No") == 0) {
         break;
       }
+      clear();
     }
-    display.setTextState(TextStates.TEXT, 0);
   }
 
   /**
@@ -306,12 +286,5 @@ public class Game extends Thread {
 
   public synchronized void setInput(int input) {
     this.input = input;
-  }
-
-  /**
-   * Enum for the type of text being displayed.
-   */
-  public enum TextStates {
-    CHOOSING, TEXT
   }
 }

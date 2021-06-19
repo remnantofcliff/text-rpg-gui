@@ -5,67 +5,89 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 import main.Game;
-import window.GameArea.Directions;
+import window.Display.Directions;
+import window.Display.DisplayStates;
 
 /**
  * The main-game window.
  */
-public class MainWindow extends Window implements ActionListener, KeyListener {
-  private Color color = new Color(255, 250, 236);
-  private GameArea gameArea;
-  private int gameFontSize = 34;
+public class MainWindow extends Window implements ActionListener {
+  private Color uiColor = new Color(255, 250, 236);
+  private Display display;
   private static final String FONT_STRING = "Constantia";
   private static final String[] buttonNames = { "Start", "Load", "Settings", "Quit" };
-  private static final String[] menuItemNameKeys = { "C", "E", "I", "M", "ESCAPE" };
-  private static final String[] menuItemNames =
-    { "Character", "Equipment", "Inventory", "Map", "Menu" };
   private transient Game game;
 
   /**
    * Main window constructor, setups window.
    */
   public MainWindow() {
-    super("Main Window", 1024, 768);
-    addKeyListener(this);
+    super("Main Window", 1280, 960);
+    addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(ComponentEvent e) {
+        super.componentResized(e);
+        if (display != null) {
+          display.setup();
+        }
+      }
+    });
+    addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyPressed(KeyEvent e) {
+        switch (e.getKeyCode()) {
+          case KeyEvent.VK_W:display.moveSelection(Directions.UP);
+            break;
+          case KeyEvent.VK_UP:display.moveSelection(Directions.UP);
+            break;
+          case KeyEvent.VK_S:display.moveSelection(Directions.DOWN);
+            break;
+          case KeyEvent.VK_DOWN:display.moveSelection(Directions.DOWN);
+            break;
+          case KeyEvent.VK_A:display.moveSelection(Directions.LEFT);
+            break;
+          case KeyEvent.VK_LEFT:display.moveSelection(Directions.LEFT);
+            break;
+          case KeyEvent.VK_D:display.moveSelection(Directions.RIGHT);
+            break;
+          case KeyEvent.VK_RIGHT:display.moveSelection(Directions.RIGHT);
+            break;
+          case KeyEvent.VK_ENTER:game.setInput(display.select());
+            break;
+          case KeyEvent.VK_E:display.changeDisplayState(DisplayStates.EQUIPMENT);
+            break;
+          case KeyEvent.VK_C:display.changeDisplayState(DisplayStates.CHARACTER);
+            break;
+          default:break;
+        }
+      }
+    });
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     menuScreen();
   }
 
   private void gameScreen() {
     setFocusable(true);
-    var buttonFont = new Font(FONT_STRING, Font.ITALIC, 18);
-    var menuItems = new JMenuItem[menuItemNames.length];
-    var menuBar = new JMenuBar();
-    for (var i = 0; i < menuItems.length; i++) {
-      menuItems[i] = new JMenuItem(menuItemNames[i]);
-      menuItems[i].setActionCommand(menuItemNames[i]);
-      menuItems[i].addActionListener(this);
-      menuItems[i].setBackground(color);
-      menuItems[i].setFont(buttonFont);
-      menuItems[i].setAccelerator(KeyStroke.getKeyStroke(menuItemNameKeys[i]));
-      menuBar.add(menuItems[i]);
-    }
-    setJMenuBar(menuBar);
-    menuBar.setFocusable(false);
-    gameArea = new GameArea(new Font("Times New Roman", Font.ITALIC, gameFontSize), color);
-    add(gameArea);
+    display = new Display();
+    add(display);
     requestFocus();
   }
 
-  private void menuScreen() {
+  /**
+   * Opens the initial Menu screen.
+   */
+  public void menuScreen() {
     setLayout(new GridLayout(0, 1));
     var title = new JLabel("Game");
     var titleFont = new Font(FONT_STRING, Font.ITALIC, 200);
@@ -80,7 +102,7 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
       buttons[i] = new JButton(buttonNames[i]);
       buttons[i].addActionListener(this);
       buttons[i].setActionCommand(buttonNames[i]);
-      buttons[i].setBackground(color);
+      buttons[i].setBackground(uiColor);
       buttons[i].setFocusPainted(false);
       buttons[i].setFont(buttonFont);
       buttonPanel.add(buttons[i]);
@@ -89,7 +111,10 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
     add(buttonPanel);
   }
 
-  private void reset() {
+  /**
+   * Empties the frame.
+   */
+  public void reset() {
     getContentPane().removeAll();
     getContentPane().revalidate();
     getContentPane().repaint();
@@ -107,23 +132,6 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
         break;
       case "Quit":System.exit(1);
         break;
-      case "Character":gameArea.changeDisplayState(DisplayStates.CHARACTER);
-        break;
-      case "Equipment":gameArea.changeDisplayState(DisplayStates.EQUIPMENT);
-        break;
-      case "Inventory":gameArea.changeDisplayState(DisplayStates.INVENTORY);
-        break;
-      case "Map":gameArea.changeDisplayState(DisplayStates.MAP);
-        break;
-      case "Menu": if (
-            JOptionPane.showConfirmDialog(this, "Quit to main menu?", "", JOptionPane.YES_NO_OPTION)
-            == 0
-        ) {
-          reset();
-          game.interrupt();
-          menuScreen();
-        }
-        break;
       default:
         break;
     }
@@ -132,47 +140,8 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
   private void startGame(boolean newgame) {
     reset();
     gameScreen();
-    game = new Game(gameArea, newgame);
+    game = new Game(display, newgame);
     game.start();
-  }
-
-  @Override
-  public void keyTyped(KeyEvent e) {
-    //
-  }
-
-  @Override
-  public void keyPressed(KeyEvent e) {
-    switch (e.getKeyCode()) {
-      case KeyEvent.VK_W:gameArea.moveSelection(Directions.UP);
-        break;
-      case KeyEvent.VK_UP:gameArea.moveSelection(Directions.UP);
-        break;
-      case KeyEvent.VK_S:gameArea.moveSelection(Directions.DOWN);
-        break;
-      case KeyEvent.VK_DOWN:gameArea.moveSelection(Directions.DOWN);
-        break;
-      case KeyEvent.VK_A:gameArea.moveSelection(Directions.LEFT);
-        break;
-      case KeyEvent.VK_LEFT:gameArea.moveSelection(Directions.LEFT);
-        break;
-      case KeyEvent.VK_D:gameArea.moveSelection(Directions.RIGHT);
-        break;
-      case KeyEvent.VK_RIGHT:gameArea.moveSelection(Directions.RIGHT);
-        break;
-      case KeyEvent.VK_ENTER: if (gameArea.getDisplayState() != DisplayStates.DEFAULT) {
-          gameArea.select();
-        } else {
-          game.setInput(gameArea.select());
-        }
-        break;
-      default:break;
-    }
-  }
-
-  @Override
-  public void keyReleased(KeyEvent e) {
-    //
   }
   /**
    * Sets the font size for the game.
@@ -180,14 +149,13 @@ public class MainWindow extends Window implements ActionListener, KeyListener {
    * @param size font size (int)
    */
   public void setGameFontSize(int size) {
-    if (gameArea != null) {
-      gameArea.setFont(new Font("Times New Roman", Font.ITALIC, size));
+    if (display != null) {
+      display.setFont(new Font("Times New Roman", Font.ITALIC, size));
     }
-    gameFontSize = size;
   }
 
-  public Color getColor() {
-    return color;
+  public Color getUiColor() {
+    return uiColor;
   }
 
   public Game getGame() {

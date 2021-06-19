@@ -1,5 +1,6 @@
 package window;
 
+import java.awt.Dimension;
 import javax.swing.JFrame;
 
 /**
@@ -14,6 +15,7 @@ public class Window extends JFrame {
    * @param height Height of window (int)
    */
   public Window(String title, int width, int height) {
+    setMinimumSize(new Dimension(width, height));
     setSize(width, height);
     setTitle(title);
     setLocationRelativeTo(null);
