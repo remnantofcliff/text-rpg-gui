@@ -19,24 +19,29 @@ import javax.swing.JPanel;
 import main.App;
 
 /**
- * GameArea.
+ * Display for game.
  */
 public class Display extends JPanel implements MouseWheelListener {
-  private FontMetrics fm;
   private DisplayStates ds = DisplayStates.DEFAULT;
+  private int fontSizeSmall = 15;
+  private Font smallFont = new Font("Constantia", Font.BOLD, fontSizeSmall);
+  private int fontSize = 34;
+  private Font textFont = new Font("Constantia", Font.ITALIC, fontSize);
+  private FontMetrics fm;
   private MainWindow mw = App.getMainWindow();
   private Rectangle[] buttons = new Rectangle[3];
   private StringBuilder text = new StringBuilder();
   private boolean setupDone;
+  private int borderHeight;
+  private int borderWidth;
   private int fontHeight;
   private int hgt;
-  private int lineAmount;
   private int lineOffset = 1;
   private int maxDescent;
-  private int maxLines;
   private int maxTextWidth;
   private int mouseOverSelection = 3;
   private int selectedIndex;
+  private int smallFontHeight;
   private int spLineY;
   private int spH;
   private int spHalfway;
@@ -50,21 +55,20 @@ public class Display extends JPanel implements MouseWheelListener {
   private int wdtOffset1;
   private int wdtOffset2;
   private int[] uiStringX = new int[3];
-  private static final List<Integer> selectableLines = new ArrayList<>();
+  private static Display instance;
   private static final Color SELECTION_COLOR = new Color(200, 200, 200, 60);
-  private static final Color PANEL_COLOR_A = new Color(100, 100, 255, 200);
+  private static final Color PANEL_COLOR = new Color(100, 100, 255, 230);
   private static final Color TEXT_COLOR = App.getMainWindow().getUiColor();
-  private static final Font SMALL_FONT = new Font("Constantia", Font.BOLD, 15);
-  private static final Font TEXT_FONT = new Font("Constantia", Font.ITALIC, 34);
-  private static final List<Integer> CHARACTER_LINE_INTEGERS = List.of(0, 2, 3, 4, 6, 7, 8, 10);
+  private static final List<Integer> SELECTABLE_LINES = new ArrayList<>();
+  private static final List<Integer> CHARACTER_LINE_INTEGERS = List.of(0, 2, 6, 10);
+  private static final String[] CHARACTER_STRINGS = {"||Character||", "Name:", "", "Health:",
+    "Mana:", "Stamina:", "", "Dexterity:", "Magic:", "Strength:", "", "Speed:"};
   private static final String[] UI_STRINGS = {"Character", "Equipment", "Menu"};
-  private static final String[] CHARACTER_STRINGS = {"Name:", "", "Health:", "Mana:", "Stamina:",
-      "", "Dexterity:", "Magic:", "Strength:", "", "Speed:"};
 
   /**
    * Constructs a new display.
    */
-  public Display() {
+  private Display() {
     addMouseWheelListener(this);
     addMouseListener();
     addMouseMotionListener();
@@ -94,29 +98,34 @@ public class Display extends JPanel implements MouseWheelListener {
 
   private void addMouseListener() {
     addMouseListener(new MouseAdapter() {
+      private void button1(MouseEvent e) {
+        int x = e.getX();
+        if (e.getY() <= borderHeight) {
+          if (x <= buttons[0].getMaxX()) {
+            changeDisplayState(DisplayStates.CHARACTER);
+          } else if (x <= buttons[1].getMaxX()) {
+            changeDisplayState(DisplayStates.EQUIPMENT);
+          } else {
+            if (JOptionPane.showConfirmDialog(
+                mw,
+                "Quit to main menu?",
+                "Quit?",
+                JOptionPane.YES_NO_OPTION
+            ) == 0) {
+              clear();
+              mw.reset();
+              mw.menuScreen();
+            }
+          }
+        } else if (borderWidth < x && x < wdtOffset1) {
+          mw.getGame().setInput(select());
+        }
+      }
+
       @Override
       public void mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
-          int x = e.getX();
-          if (e.getY() <= 20) {
-            if (x <= buttons[0].getMaxX()) {
-              changeDisplayState(DisplayStates.CHARACTER);
-            } else if (x <= buttons[1].getMaxX()) {
-              changeDisplayState(DisplayStates.EQUIPMENT);
-            } else {
-              if (JOptionPane.showConfirmDialog(
-                  mw,
-                  "Quit to main menu?",
-                  "Quit?",
-                  JOptionPane.YES_NO_OPTION
-              ) == 0) {
-                mw.reset();
-                mw.menuScreen();
-              }
-            }
-          } else if (20 < x && x < wdtOffset1) {
-            mw.getGame().setInput(select());
-          }
+          button1(e);
         }
       }
     });
@@ -129,7 +138,7 @@ public class Display extends JPanel implements MouseWheelListener {
           var repaint = false;
           int temp = mouseOverSelection;
           int y = e.getY();
-          if (y <= 20) {
+          if (y <= borderHeight) {
             int x = e.getX();
             if (x <= buttons[0].getMaxX()) {
               mouseOverSelection = 0;
@@ -141,8 +150,8 @@ public class Display extends JPanel implements MouseWheelListener {
           } else {
             mouseOverSelection = 3;
             int select = y / fontHeight - 1;
-            if (selectableLines.contains(select)) {
-              selectedIndex = selectableLines.indexOf(select);
+            if (SELECTABLE_LINES.contains(select)) {
+              selectedIndex = SELECTABLE_LINES.indexOf(select);
               repaint = true;
             }
           }
@@ -156,82 +165,21 @@ public class Display extends JPanel implements MouseWheelListener {
     });
   }
 
-  /**
-   * Enum for directions of selection.
-   */
-  public enum Directions {
-    UP, DOWN, LEFT, RIGHT
+  private void drawBackground(Graphics g) {
+    g.setColor(Color.BLACK);
+    g.fillRect(borderWidth, 0, wdtOffset2, hgt);
   }
 
-  /**
-   * Display-states.
-   */
-  public enum DisplayStates {
-    CHARACTER, EQUIPMENT, DEFAULT
-  }
-
-  public void addText(String text) {
-    this.text.append(text);
-    repaint();
-  }
-
-  public void clear() {
-    text = new StringBuilder();
-    repaint();
-  }
-
-  @Override
-  public void paintComponent(Graphics g) {
-    super.paintComponent(g);
-    if (setupDone) {
-      Graphics2D g2D = (Graphics2D) g;
-      g2D.setRenderingHint(
-          RenderingHints.KEY_TEXT_ANTIALIASING,
-          RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB
-      );
-      drawBackground(g);
-      drawBorders(g);
-      drawTopButtons(g, g2D);
-      drawText(g);
-      drawSelection(g);
-      drawSecondaryPanel(g);
-    } else {
-      int wdt = getWidth() - 1;
-      spX = wdt / 20;
-      spTextX = spX + 20;
-      spW = spX * 16;
-      spMaxX = spX + spW;
-      spHalfway = (spW) / 2 + 20;
-      wdtOffset1 = wdt - 20;
-      wdtOffset2 = wdtOffset1 - 20;
-      maxTextWidth = wdtOffset2 - 5;
-      fm = getFontMetrics(TEXT_FONT);
-      fontHeight = fm.getHeight();
-      maxDescent = fm.getMaxDescent();
-      var fmSmall = getFontMetrics(SMALL_FONT);
-      int wdtdiv6 = wdt / 6 + 1;
-      uiStringX[0] = wdtdiv6 - fmSmall.stringWidth(UI_STRINGS[0]) / 2;
-      uiStringX[1] = wdtdiv6 * 3 - fmSmall.stringWidth(UI_STRINGS[1]) / 2;
-      uiStringX[2] = wdtdiv6 * 5 - fmSmall.stringWidth(UI_STRINGS[2]) / 2;
-      uiStringY = fmSmall.getLeading() + 10;
-      hgt = getHeight() - 1;
-      spY = hgt / 20;
-      spH = spY * 16;
-      spTextY = spY + 20;
-      spLineY = spTextY + maxDescent;
-      maxLines = hgt / fontHeight;
-      int wdtdiv3 = wdtdiv6 * 2;
-      buttons[0] = new Rectangle(0, 0, wdtdiv3, 20);
-      buttons[1] = new Rectangle(wdtdiv3, 0, wdtdiv3, 20);
-      buttons[2] = new Rectangle(wdtdiv3 * 2, 0, wdtdiv3, 20);
-      setupDone = true;
-      repaint();
-    }
+  private void drawBorders(Graphics g) {
+    g.setColor(TEXT_COLOR);
+    g.fillRect(0, 0, borderWidth, hgt);
+    g.fillRect(wdtOffset1, 0, borderWidth, hgt);
+    g.fillRect(borderWidth, 0, wdtOffset2, borderHeight);
   }
 
   private void drawSecondaryPanel(Graphics g) {
     if (ds != DisplayStates.DEFAULT) {
-      g.setColor(PANEL_COLOR_A);
+      g.setColor(PANEL_COLOR);
       g.fillRect(spX, spY, spW, spH);
       g.setColor(Color.WHITE);
       var player = mw.getGame().getPlayer();
@@ -243,58 +191,71 @@ public class Display extends JPanel implements MouseWheelListener {
           }
           g.drawString(CHARACTER_STRINGS[i], spTextX, spTextY + fontHeight * j);
           g.drawString(
-              switch (i) { case 0 -> player.getName();
-              case 2 -> player.getHp() + " / " + player.getMaxHp();
-              case 3 -> player.getMp() + " / " + player.getMaxMp();
-              case 4 -> player.getSp() + " / " + player.getMaxSp();
-              case 6 -> Integer.toString(player.getDexterity());
-              case 7 -> Integer.toString(player.getMagic());
-              case 8 -> Integer.toString(player.getStrength());
-              case 10 -> Double.toString(player.getSpeed());
+              switch (i) { case 1 -> player.getName();
+              case 3 -> player.getHp() + " / " + player.getMaxHp();
+              case 4 -> player.getMp() + " / " + player.getMaxMp();
+              case 5 -> player.getSp() + " / " + player.getMaxSp();
+              case 7 -> Integer.toString(player.getDexterity());
+              case 8 -> Integer.toString(player.getMagic());
+              case 9 -> Integer.toString(player.getStrength());
+              case 11 -> Double.toString(player.getSpeed());
               default -> "";
             }, spHalfway, spTextY + fontHeight * j);
         }
       } else {
+        for (var i = 1; i <= 3; i++) {
 
+          g.drawString(
+              switch (i) { case 1 -> "||Equipment||";
+              case 2 -> "Armor: " + player.getArmor().getName();
+              case 3 -> "Weapon: " + player.getWeapon().getName();
+              default -> "";
+            }, spTextX, spTextY + fontHeight * i);
+        }
+        g.drawLine(spX, spLineY + fontHeight, spMaxX, spLineY + fontHeight);
       }
     }
   }
 
   private void drawSelection(Graphics g) {
     g.setColor(SELECTION_COLOR);
-    if (selectedIndex >= selectableLines.size() && !selectableLines.isEmpty()) {
-      selectedIndex = selectableLines.size() - 1;
+    if (selectedIndex >= SELECTABLE_LINES.size() && !SELECTABLE_LINES.isEmpty()) {
+      selectedIndex = SELECTABLE_LINES.size() - 1;
     }
-    if (!selectableLines.isEmpty()) {
+    if (!SELECTABLE_LINES.isEmpty()) {
       g.fillRect(
-          20,
-          25 + selectableLines.get(selectedIndex) * fontHeight + maxDescent,
+          borderWidth,
+          borderHeight + 5 + SELECTABLE_LINES.get(selectedIndex) * fontHeight + maxDescent,
           wdtOffset2,
           fontHeight
       );
     }
   }
-
+ 
   private void drawText(Graphics g) {
     g.setColor(TEXT_COLOR);
-    g.setFont(TEXT_FONT);
+    g.setFont(textFont);
     String[] arr = getTextRows();
-    lineAmount = arr.length;
-    selectableLines.clear();
-    for (var i = 0; i < lineAmount; i++) {
-      g.drawString(arr[i], 25, 25 + fontHeight * (i + lineOffset));
+    SELECTABLE_LINES.clear();
+    for (var i = 0; i < arr.length; i++) {
+      g.drawString(arr[i], borderWidth + 5, borderHeight + 5 + fontHeight * (i + lineOffset));
       if (arr[i].startsWith("-")) {
-        selectableLines.add(i);
+        SELECTABLE_LINES.add(i);
       }
     }
   }
 
-  private void drawTopButtons(Graphics g, Graphics2D g2D) {
+  private void drawTopButtons(Graphics g) {
     g.setColor(Color.BLACK);
-    g.setFont(SMALL_FONT);
+    g.setFont(smallFont);
     for (var i = 0; i < UI_STRINGS.length; i++) {
       g.drawString(UI_STRINGS[i], uiStringX[i], uiStringY);
     }
+    Graphics2D g2D = (Graphics2D) g;
+    g2D.setRenderingHint(
+        RenderingHints.KEY_TEXT_ANTIALIASING,
+        RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB
+    );
     for (var i = 0; i < buttons.length; i++) {
       g2D.draw(buttons[i]);
     }
@@ -304,16 +265,9 @@ public class Display extends JPanel implements MouseWheelListener {
     }
   }
 
-  private void drawBorders(Graphics g) {
-    g.setColor(TEXT_COLOR);
-    g.fillRect(0, 0, 20, hgt);
-    g.fillRect(wdtOffset1, 0, 20, hgt);
-    g.fillRect(20, 0, wdtOffset2, 20);
-  }
-
-  private void drawBackground(Graphics g) {
-    g.setColor(Color.BLACK);
-    g.fillRect(20, 0, wdtOffset2, hgt);
+  public void addText(String text) {
+    this.text.append(text);
+    repaint();
   }
 
   /**
@@ -331,6 +285,58 @@ public class Display extends JPanel implements MouseWheelListener {
     repaint();
   }
 
+  public void clear() {
+    text = new StringBuilder();
+    repaint();
+  }
+
+  @Override
+  public void paintComponent(Graphics g) {
+    if (setupDone) {
+      super.paintComponent(g);
+      
+      drawBackground(g);
+      drawBorders(g);
+      drawTopButtons(g);
+      drawText(g);
+      drawSelection(g);
+      drawSecondaryPanel(g);
+    } else {
+      int wdt = getWidth();
+      borderWidth = (wdt - 4) / 63;
+      hgt = getHeight();
+      borderHeight = (hgt - 1) / 46;
+      spX = wdt / borderWidth;
+      spTextX = spX + borderWidth;
+      spW = spX * 16;
+      spMaxX = spX + spW;
+      spHalfway = (spW) / 2 + borderWidth;
+      wdtOffset1 = wdt - borderWidth;
+      wdtOffset2 = wdtOffset1 - borderWidth;
+      maxTextWidth = wdtOffset2 - 5;
+      fm = getFontMetrics(textFont);
+      fontHeight = fm.getHeight();
+      maxDescent = fm.getMaxDescent();
+      var fmSmall = getFontMetrics(smallFont);
+      smallFontHeight = fmSmall.getHeight();
+      int wdtdiv6 = wdt / 6 + 1;
+      uiStringX[0] = wdtdiv6 - fmSmall.stringWidth(UI_STRINGS[0]) / 2;
+      uiStringX[1] = wdtdiv6 * 3 - fmSmall.stringWidth(UI_STRINGS[1]) / 2;
+      uiStringX[2] = wdtdiv6 * 5 - fmSmall.stringWidth(UI_STRINGS[2]) / 2;
+      uiStringY = borderHeight / 2 + 1 + fmSmall.getDescent();
+      spY = hgt / borderHeight;
+      spH = spY * 16;
+      spTextY = spY + borderHeight;
+      spLineY = spTextY + maxDescent;
+      int wdtdiv3 = wdtdiv6 * 2;
+      buttons[0] = new Rectangle(0, 0, wdtdiv3, borderHeight);
+      buttons[1] = new Rectangle(wdtdiv3, 0, wdtdiv3, borderHeight);
+      buttons[2] = new Rectangle(wdtdiv3 * 2, 0, wdtdiv3, borderHeight);
+      setupDone = true;
+      repaint();
+    }
+  }
+
   /**
    * Moves current selection.
 
@@ -339,7 +345,7 @@ public class Display extends JPanel implements MouseWheelListener {
   public void moveSelection(Directions direction) {
     switch (direction) {
       case DOWN:
-        if (selectedIndex != selectableLines.size() - 1) {
+        if (selectedIndex != SELECTABLE_LINES.size() - 1) {
           selectedIndex++;
         }
         break;
@@ -358,6 +364,26 @@ public class Display extends JPanel implements MouseWheelListener {
     repaint();
   }
 
+  @Override
+  public void mouseWheelMoved(MouseWheelEvent e) {
+    if (e.getWheelRotation() == -1 && smallFontHeight < borderHeight + 1) {
+      fontSize++;
+      fontSizeSmall++;
+    } else if (e.getWheelRotation() == 1 && 18 < smallFontHeight) {
+      fontSize--;
+      fontSizeSmall--;
+    }
+    smallFont = smallFont.deriveFont((float) fontSizeSmall);
+    textFont = textFont.deriveFont((float) fontSize);
+    setup();
+    repaint();
+  }
+
+  public void resetFont() {
+    smallFont = smallFont.deriveFont((float) 15);
+    textFont = textFont.deriveFont((float) 34);
+  }
+
   /**
    * Returns selection number. Starts from 0.
    */
@@ -371,17 +397,29 @@ public class Display extends JPanel implements MouseWheelListener {
     setupDone = false;
   }
 
-  public DisplayStates getDisplayState() {
-    return DisplayStates.DEFAULT;
+  /**
+   * Enum for directions of selection.
+   */
+  public enum Directions {
+    UP, DOWN, LEFT, RIGHT
   }
 
-  @Override
-  public void mouseWheelMoved(MouseWheelEvent e) {
-    if (-lineOffset + maxLines + 1 < lineAmount && e.getWheelRotation() == 1) {
-      lineOffset--;
-    } else if (lineOffset != 1 && e.getWheelRotation() == -1) {
-      lineOffset++;
+  /**
+   * Display-states.
+   */
+  public enum DisplayStates {
+    CHARACTER, EQUIPMENT, DEFAULT
+  }
+
+  /**
+   * Returns the single instance of the Display-class.
+
+   * @return (Display)
+   */
+  public static Display getInstance() {
+    if (instance == null) {
+      instance = new Display();
     }
-    repaint();
+    return instance;
   }
 }

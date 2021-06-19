@@ -16,7 +16,7 @@ import window.Display;
  * Game-class handles what gets displayed on the GameArea display.
  */
 public class Game extends Thread {
-  private Display display;
+  private Display display = Display.getInstance();
   private Player player;
   private boolean newgame;
   private int input = -1;
@@ -24,13 +24,11 @@ public class Game extends Thread {
   /**
    * Constructor for game.
 
-   * @param display The display. (GameArea)
    * @param newgame Whether to start a new game or load a game. (boolean)
    */
-  public Game(Display display, boolean newgame) {
+  public Game(boolean newgame) {
     setName("Game");
     this.newgame = newgame;
-    this.display = display;
   }
 
   private int waitForInput() {

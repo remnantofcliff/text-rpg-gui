@@ -39,6 +39,7 @@ public class MainWindow extends Window implements ActionListener {
       public void componentResized(ComponentEvent e) {
         super.componentResized(e);
         if (display != null) {
+          display.resetFont();
           display.setup();
         }
       }
@@ -73,13 +74,14 @@ public class MainWindow extends Window implements ActionListener {
         }
       }
     });
+    
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     menuScreen();
   }
 
   private void gameScreen() {
     setFocusable(true);
-    display = new Display();
+    display = Display.getInstance();
     add(display);
     requestFocus();
   }
@@ -140,7 +142,7 @@ public class MainWindow extends Window implements ActionListener {
   private void startGame(boolean newgame) {
     reset();
     gameScreen();
-    game = new Game(display, newgame);
+    game = new Game(newgame);
     game.start();
   }
   /**
