@@ -14,9 +14,8 @@ public class Antidote extends Item implements Droppable, Usable {
   }
 
   @Override
-  public boolean use(BattleCharacter battleCharacter) {
+  public void use(BattleCharacter battleCharacter) {
     drop(battleCharacter);
-    return battleCharacter.getStatusEffects().remove("Poisoned");
   }
 
   @Override

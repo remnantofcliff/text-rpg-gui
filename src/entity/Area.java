@@ -7,14 +7,14 @@ import entity.interfaces.Vendor;
  * Abstract area game.
  */
 public abstract class Area extends Entity {
-  protected Action[] actions;
+  protected Event[] events;
   protected String description;
   protected String location;
   protected Talker[] talkers;
   protected Vendor[] vendors;
 
-  public Action[] getActions() {
-    return actions;
+  public Event[] getEvents() {
+    return events;
   }
   
   private boolean checkIfEmpty(Object[] objects) {
@@ -37,8 +37,8 @@ public abstract class Area extends Entity {
     return vendors;
   }
 
-  public boolean hasActions() {
-    return checkIfEmpty(actions);
+  public boolean hasEvents() {
+    return checkIfEmpty(events);
   }
 
   public boolean hasTalkers() {

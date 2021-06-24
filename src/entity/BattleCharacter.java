@@ -1,15 +1,12 @@
 package entity;
 
 import inventory.Inventory;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Class for characters that can battle.
  */
 public abstract class BattleCharacter extends Entity {
   protected Armor armor;
-  protected List<String> statusEffects = new ArrayList<>();
   protected Inventory inventory = new Inventory();
   protected Weapon weapon;
   protected double hp;
@@ -56,14 +53,6 @@ public abstract class BattleCharacter extends Entity {
   
   public void setArmor(Armor armor) {
     this.armor = armor;
-  }
-
-  public List<String> getStatusEffects() {
-    return statusEffects;
-  }
-
-  public void setStatusEffects(List<String> statusEffects) {
-    this.statusEffects = statusEffects;
   }
 
   public Weapon getWeapon() {

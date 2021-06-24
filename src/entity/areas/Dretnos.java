@@ -1,8 +1,8 @@
 package entity.areas;
 
-import entity.Action;
 import entity.Area;
-import entity.actions.DretnosAction1;
+import entity.Event;
+import entity.actions.DretnosEvent1;
 import entity.characters.DretnosFarmer;
 import entity.characters.DretnosVendor1;
 import entity.characters.DretnosVendor2;
@@ -28,7 +28,7 @@ public class Dretnos extends Area implements Leavable {
     location = "Western Dereliquerat";
     vendors = new Vendor[] {new DretnosVendor1(), new DretnosVendor2()};
     talkers = new Talker[] {new DretnosFarmer()};
-    actions = new Action[] {new DretnosAction1()};
+    events = new Event[] {new DretnosEvent1()};
   }
 
   @Override

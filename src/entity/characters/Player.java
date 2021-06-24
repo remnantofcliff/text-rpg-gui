@@ -1,22 +1,27 @@
 package entity.characters;
 
+import entity.Area;
 import entity.Armor;
 import entity.BattleCharacter;
 import entity.Weapon;
+import entity.areas.Dretnos;
 import entity.items.armors.Rags;
 import entity.items.weapons.Fists;
+import java.io.Serializable;
+import main.Difficulties;
 
 /**
  * Player character class.
  */
 public class Player extends BattleCharacter {
-  private String profession;
+  private Area area = new Dretnos();
+  private Difficulties difficulty = Difficulties.NORMAL;
   
   /**
    * Creates a new player-object.
    */
   public Player() {
-    name = "Johnny"; 
+    name = "Johnny";
     maxHp = 100;
     maxMp = 100;
     maxSp = 100;
@@ -31,10 +36,15 @@ public class Player extends BattleCharacter {
     inventory.add(new Rags());
     weapon = (Weapon) inventory.getItem("Fists");
     armor = (Armor) inventory.getItem("Rags");
+    
   }
 
-  public String getProfession() {
-    return profession;
+  public Area getArea() {
+    return area;
+  }
+
+  public Difficulties getDifficulty() {
+    return difficulty;
   }
 
   public void incrementStrength() {
@@ -49,7 +59,11 @@ public class Player extends BattleCharacter {
     magic++;
   }
 
-  public void setProfession(String profession) {
-    this.profession = profession;
+  public void setArea(Area area) {
+    this.area = area;
+  }
+
+  public void setDifficulty(Difficulties difficulty) {
+    this.difficulty = difficulty;
   }
 }

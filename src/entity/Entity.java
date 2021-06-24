@@ -1,9 +1,11 @@
 package entity;
 
+import java.io.Serializable;
+
 /**
  * Every entity in game must extend this class.
  */
-public abstract class Entity {
+public abstract class Entity implements Serializable {
   protected String name;
   
   public String getName() {

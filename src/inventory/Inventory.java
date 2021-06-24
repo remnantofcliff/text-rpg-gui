@@ -4,6 +4,8 @@ import entity.Armor;
 import entity.Item;
 import entity.Weapon;
 import entity.items.CustomItem;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,7 +17,7 @@ import main.App;
 /**
  * Player's inventory.
  */
-public class Inventory {
+public class Inventory implements Serializable {
   private List<Item> container = new ArrayList<>();
   private int gold;
 

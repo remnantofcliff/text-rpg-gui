@@ -60,9 +60,9 @@ public class Display extends JPanel implements MouseWheelListener {
   private static final Color PANEL_COLOR = new Color(100, 100, 255, 230);
   private static final Color TEXT_COLOR = App.getMainWindow().getUiColor();
   private static final List<Integer> SELECTABLE_LINES = new ArrayList<>();
-  private static final List<Integer> CHARACTER_LINE_INTEGERS = List.of(0, 2, 6, 10);
-  private static final String[] CHARACTER_STRINGS = {"||Character||", "Name:", "", "Health:",
-    "Mana:", "Stamina:", "", "Dexterity:", "Magic:", "Strength:", "", "Speed:"};
+  private static final List<Integer> CHARACTER_LINE_INTEGERS = List.of(0, 3, 7, 11);
+  private static final String[] CHARACTER_STRINGS = {"||Character||", "Name:", "Difficulty:", "",
+    "Health:", "Mana:", "Stamina:", "", "Dexterity:", "Magic:", "Strength:", "", "Speed:"};
   private static final String[] UI_STRINGS = {"Character", "Equipment", "Menu"};
 
   /**
@@ -106,16 +106,7 @@ public class Display extends JPanel implements MouseWheelListener {
           } else if (x <= buttons[1].getMaxX()) {
             changeDisplayState(DisplayStates.EQUIPMENT);
           } else {
-            if (JOptionPane.showConfirmDialog(
-                mw,
-                "Quit to main menu?",
-                "Quit?",
-                JOptionPane.YES_NO_OPTION
-            ) == 0) {
-              clear();
-              mw.reset();
-              mw.menuScreen();
-            }
+            exit();
           }
         } else if (borderWidth < x && x < wdtOffset1) {
           mw.getGame().setInput(select());
@@ -192,19 +183,19 @@ public class Display extends JPanel implements MouseWheelListener {
           g.drawString(CHARACTER_STRINGS[i], spTextX, spTextY + fontHeight * j);
           g.drawString(
               switch (i) { case 1 -> player.getName();
-              case 3 -> player.getHp() + " / " + player.getMaxHp();
-              case 4 -> player.getMp() + " / " + player.getMaxMp();
-              case 5 -> player.getSp() + " / " + player.getMaxSp();
-              case 7 -> Integer.toString(player.getDexterity());
-              case 8 -> Integer.toString(player.getMagic());
-              case 9 -> Integer.toString(player.getStrength());
-              case 11 -> Double.toString(player.getSpeed());
+              case 2 -> player.getDifficulty().toString();
+              case 4 -> player.getHp() + " / " + player.getMaxHp();
+              case 5 -> player.getMp() + " / " + player.getMaxMp();
+              case 6 -> player.getSp() + " / " + player.getMaxSp();
+              case 8 -> Integer.toString(player.getDexterity());
+              case 9 -> Integer.toString(player.getMagic());
+              case 10 -> Integer.toString(player.getStrength());
+              case 12 -> Double.toString(player.getSpeed());
               default -> "";
             }, spHalfway, spTextY + fontHeight * j);
         }
       } else {
         for (var i = 1; i <= 3; i++) {
-
           g.drawString(
               switch (i) { case 1 -> "||Equipment||";
               case 2 -> "Armor: " + player.getArmor().getName();
@@ -290,11 +281,25 @@ public class Display extends JPanel implements MouseWheelListener {
     repaint();
   }
 
+  /**
+   * Close the game and reset MainWindow to main menu.
+   */
+  public void exit() {
+    if (JOptionPane.showConfirmDialog(mw, "Quit to main menu?", "Quit?",
+        JOptionPane.YES_NO_OPTION
+    ) == 0) {
+      clear();
+      mw.serialize();
+      mw.getGame().interrupt();
+      mw.reset();
+      mw.menuScreen();
+    }
+  }
+
   @Override
   public void paintComponent(Graphics g) {
     if (setupDone) {
       super.paintComponent(g);
-      
       drawBackground(g);
       drawBorders(g);
       drawTopButtons(g);
@@ -306,11 +311,11 @@ public class Display extends JPanel implements MouseWheelListener {
       borderWidth = (wdt - 4) / 63;
       hgt = getHeight();
       borderHeight = (hgt - 1) / 46;
-      spX = wdt / borderWidth;
-      spTextX = spX + borderWidth;
+      spX = wdt / 20;
+      spTextX = spX + 20;
       spW = spX * 16;
       spMaxX = spX + spW;
-      spHalfway = (spW) / 2 + borderWidth;
+      spHalfway = (spW) / 2 + 20;
       wdtOffset1 = wdt - borderWidth;
       wdtOffset2 = wdtOffset1 - borderWidth;
       maxTextWidth = wdtOffset2 - 5;
@@ -324,9 +329,9 @@ public class Display extends JPanel implements MouseWheelListener {
       uiStringX[1] = wdtdiv6 * 3 - fmSmall.stringWidth(UI_STRINGS[1]) / 2;
       uiStringX[2] = wdtdiv6 * 5 - fmSmall.stringWidth(UI_STRINGS[2]) / 2;
       uiStringY = borderHeight / 2 + 1 + fmSmall.getDescent();
-      spY = hgt / borderHeight;
+      spY = hgt / 20;
       spH = spY * 16;
-      spTextY = spY + borderHeight;
+      spTextY = spY + 20;
       spLineY = spTextY + maxDescent;
       int wdtdiv3 = wdtdiv6 * 2;
       buttons[0] = new Rectangle(0, 0, wdtdiv3, borderHeight);

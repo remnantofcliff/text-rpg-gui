@@ -6,5 +6,5 @@ import entity.BattleCharacter;
  * For items that can be used.
  */
 public interface Usable {
-  boolean use(BattleCharacter battleCharacter);
+  void use(BattleCharacter battleCharacter);
 }

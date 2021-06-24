@@ -1,6 +1,8 @@
 package window;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -9,7 +11,14 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -22,18 +31,23 @@ import window.Display.DisplayStates;
 /**
  * The main-game window.
  */
-public class MainWindow extends Window implements ActionListener {
+public class MainWindow extends JFrame implements ActionListener {
   private Color uiColor = new Color(255, 250, 236);
   private Display display;
+  private boolean inGame;
   private static final String FONT_STRING = "Constantia";
-  private static final String[] buttonNames = { "Start", "Load", "Settings", "Quit" };
+  private static final String[] buttonNames = { "Start", "Load", "Quit" };
   private transient Game game;
 
   /**
    * Main window constructor, setups window.
    */
   public MainWindow() {
-    super("Main Window", 1280, 960);
+    super("Deliquerat");
+    setMinimumSize(new Dimension(1280, 960));
+    setSize(1280, 960);
+    setLocationRelativeTo(null);
+    setVisible(true);
     addComponentListener(new ComponentAdapter() {
       @Override
       public void componentResized(ComponentEvent e) {
@@ -70,16 +84,39 @@ public class MainWindow extends Window implements ActionListener {
             break;
           case KeyEvent.VK_C:display.changeDisplayState(DisplayStates.CHARACTER);
             break;
+          case KeyEvent.VK_ESCAPE: if (inGame) {
+              display.exit();
+            }
+            break;
           default:break;
         }
       }
     });
-    
+    addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(WindowEvent e) {
+        if (game != null) {
+          serialize();
+        }
+      }
+    });
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     menuScreen();
   }
 
+  /**
+   * Saves the game.
+   */
+  public void serialize() {
+    try (var out = new ObjectOutputStream(new FileOutputStream("tmp/save.ser"))) {
+      out.writeObject(game.getPlayer());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   private void gameScreen() {
+    inGame = true;
     setFocusable(true);
     display = Display.getInstance();
     add(display);
@@ -90,15 +127,17 @@ public class MainWindow extends Window implements ActionListener {
    * Opens the initial Menu screen.
    */
   public void menuScreen() {
-    setLayout(new GridLayout(0, 1));
-    var title = new JLabel("Game");
+    inGame = false;
+    getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
+    var title = new JLabel("Deliquerat");
+    title.setAlignmentX(Component.CENTER_ALIGNMENT);
+    title.setBorder(new EmptyBorder(250, 0, 0, 0));
     var titleFont = new Font(FONT_STRING, Font.ITALIC, 200);
     title.setFont(titleFont);
     title.setHorizontalAlignment(SwingConstants.CENTER);
-    title.setBorder(new EmptyBorder(200, 0, 0, 0));
     var buttonPanel = new JPanel(new GridLayout(0, 1));
-    buttonPanel.setBorder(new EmptyBorder(60, 400, 100, 400));
-    var buttons = new JButton[4];
+    buttonPanel.setMaximumSize(new Dimension(300, 300));
+    var buttons = new JButton[3];
     var buttonFont = new Font(FONT_STRING, Font.ITALIC, 20);
     for (var i = 0; i < buttons.length; i++) {
       buttons[i] = new JButton(buttonNames[i]);
@@ -120,7 +159,6 @@ public class MainWindow extends Window implements ActionListener {
     getContentPane().removeAll();
     getContentPane().revalidate();
     getContentPane().repaint();
-    setJMenuBar(null);
   }
 
   @Override
@@ -130,9 +168,7 @@ public class MainWindow extends Window implements ActionListener {
         break;
       case "Load":startGame(false);
         break;
-      case "Settings":new SettingsWindow();
-        break;
-      case "Quit":System.exit(1);
+      case "Quit":System.exit(0);
         break;
       default:
         break;
@@ -144,16 +180,6 @@ public class MainWindow extends Window implements ActionListener {
     gameScreen();
     game = new Game(newgame);
     game.start();
-  }
-  /**
-   * Sets the font size for the game.
-
-   * @param size font size (int)
-   */
-  public void setGameFontSize(int size) {
-    if (display != null) {
-      display.setFont(new Font("Times New Roman", Font.ITALIC, size));
-    }
   }
 
   public Color getUiColor() {

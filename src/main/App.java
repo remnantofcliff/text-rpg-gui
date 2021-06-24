@@ -15,7 +15,7 @@ public class App {
     SwingUtilities.invokeLater(() -> mainWindow = new MainWindow());
   }
 
-  public static MainWindow getMainWindow() {
+  public static synchronized MainWindow getMainWindow() {
     return mainWindow;
   }
 }

@@ -14,9 +14,9 @@ public class HealthPotion extends Item implements Droppable, Usable {
   }
   
   @Override
-  public boolean use(BattleCharacter battleCharacter) {
+  public void use(BattleCharacter battleCharacter) {
     drop(battleCharacter);
-    return battleCharacter.addHp(25);
+    battleCharacter.addHp(25);
   }
 
   @Override
