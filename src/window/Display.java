@@ -23,10 +23,8 @@ import main.App;
  */
 public class Display extends JPanel implements MouseWheelListener {
   private DisplayStates ds = DisplayStates.DEFAULT;
-  private int fontSizeSmall = 15;
-  private Font smallFont = new Font("Constantia", Font.BOLD, fontSizeSmall);
-  private int fontSize = 34;
-  private Font textFont = new Font("Constantia", Font.ITALIC, fontSize);
+  private Font smallFont = new Font("Constantia", Font.BOLD, 15);
+  private Font textFont = new Font("Constantia", Font.ITALIC, 34);
   private FontMetrics fm;
   private MainWindow mw = App.getMainWindow();
   private Rectangle[] buttons = new Rectangle[3];
@@ -35,6 +33,8 @@ public class Display extends JPanel implements MouseWheelListener {
   private int borderHeight;
   private int borderWidth;
   private int fontHeight;
+  private int fontSize = 34;
+  private int fontSizeSmall = 15;
   private int hgt;
   private int lineOffset = 1;
   private int maxDescent;
@@ -364,7 +364,7 @@ public class Display extends JPanel implements MouseWheelListener {
         }
         break;
       default:
-        break;
+      
     }
     repaint();
   }

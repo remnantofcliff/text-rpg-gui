@@ -1,11 +1,12 @@
 package entity.areas;
 
 import entity.Area;
+import entity.Battle;
 import entity.Event;
-import entity.actions.DretnosEvent1;
 import entity.characters.DretnosFarmer;
 import entity.characters.DretnosVendor1;
 import entity.characters.DretnosVendor2;
+import entity.events.DretnosEvent1;
 import entity.interfaces.Leavable;
 import entity.interfaces.Talker;
 import entity.interfaces.Vendor;

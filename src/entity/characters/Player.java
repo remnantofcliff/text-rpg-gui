@@ -2,18 +2,17 @@ package entity.characters;
 
 import entity.Area;
 import entity.Armor;
-import entity.BattleCharacter;
+import entity.BattleEntity;
 import entity.Weapon;
 import entity.areas.Dretnos;
 import entity.items.armors.Rags;
 import entity.items.weapons.Fists;
-import java.io.Serializable;
 import main.Difficulties;
 
 /**
  * Player character class.
  */
-public class Player extends BattleCharacter {
+public class Player extends BattleEntity {
   private Area area = new Dretnos();
   private Difficulties difficulty = Difficulties.NORMAL;
   

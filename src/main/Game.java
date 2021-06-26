@@ -3,16 +3,14 @@ package main;
 import entity.Area;
 import entity.Entity;
 import entity.Event;
-import entity.actions.NewGame;
 import entity.characters.Player;
+import entity.events.NewGame;
 import entity.interfaces.Leavable;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import javax.swing.JOptionPane;
 import window.Display;
 
 /**
@@ -35,6 +33,14 @@ public class Game extends Thread {
     this.newgame = newgame;
   }
 
+  private String getChoosingStrings(Object[] objects, String string) {
+    var stringBuilder = new StringBuilder(string);
+    for (Object o : objects) {
+      stringBuilder.append("\n-" + ((Entity) o).getName());
+    }
+    return stringBuilder.append(BACK).toString();
+  }
+
   private int waitForInput() {
     //Input is the selected option number. 
     //0, 1, 2, 3... if option selected
@@ -45,11 +51,7 @@ public class Game extends Thread {
         Thread.sleep(16, 666666);
       } catch (InterruptedException e) {
         interrupt();
-        App.LOGGER.log(
-            Level.INFO,
-            "Thread interrupted.\n      Closing thread: {0}",
-            getClass().getName()
-        );
+        App.logThreadExit(getName());
         input = -2;
         return input;
       }
@@ -94,8 +96,7 @@ public class Game extends Thread {
           addText("Unable to leave area...");
         }
         break;
-      default:App.LOGGER.log(Level.SEVERE, "Wrong input in area: {0}", temp);
-        break;
+      default:App.logWrongInput(temp);
     }
     if (input != -2) {
       area(nextArea);
@@ -114,23 +115,6 @@ public class Game extends Thread {
       }
     } else {
       addText("No actions available in this location.");
-    }
-  }
-
-  private void areaTalk(Area area) {
-    clear();
-    if (area.hasTalkers()) {
-      int index = addText(
-          getChoosingStrings(area.getTalkers(), "Who do you want to talk to?")
-      );
-      if (index != area.getTalkers().length) {
-        clear();
-        for (String string : area.getTalkers()[index].getText()) {
-          addText(string);
-        }
-      }
-    } else {
-      addText("No one to talk to in this location.");
     }
   }
 
@@ -171,29 +155,20 @@ public class Game extends Thread {
     }
   }
 
-  private String getChoosingStrings(Object[] objects, String string) {
-    var stringBuilder = new StringBuilder(string);
-    for (Object o : objects) {
-      stringBuilder.append("\n-" + ((Entity) o).getName());
-    }
-    return stringBuilder.append(BACK).toString();
-  }
-
-  /**
-   * Change name -method.
-   */
-  public void changeName() {
-    while (input != -2) {
-      String newName = 
-          JOptionPane.showInputDialog(App.getMainWindow(), "What is your name?", player.getName());
-      if (newName != null) {
-        player.setName(newName);
+  private void areaTalk(Area area) {
+    clear();
+    if (area.hasTalkers()) {
+      int index = addText(
+          getChoosingStrings(area.getTalkers(), "Who do you want to talk to?")
+      );
+      if (index != area.getTalkers().length) {
+        clear();
+        for (String string : area.getTalkers()[index].getText()) {
+          addText(string);
+        }
       }
-      addText("Your name is " + player.getName() + ".");
-      if (addText("\nIs this correct?\n-Yes\n-No") == 0) {
-        break;
-      }
-      clear();
+    } else {
+      addText("No one to talk to in this location.");
     }
   }
 
@@ -209,6 +184,10 @@ public class Game extends Thread {
     }
     display.addText(text);
     return waitForInput();
+  }
+
+  public synchronized int getInput() {
+    return input;
   }
 
   /**
@@ -231,21 +210,11 @@ public class Game extends Thread {
       try (var in = new ObjectInputStream(new FileInputStream("tmp/save.ser"))) {
         player = (Player) in.readObject();
       } catch (IOException | ClassNotFoundException e) {
-        e.printStackTrace();
+        App.logNoSaveFound();
         newgame = true;
         run();
       }
       area(player.getArea());
-    }
-  }
-
-  /**
-   * Select difficulty.
-   */
-  public void selectDifficulty() {
-    clear();
-    if (addText("Select difficulty:\n-Normal\n-Critical") == 1) {
-      player.setDifficulty(Difficulties.CRITICAL);
     }
   }
   

@@ -1,10 +1,10 @@
 package entity.interfaces;
 
-import entity.BattleCharacter;
+import entity.BattleEntity;
 
 /**
  * For items that can be used.
  */
 public interface Usable {
-  void use(BattleCharacter battleCharacter);
+  void use(BattleEntity battleCharacter);
 }

@@ -4,11 +4,9 @@ import entity.Armor;
 import entity.Item;
 import entity.Weapon;
 import entity.items.CustomItem;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -18,7 +16,7 @@ import main.App;
  * Player's inventory.
  */
 public class Inventory implements Serializable {
-  private List<Item> container = new ArrayList<>();
+  private ArrayList<Item> container = new ArrayList<>();
   private int gold;
 
   private Map<String, Integer> getType(Class<?> classToGet) {
@@ -85,7 +83,7 @@ public class Inventory implements Serializable {
         return item;
       }
     }
-    App.LOGGER.log(Level.SEVERE, "Item name not in inventory: {0}", name);
+    App.logNoItemFound(name);
     return null;
   }
 }

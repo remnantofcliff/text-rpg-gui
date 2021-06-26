@@ -1,7 +1,7 @@
 package entity.items.armors;
 
 import entity.Armor;
-import entity.BattleCharacter;
+import entity.BattleEntity;
 import entity.interfaces.Droppable;
 import entity.interfaces.Equippable;
 
@@ -20,12 +20,12 @@ public class LeatherArmor extends Armor implements Droppable, Equippable {
   }
 
   @Override
-  public void equip(BattleCharacter battleCharacter) {
+  public void equip(BattleEntity battleCharacter) {
     battleCharacter.setArmor(this);
   }
 
   @Override
-  public void drop(BattleCharacter battleCharacter) {
+  public void drop(BattleEntity battleCharacter) {
     if (battleCharacter.getArmor() == this) {
       battleCharacter.setArmor(Naked.getInstance());
     }

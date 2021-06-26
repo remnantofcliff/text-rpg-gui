@@ -1,6 +1,6 @@
 package entity.items.weapons;
 
-import entity.BattleCharacter;
+import entity.BattleEntity;
 import entity.Weapon;
 import entity.interfaces.Droppable;
 import entity.interfaces.Equippable;
@@ -22,7 +22,7 @@ public class Dagger extends Weapon implements Droppable, Equippable {
   }
 
   @Override
-  public void drop(BattleCharacter battleCharacter) {
+  public void drop(BattleEntity battleCharacter) {
     if (battleCharacter.getWeapon() == this) {
       battleCharacter.setWeapon(new Fists());
     }
@@ -30,7 +30,7 @@ public class Dagger extends Weapon implements Droppable, Equippable {
   }
 
   @Override
-  public void equip(BattleCharacter battleCharacter) {
+  public void equip(BattleEntity battleCharacter) {
     battleCharacter.setWeapon(this);
   }
 }
