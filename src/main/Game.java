@@ -3,14 +3,17 @@ package main;
 import entity.Area;
 import entity.Entity;
 import entity.Event;
-import entity.characters.Player;
+import entity.enemies.Player;
 import entity.events.NewGame;
 import entity.interfaces.Leavable;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
+
 import window.Display;
 
 /**
@@ -20,8 +23,8 @@ public class Game extends Thread {
   private Display display = Display.getInstance();
   private Player player;
   private boolean newgame;
-  private static final String BACK = "\n-Back";
   private int input = -1;
+  public static final String BACK_NL = "\n-Back";
   
   /**
    * Constructor for game.
@@ -34,11 +37,9 @@ public class Game extends Thread {
   }
 
   private String getChoosingStrings(Object[] objects, String string) {
-    var stringBuilder = new StringBuilder(string);
-    for (Object o : objects) {
-      stringBuilder.append("\n-" + ((Entity) o).getName());
-    }
-    return stringBuilder.append(BACK).toString();
+    var sb = new StringBuilder(string);
+    Stream.of(objects).forEach(x -> sb.append("\n-" + ((Entity) x).getName()));
+    return sb.append(BACK_NL).toString();
   }
 
   private int waitForInput() {
@@ -82,13 +83,13 @@ public class Game extends Thread {
       case 3:areaShop(area);
         break;
       case 4: if (area instanceof Leavable l) {
-          var stringBuilder = new StringBuilder("Where do you want to go next?");
+          var sb = new StringBuilder("Where do you want to go next?");
           ArrayList<String> directionList = new ArrayList<>();
           for (String string : l.getDirections()) {
             directionList.add(string);
-            stringBuilder.append("\n-" + string);
+            sb.append("\n-" + string);
           }
-          int index = addText(stringBuilder.append(BACK).toString());
+          int index = addText(sb.append(BACK_NL).toString());
           if (index != directionList.size()) {
             nextArea = l.nextLocation(directionList.get(index));
           }
@@ -105,11 +106,9 @@ public class Game extends Thread {
 
   private void areaEvent(Area area) {
     if (area.hasEvents()) {
-      var stringBuilder = new StringBuilder("What do you want to do?");
-      for (Event action : area.getEvents()) {
-        stringBuilder.append("\n-" + action.getName());
-      }
-      int index = addText(stringBuilder.append(BACK).toString());
+      var sb = new StringBuilder("What do you want to do?");
+      Stream.of(area.getEvents()).forEach(x -> sb.append("\n-" + x.getName()));
+      int index = addText(sb.append(BACK_NL).toString());
       if (index != area.getEvents().length) {
         area.getEvents()[index].event(this);
       }
@@ -126,15 +125,15 @@ public class Game extends Thread {
       );
       if (index != area.getVendors().length) {
         var vendor = area.getVendors()[index];
-        var stringBuilder = new StringBuilder(vendor.greeting());
+        var sb = new StringBuilder(vendor.greeting());
         ArrayList<String> nameList = new ArrayList<>();
         for (Entry<String, Integer> entry : vendor.prices().entrySet()) {
           String key = entry.getKey();
           nameList.add(key);
-          stringBuilder.append("\n-" + key + ": " + entry.getValue().toString());
+          sb.append("\n-" + key + ": " + entry.getValue().toString());
         }
         clear();
-        index = addText(stringBuilder.append(BACK).toString());
+        index = addText(sb.append(BACK_NL).toString());
         if (index != nameList.size()) {
           var selectedString = nameList.get(index);
           var inventory = player.getInventory();
@@ -163,9 +162,7 @@ public class Game extends Thread {
       );
       if (index != area.getTalkers().length) {
         clear();
-        for (String string : area.getTalkers()[index].getText()) {
-          addText(string);
-        }
+        Stream.of(area.getTalkers()[index].getText()).forEach(this::addText);
       }
     } else {
       addText("No one to talk to in this location.");
@@ -186,10 +183,6 @@ public class Game extends Thread {
     return waitForInput();
   }
 
-  public synchronized int getInput() {
-    return input;
-  }
-
   /**
    * Clears the display.
    */
@@ -204,10 +197,18 @@ public class Game extends Thread {
   public void run() {
     if (newgame) {
       player = new Player();
+      var file = new File("saves/save.ser");
+      try {
+        if (file.createNewFile()) {
+          App.getMainWindow().serialize();
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
       new NewGame(this);
       area(player.getArea());
     } else {
-      try (var in = new ObjectInputStream(new FileInputStream("tmp/save.ser"))) {
+      try (var in = new ObjectInputStream(new FileInputStream("saves/save.ser"))) {
         player = (Player) in.readObject();
       } catch (IOException | ClassNotFoundException e) {
         App.logNoSaveFound();
@@ -220,6 +221,10 @@ public class Game extends Thread {
   
   public synchronized Player getPlayer() {
     return player;
+  }
+
+  public synchronized int getInput() {
+    return input;
   }
 
   public synchronized void setInput(int input) {

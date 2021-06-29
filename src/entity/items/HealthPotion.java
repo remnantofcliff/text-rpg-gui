@@ -1,9 +1,10 @@
 package entity.items;
 
-import entity.BattleEntity;
 import entity.Item;
+import entity.enemies.Player;
 import entity.interfaces.Droppable;
 import entity.interfaces.Usable;
+import utilities.Utilities;
 
 /**
  * Basic health potion class. Restores hp to player.
@@ -14,13 +15,13 @@ public class HealthPotion extends Item implements Droppable, Usable {
   }
   
   @Override
-  public void use(BattleEntity battleCharacter) {
-    drop(battleCharacter);
-    battleCharacter.addHp(25);
+  public void use(Player player) {
+    drop(player);
+    player.addHp(25);
   }
 
   @Override
-  public void drop(BattleEntity battleCharacter) {
-    battleCharacter.getInventory().remove(this);
+  public void drop(Player player) {
+    Utilities.dropItem(player, this);
   }
 }

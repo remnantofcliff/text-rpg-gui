@@ -1,7 +1,7 @@
 package entity.items.weapons;
 
-import entity.BattleEntity;
 import entity.Weapon;
+import entity.enemies.Player;
 import entity.interfaces.Droppable;
 import entity.interfaces.Equippable;
 
@@ -22,15 +22,15 @@ public class Club extends Weapon implements Droppable, Equippable {
   }
   
   @Override
-  public void drop(BattleEntity battleCharacter) {
-    if (battleCharacter.getWeapon() == this) {
-      battleCharacter.setWeapon(new Fists());
+  public void drop(Player player) {
+    if (player.getWeapon() == this) {
+      player.setWeapon(new Fists());
     }
-    battleCharacter.getInventory().remove(this);
+    player.getInventory().remove(this);
   }
 
   @Override
-  public void equip(BattleEntity battleCharacter) {
-    battleCharacter.setWeapon(this);
+  public void equip(Player player) {
+    player.setWeapon(this);
   }
 }

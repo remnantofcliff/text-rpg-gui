@@ -1,1 +1,0 @@
-start .\runtime\bin\javaw -jar --enable-preview .\text-rpg-gui.jar

@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import main.App;
 
 /**
  * Player's inventory.
@@ -21,28 +19,36 @@ public class Inventory implements Serializable {
 
   private Map<String, Integer> getType(Class<?> classToGet) {
     Map<String, Integer> tempMap = new TreeMap<>();
-    for (Item item : container) {
-      if (item.getClass().getSuperclass() == classToGet) {
-        if (tempMap.keySet().contains(item.getName())) {
-          tempMap.replace(item.getName(), tempMap.get(item.getName()) + 1);
-        } else {
-          tempMap.put(item.getName(), 1);
-        }
-      }
-    }
+    container.stream().filter(x -> x.getClass().getSuperclass() == classToGet).forEach(x -> putItemInMap(tempMap, x));
     return tempMap;
+  }
+
+  private void putItemInMap(Map<String, Integer> tempMap, Item x) {
+    if (tempMap.keySet().contains(x.getName())) {
+      tempMap.replace(x.getName(), tempMap.get(x.getName()) + 1);
+    } else {
+      tempMap.put(x.getName(), 1);
+    }
+  }
+
+  public Item getItem(String name) {
+    return container.stream().filter(x -> x.compareTo(new CustomItem(name)) == 0).findAny().orElse(null);
+  }
+
+  public Item[] array() {
+    return container.toArray(new Item[0]);
   }
 
   public Map<String, Integer> getArmors() {
     return getType(Armor.class);
   }
-
-  public Map<String, Integer> getWeapons() {
-    return getType(Weapon.class);
-  }
-
+  
   public Map<String, Integer> getItems() {
     return getType(Item.class);
+  }
+  
+  public Map<String, Integer> getWeapons() {
+    return getType(Weapon.class);
   }
 
   public boolean hasGold(int gold) {
@@ -68,22 +74,5 @@ public class Inventory implements Serializable {
 
   public void removeGold(int gold) {
     this.gold -= gold;
-  }
-
-  /**
-   * Returns an item in the inventory with the given name.
-
-   * @param name (String)
-   * @return (Item)
-   */
-  public Item getItem(String name) {
-    Item compareItem = new CustomItem(name);
-    for (Item item : container) {
-      if (item.compareTo(compareItem) == 0) {
-        return item;
-      }
-    }
-    App.logNoItemFound(name);
-    return null;
   }
 }

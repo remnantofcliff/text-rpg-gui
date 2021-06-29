@@ -24,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
+import main.App;
 import main.Game;
 import window.Display.Directions;
 import window.Display.DisplayStates;
@@ -108,10 +109,10 @@ public class MainWindow extends JFrame implements ActionListener {
    * Saves the game.
    */
   public void serialize() {
-    try (var out = new ObjectOutputStream(new FileOutputStream("tmp/save.ser"))) {
+    try (var out = new ObjectOutputStream(new FileOutputStream("saves/save.ser"))) {
       out.writeObject(game.getPlayer());
     } catch (IOException e) {
-      e.printStackTrace();
+      App.logNoSaveFound();
     }
   }
 
@@ -121,35 +122,6 @@ public class MainWindow extends JFrame implements ActionListener {
     display = Display.getInstance();
     add(display);
     requestFocus();
-  }
-
-  /**
-   * Opens the initial Menu screen.
-   */
-  public void menuScreen() {
-    inGame = false;
-    getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
-    var title = new JLabel("Deliquerat");
-    title.setAlignmentX(Component.CENTER_ALIGNMENT);
-    title.setBorder(new EmptyBorder(250, 0, 0, 0));
-    var titleFont = new Font(FONT_STRING, Font.ITALIC, 200);
-    title.setFont(titleFont);
-    title.setHorizontalAlignment(SwingConstants.CENTER);
-    var buttonPanel = new JPanel(new GridLayout(0, 1));
-    buttonPanel.setMaximumSize(new Dimension(300, 300));
-    var buttons = new JButton[3];
-    var buttonFont = new Font(FONT_STRING, Font.ITALIC, 20);
-    for (var i = 0; i < buttons.length; i++) {
-      buttons[i] = new JButton(buttonNames[i]);
-      buttons[i].addActionListener(this);
-      buttons[i].setActionCommand(buttonNames[i]);
-      buttons[i].setBackground(uiColor);
-      buttons[i].setFocusPainted(false);
-      buttons[i].setFont(buttonFont);
-      buttonPanel.add(buttons[i]);
-    }
-    add(title);
-    add(buttonPanel);
   }
 
   /**
@@ -188,5 +160,34 @@ public class MainWindow extends JFrame implements ActionListener {
 
   public Game getGame() {
     return game;
+  }
+
+  /**
+   * Opens the initial Menu screen.
+   */
+  public synchronized void menuScreen() {
+    inGame = false;
+    getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
+    var title = new JLabel("Deliquerat");
+    title.setAlignmentX(Component.CENTER_ALIGNMENT);
+    title.setBorder(new EmptyBorder(250, 0, 0, 0));
+    var titleFont = new Font(FONT_STRING, Font.ITALIC, 200);
+    title.setFont(titleFont);
+    title.setHorizontalAlignment(SwingConstants.CENTER);
+    var buttonPanel = new JPanel(new GridLayout(0, 1));
+    buttonPanel.setMaximumSize(new Dimension(300, 300));
+    var buttons = new JButton[3];
+    var buttonFont = new Font(FONT_STRING, Font.ITALIC, 20);
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i] = new JButton(buttonNames[i]);
+      buttons[i].addActionListener(this);
+      buttons[i].setActionCommand(buttonNames[i]);
+      buttons[i].setBackground(uiColor);
+      buttons[i].setFocusPainted(false);
+      buttons[i].setFont(buttonFont);
+      buttonPanel.add(buttons[i]);
+    }
+    add(title);
+    add(buttonPanel);
   }
 }

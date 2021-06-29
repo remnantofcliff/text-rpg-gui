@@ -10,19 +10,17 @@ public abstract class Weapon extends Item {
   protected double strengthModifier;
   protected double range;
   /**
-   * Calculates the damage that the weapon does given player stats.
+   * Calculates the damage that the weapon does given battleEntity stats.
 
-   * @param dexterity (int)
-   * @param magic (int)
-   * @param strength (int)
+   * @param e The BattleEntity 
    * @return (double)
    */
-  public double calculateDamage(int dexterity, int magic, int strength) {
+  public double calculateDamage(BattleEntity e) {
     return Math.floor(
       baseDamage 
-      + dexterityModifier * dexterity 
-      + magicModifier * magic 
-      + strengthModifier * strength
+      + dexterityModifier * e.getDexterity() 
+      + magicModifier * e.getMagic()
+      + strengthModifier * e.getStrength()
     );
   }
 

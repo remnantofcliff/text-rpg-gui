@@ -14,6 +14,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import main.App;
@@ -195,14 +196,12 @@ public class Display extends JPanel implements MouseWheelListener {
             }, spHalfway, spTextY + fontHeight * j);
         }
       } else {
-        for (var i = 1; i <= 3; i++) {
-          g.drawString(
-              switch (i) { case 1 -> "||Equipment||";
-              case 2 -> "Armor: " + player.getArmor().getName();
-              case 3 -> "Weapon: " + player.getWeapon().getName();
-              default -> "";
-            }, spTextX, spTextY + fontHeight * i);
-        }
+        IntStream.range(1, 4).forEach(i -> g.drawString(switch (i) {
+          case 1 -> "||Equipment||";
+          case 2 -> "Armor: " + player.getArmor().getName();
+          case 3 -> "Weapon: " + player.getWeapon().getName();
+          default -> "";
+        }, spTextX, spTextY + fontHeight * i));
         g.drawLine(spX, spLineY + fontHeight, spMaxX, spLineY + fontHeight);
       }
     }
@@ -239,17 +238,13 @@ public class Display extends JPanel implements MouseWheelListener {
   private void drawTopButtons(Graphics g) {
     g.setColor(Color.BLACK);
     g.setFont(smallFont);
-    for (var i = 0; i < UI_STRINGS.length; i++) {
-      g.drawString(UI_STRINGS[i], uiStringX[i], uiStringY);
-    }
+    IntStream.range(0, UI_STRINGS.length).forEach(i -> g.drawString(UI_STRINGS[i], uiStringX[i], uiStringY));
     Graphics2D g2D = (Graphics2D) g;
     g2D.setRenderingHint(
         RenderingHints.KEY_TEXT_ANTIALIASING,
         RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB
     );
-    for (var i = 0; i < buttons.length; i++) {
-      g2D.draw(buttons[i]);
-    }
+    IntStream.range(0, buttons.length).forEach(i -> g2D.draw(buttons[i]));
     if (mouseOverSelection != 3) {
       g.setColor(SELECTION_COLOR);
       g2D.fill(buttons[mouseOverSelection]);

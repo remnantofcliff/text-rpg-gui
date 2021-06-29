@@ -16,10 +16,13 @@ public abstract class Armor extends Item {
    */
   public double absorb(double damage, boolean magic) {
     double flat = damage - flatAbsorption;
-    if (magic) {
-      return flat * magicAbsorption;
+    if (flat <= 0) {
+      return 0;
     }
-    return flat * physicalAbsorption;
+    if (magic) {
+      return flat * (1 - magicAbsorption);
+    }
+    return flat * (1 - physicalAbsorption);
   }
   
   @Override

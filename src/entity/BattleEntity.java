@@ -1,13 +1,10 @@
 package entity;
 
-import inventory.Inventory;
-
 /**
  * Class for characters that can battle.
  */
 public abstract class BattleEntity extends Entity {
   protected Armor armor;
-  protected Inventory inventory = new Inventory();
   protected Weapon weapon;
   protected double hp;
   protected double mp;
@@ -22,10 +19,6 @@ public abstract class BattleEntity extends Entity {
   
   public Armor getArmor() {
     return armor;
-  }
-
-  public Inventory getInventory() {
-    return inventory;
   }
   /**
    * Adds the parameter amount of hp. If larger than maxHp, sets hp to maxHp.
@@ -145,4 +138,6 @@ public abstract class BattleEntity extends Entity {
   public void setMagic(int magic) {
     this.magic = magic;
   }
+
+  public abstract void setDefaultValues();
 }
