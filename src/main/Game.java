@@ -2,7 +2,6 @@ package main;
 
 import entity.Area;
 import entity.Entity;
-import entity.Event;
 import entity.enemies.Player;
 import entity.events.NewGame;
 import entity.interfaces.Leavable;
@@ -13,7 +12,6 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
-
 import window.Display;
 
 /**
@@ -65,12 +63,7 @@ public class Game extends Thread {
   private void area(Area area) {
     player.setArea(area);
     clear();
-    int temp = addText(
-        area.getName()
-        + " | "
-        + area.getLocation()
-        + "\n-Action\n-Description\n-Talk\n-Shop\n-Leave"
-    );
+    int temp = addText(area.getName() + " | " + area.getLocation() + "\n-Action\n-Description\n-Talk\n-Shop\n-Leave");
     var nextArea = area;
     clear();
     switch (temp) {
@@ -120,9 +113,7 @@ public class Game extends Thread {
   private void areaShop(Area area) {
     clear();
     if (area.hasVendors()) {
-      int index = addText(
-          getChoosingStrings(area.getVendors(), "Who would you like to barter with?")
-      );
+      int index = addText(getChoosingStrings(area.getVendors(), "Who would you like to barter with?"));
       if (index != area.getVendors().length) {
         var vendor = area.getVendors()[index];
         var sb = new StringBuilder(vendor.greeting());
@@ -157,9 +148,7 @@ public class Game extends Thread {
   private void areaTalk(Area area) {
     clear();
     if (area.hasTalkers()) {
-      int index = addText(
-          getChoosingStrings(area.getTalkers(), "Who do you want to talk to?")
-      );
+      int index = addText(getChoosingStrings(area.getTalkers(), "Who do you want to talk to?"));
       if (index != area.getTalkers().length) {
         clear();
         Stream.of(area.getTalkers()[index].getText()).forEach(this::addText);

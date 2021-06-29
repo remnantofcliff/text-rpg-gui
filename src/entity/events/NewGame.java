@@ -42,10 +42,7 @@ public class NewGame extends Event {
     game.addText("Thrown in here, and left to die...\"");
     game.clear();
     game.addText("\"Be careful out there\" ");
-    game.addText("""
-        
-        There's nothing worse than seeing the people I save just die a gruelsome death.., 
-        """);
+    game.addText("\nThere's nothing worse than seeing the people I save just die a gruelsome death.., ");
     game.addText("as many have...\"");
     game.clear();
     game.addText("The man lights up a candle. ");
@@ -55,9 +52,7 @@ public class NewGame extends Event {
     game.addText("\"You need to leave. ");
     game.addText("I don't have anything else for you.\"");
     game.clear();
-    game.addText("""
-        You can't quite tell how old the man is due to the scars and damage he's suffered. 
-        """);
+    game.addText("You can't quite tell how old the man is due to the scars and damage he's suffered. ");
     game.addText("He shows you the way to the door that leads you to the outside.");
     game.clear();
     game.addText("He opens the door and says in a calming manner: ");
@@ -65,9 +60,7 @@ public class NewGame extends Event {
     game.addText("Many have tried, ");
     game.addText("and just as many have failed.\"");
     game.clear();
-    game.addText("""
-        "This place is where criminals, fugitives, and heretics of Nilium are left to die." 
-        """);
+    game.addText("\"This place is where criminals, fugitives, and heretics of Nilium are left to die.\"");
     game.clear();
     game.addText("You see a large cave out of the door. ");
     game.addText("The place is lit up by torches and you see a few people standing around.");

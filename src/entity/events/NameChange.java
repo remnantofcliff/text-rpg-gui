@@ -22,8 +22,7 @@ public class NameChange extends Event {
   public void event(Game game) {
     var player = game.getPlayer();
     while (game.getInput() != -2) {
-      String newName = 
-          JOptionPane.showInputDialog(App.getMainWindow(), "What is your name?", player.getName());
+      String newName = JOptionPane.showInputDialog(App.getMainWindow(), "What is your name?", player.getName());
       if (newName != null) {
         player.setName(newName);
       }

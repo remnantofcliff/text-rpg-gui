@@ -16,12 +16,7 @@ public abstract class Weapon extends Item {
    * @return (double)
    */
   public double calculateDamage(BattleEntity e) {
-    return Math.floor(
-      baseDamage 
-      + dexterityModifier * e.getDexterity() 
-      + magicModifier * e.getMagic()
-      + strengthModifier * e.getStrength()
-    );
+    return Math.floor(baseDamage + dexterityModifier * e.getDexterity() + magicModifier * e.getMagic() + strengthModifier * e.getStrength());
   }
 
   @Override

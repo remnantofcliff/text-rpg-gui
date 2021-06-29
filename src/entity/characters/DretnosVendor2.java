@@ -27,10 +27,10 @@ public class DretnosVendor2 extends Entity implements Vendor {
 
   @Override
   public Item getItem(String name) {
-    switch (name) {
-      case"Robes": return new Robes();
-      case"Leather Armor": return new LeatherArmor();
-      default: return null;
-    }
+    return switch (name) {
+      case"Robes" -> new Robes();
+      case"Leather Armor" -> new LeatherArmor();
+      default -> null;
+    };
   }
 }

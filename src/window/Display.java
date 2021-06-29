@@ -85,12 +85,13 @@ public class Display extends JPanel implements MouseWheelListener {
         arr[i] = arr[i].substring(0, lastSpace);
       }
       int j = i + 1;
-      if (j == arr.length && !sb.isEmpty()) {
+      boolean isEmpty = !sb.isEmpty();
+      if (j == arr.length && isEmpty) {
         var temp = new String[arr.length + 1];
         System.arraycopy(arr, 0, temp, 0, arr.length);
         arr = temp;
       }
-      if (!sb.isEmpty()) {
+      if (isEmpty) {
         arr[j] = arr[j] == null ? sb.substring(1) : sb.append(" ").substring(1) + arr[j];
       }
     }
@@ -196,12 +197,13 @@ public class Display extends JPanel implements MouseWheelListener {
             }, spHalfway, spTextY + fontHeight * j);
         }
       } else {
-        IntStream.range(1, 4).forEach(i -> g.drawString(switch (i) {
-          case 1 -> "||Equipment||";
-          case 2 -> "Armor: " + player.getArmor().getName();
-          case 3 -> "Weapon: " + player.getWeapon().getName();
-          default -> "";
-        }, spTextX, spTextY + fontHeight * i));
+        IntStream.range(1, 4).forEach(i -> g.drawString(
+            switch (i) {
+            case 1 -> "||Equipment||";
+            case 2 -> "Armor: " + player.getArmor().getName();
+            case 3 -> "Weapon: " + player.getWeapon().getName();
+            default -> "";
+          }, spTextX, spTextY + fontHeight * i));
         g.drawLine(spX, spLineY + fontHeight, spMaxX, spLineY + fontHeight);
       }
     }
@@ -213,12 +215,7 @@ public class Display extends JPanel implements MouseWheelListener {
       selectedIndex = SELECTABLE_LINES.size() - 1;
     }
     if (!SELECTABLE_LINES.isEmpty()) {
-      g.fillRect(
-          borderWidth,
-          borderHeight + 5 + SELECTABLE_LINES.get(selectedIndex) * fontHeight + maxDescent,
-          wdtOffset2,
-          fontHeight
-      );
+      g.fillRect(borderWidth, borderHeight + 5 + SELECTABLE_LINES.get(selectedIndex) * fontHeight + maxDescent, wdtOffset2, fontHeight);
     }
   }
  
@@ -240,10 +237,7 @@ public class Display extends JPanel implements MouseWheelListener {
     g.setFont(smallFont);
     IntStream.range(0, UI_STRINGS.length).forEach(i -> g.drawString(UI_STRINGS[i], uiStringX[i], uiStringY));
     Graphics2D g2D = (Graphics2D) g;
-    g2D.setRenderingHint(
-        RenderingHints.KEY_TEXT_ANTIALIASING,
-        RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB
-    );
+    g2D.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
     IntStream.range(0, buttons.length).forEach(i -> g2D.draw(buttons[i]));
     if (mouseOverSelection != 3) {
       g.setColor(SELECTION_COLOR);
@@ -280,9 +274,7 @@ public class Display extends JPanel implements MouseWheelListener {
    * Close the game and reset MainWindow to main menu.
    */
   public void exit() {
-    if (JOptionPane.showConfirmDialog(mw, "Quit to main menu?", "Quit?",
-        JOptionPane.YES_NO_OPTION
-    ) == 0) {
+    if (JOptionPane.showConfirmDialog(mw, "Quit to main menu?", "Quit?", JOptionPane.YES_NO_OPTION) == 0) {
       clear();
       mw.serialize();
       mw.getGame().interrupt();
