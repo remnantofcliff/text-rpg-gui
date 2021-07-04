@@ -1,11 +1,15 @@
 package entity.events;
 
+import static utilities.Utilities.round;
+
 import entity.Enemy;
 import entity.Event;
-import entity.enemies.Player;
+import entity.Special;
+import entity.player.Player;
 import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Stream;
+import javax.swing.SwingUtilities;
 import main.App;
 import main.Game;
 
@@ -15,6 +19,8 @@ import main.Game;
 public class Battle extends Event {
   private Enemy[] enemies;
   private Random random = new Random();
+  private int turns = 1;
+  private static final String BACK = "-Back";
 
   /**
    * Creates a new battle event. Takes in the enemies as a parameter.
@@ -42,7 +48,7 @@ public class Battle extends Event {
     switch (temp) {
       case 0:attack(game, player);
         break;
-      case 1:
+      case 1:special(game, player);
         break;
       case 2:
         break;
@@ -56,7 +62,12 @@ public class Battle extends Event {
       game.addText(".");
       game.addText(".");
       game.addText(".");
-      App.getMainWindow().menuScreen();
+      game.clear();
+      game.interrupt();
+      SwingUtilities.invokeLater(() -> {
+        App.getMainWindow().reset();
+        App.getMainWindow().menuScreen();
+      });
       return;
     }
     if (Stream.of(enemies).allMatch(x -> x.getHp() == 0)) {
@@ -68,22 +79,48 @@ public class Battle extends Event {
       });
       return;
     }
-    event(game);
+    turns++;
+    if (game.getInput() != -2) {
+      event(game);
+    }
   }
 
   private void attack(Game game, Player player) {
-    var sb = new StringBuilder();
+    var sb = new StringBuilder("Choose who to attack:\n");
     Stream.of(enemies).forEach(x -> sb.append("-" + x.getName() + " " + x.getHp() + " / " + x.getMaxHp() + "\n"));
-    int temp = game.addText(sb.append("-Back").toString());
-    double damage = enemies[temp].getArmor().absorb(player.getWeapon().calculateDamage(player), false);
-    enemies[temp].removeHp(damage);
+    int index = game.addText(sb.append(BACK).toString());
+    if (index == enemies.length) {
+      return;
+    }
+    float damage = round(enemies[index].getArmor().absorb(player.getWeapon().calculateDamage(player), player.getWeapon().getDamageTypeMap()));
+    enemies[index].removeHp(damage);
     game.clear();
-    game.addText("Dealt " + damage + " damage to " + enemies[temp].getName());
+    game.addText("Dealt " + damage + " damage to " + enemies[index].getName());
     game.clear();
+    enemyAttack(game, player);
+  }
+
+  private void enemyAttack(Game game, Player player) {
     for (Enemy e : enemies) {
-      damage = player.getArmor().absorb(e.getWeapon().calculateDamage(e), false);
+      float damage = round(player.getArmor().absorb(e.getWeapon().calculateDamage(e), e.getWeapon().getDamageTypeMap()));
       player.removeHp(damage);
       game.addText(e.getName() + " dealt " + damage + " damage to you!\n");
+    }
+  }
+
+  private void special(Game game, Player player) {
+    var sb = new StringBuilder();
+    Special[] specials = player.getSpecials();
+    Stream.of(specials).forEach(x -> sb.append("-" + x.getName() + "  " + x.getResourceCost() + "\n"));
+    int index = game.addText(sb.append(BACK).toString());
+    if (index == specials.length) {
+      return;
+    }
+    game.clear();
+    if (specials[index].getResourceCost() <= player.getSp()) {
+      specials[index].use(player, game, enemies);
+    } else {
+      game.addText("Not enough SP: " + player.getSp() + " / " + specials[index].getResourceCost() + " required.");
     }
   }
 }

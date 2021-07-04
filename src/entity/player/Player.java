@@ -1,5 +1,6 @@
-package entity.enemies;
+package entity.player;
 
+import core.Difficulties;
 import entity.Area;
 import entity.Armor;
 import entity.BattleEntity;
@@ -8,7 +9,6 @@ import entity.areas.Dretnos;
 import entity.items.armors.Rags;
 import entity.items.weapons.Fists;
 import inventory.Inventory;
-import main.Difficulties;
 
 /**
  * Player character class.
@@ -62,14 +62,13 @@ public class Player extends BattleEntity {
     hp = 100;
     mp = 100;
     sp = 100;
-    speed = 1;
     dexterity = 1;
     magic = 1;
     strength = 1;
     inventory.add(new Fists());
     inventory.add(new Rags());
     weapon = (Weapon) inventory.getItem("Fists");
-    armor = (Armor) inventory.getItem("Rags");    
+    armor = (Armor) inventory.getItem("Rags");
   }
 
   public void setDifficulty(Difficulties difficulty) {

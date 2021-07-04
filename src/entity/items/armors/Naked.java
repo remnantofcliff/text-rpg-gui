@@ -1,6 +1,14 @@
 package entity.items.armors;
 
+import static core.DamageTypes.FIRE;
+import static core.DamageTypes.ICE;
+import static core.DamageTypes.LIGHTNING;
+import static core.DamageTypes.PHYSICAL;
+import static core.DamageTypes.POISON;
+import static core.DamageTypes.WATER;
+
 import entity.Armor;
+import java.util.Map;
 
 /**
  * Armor for when nothing is worn.
@@ -14,8 +22,14 @@ public class Naked extends Armor {
   private Naked() {
     name = "Naked";
     flatAbsorption = 0;
-    physicalAbsorption = 0;
-    magicAbsorption = 0;
+    absorptionMap.putAll(Map.of(
+        FIRE, 0f,
+        ICE, 0f,
+        LIGHTNING, 0f,
+        PHYSICAL, 0f,
+        POISON, 0f,
+        WATER, 0f
+    ));
   }
 
   /**

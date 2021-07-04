@@ -1,15 +1,20 @@
 package entity;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 /**
  * Class for characters that can battle.
  */
 public abstract class BattleEntity extends Entity {
   protected Armor armor;
+  protected ArrayList<Special> specials = new ArrayList<>();
+  protected ArrayList<Spell> spells = new ArrayList<>();
+  protected HashSet<String> statusEffects = new HashSet<>();
   protected Weapon weapon;
-  protected double hp;
-  protected double mp;
-  protected double sp;
-  protected double speed;
+  protected float hp;
+  protected float mp;
+  protected float sp;
   protected int dexterity;
   protected int magic;
   protected int maxHp;
@@ -20,59 +25,37 @@ public abstract class BattleEntity extends Entity {
   public Armor getArmor() {
     return armor;
   }
-  /**
-   * Adds the parameter amount of hp. If larger than maxHp, sets hp to maxHp.
 
-   * @param add Hp to be added (double)
-   */
-  public boolean addHp(double add) {
-    if (hp == maxHp) {
-      return false;
-    }
-    hp += Math.floor(add);
-    if (hp >= maxHp) {
-      hp = maxHp;
-    }
-    return true;
+  public Special[] getSpecials() {
+    return specials.toArray(new Special[0]);
   }
-  /**
-   * Removes the parameter amount of hp. If smaller than 0, sets hp to 0.
 
-   * @param remove Hp to be removed (double)
-   */
-  public void removeHp(double remove) {
-    hp -= Math.floor(remove);
-    if (hp <= 0) {
-      hp = 0;
-    }
-  }
-  
-  public void setArmor(Armor armor) {
-    this.armor = armor;
+  public Spell[] getSpells() {
+    return spells.toArray(new Spell[0]);
   }
 
   public Weapon getWeapon() {
     return weapon;
   }
 
-  public void setWeapon(Weapon weapon) {
-    this.weapon = weapon;
-  }
-
-  public double getHp() {
+  public float getHp() {
     return hp;
   }
 
-  public double getMp() {
+  public float getMp() {
     return mp;
   }
 
-  public double getSp() {
+  public float getSp() {
     return sp;
   }
 
-  public double getSpeed() {
-    return speed;
+  public int getDexterity() {
+    return dexterity;
+  }
+
+  public int getMagic() {
+    return magic;
   }
 
   public int getMaxHp() {
@@ -90,53 +73,87 @@ public abstract class BattleEntity extends Entity {
   public int getStrength() {
     return strength;
   }
+  /**
+   * Adds the parameter amount of hp. If larger than maxHp, sets hp to maxHp.
 
-  public int getDexterity() {
-    return dexterity;
+   * @param num Hp to be added (float)
+   */
+  public void addHp(float num) {
+    hp += num;
+    if (hp > maxHp) {
+      hp = maxHp;
+    }
+  }
+  /**
+   * Adds the parameter amount of mp. If larger than maxMp, sets mp to maxMp.
+
+   * @param num Mp to be added (int)
+   */
+  public void addMp(int num) {
+    mp += num;
+    if (mp > maxMp) {
+      mp = maxMp;
+    }
+  }
+  /**
+   * Adds the parameter amount of sp. If larger than maxSp, sets sp to maxSp.
+
+   * @param num Sp to be added (int)
+   */
+  public void addSp(int num) {
+    sp += num;
+    if (sp > maxSp) {
+      sp = maxSp;
+    }
   }
 
-  public int getMagic() {
-    return magic;
+  public void addSpecial(Special special) {
+    specials.add(special);
   }
 
-  public void setHp(double hp) {
-    this.hp = hp;
+  public void addSpell(Spell spell) {
+    spells.add(spell);
+  }
+  /**
+   * Removes the parameter amount of hp. If smaller than 0, sets hp to 0.
+
+   * @param num Hp to be removed (float)
+   */
+  public void removeHp(float num) {
+    hp -= num;
+    if (hp < 0) {
+      hp = 0;
+    }
+  }
+  /**
+   * Removes the parameter amount of mp. If smaller than 0, sets mp to 0.
+
+   * @param remove Mp to be removed (int)
+   */
+  public void removeMp(int remove) {
+    mp -= remove;
+    if (mp < 0) {
+      mp = 0; 
+    }
+  }
+  /**
+   * Removes the parameter amount of sp. If smaller than 0, sets sp to 0.
+
+   * @param remove Sp to be removed (int)
+   */
+  public void removeSp(int remove) {
+    sp -= remove;
+    if (sp < 0) {
+      sp = 0;
+    }
+  }
+  
+  public void setArmor(Armor armor) {
+    this.armor = armor;
   }
 
-  public void setMp(double mp) {
-    this.mp = mp;
-  }
-
-  public void setSp(double sp) {
-    this.sp = sp;
-  }
-
-  public void setSpeed(double speed) {
-    this.speed = speed;
-  }
-
-  public void setMaxHp(int maxHp) {
-    this.maxHp = maxHp;
-  }
-
-  public void setMaxMp(int maxMp) {
-    this.maxMp = maxMp;
-  }
-
-  public void setMaxSp(int maxSp) {
-    this.maxSp = maxSp;
-  }
-
-  public void setStrength(int strength) {
-    this.strength = strength;
-  }
-
-  public void setDexterity(int dexterity) {
-    this.dexterity = dexterity;
-  }
-
-  public void setMagic(int magic) {
-    this.magic = magic;
+  public void setWeapon(Weapon weapon) {
+    this.weapon = weapon;
   }
 
   public abstract void setDefaultValues();

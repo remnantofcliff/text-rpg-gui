@@ -1,4 +1,4 @@
-package entity.items.weapons;
+package core;
 
 import utilities.Utilities;
 
@@ -6,7 +6,7 @@ import utilities.Utilities;
  * Enum of damage-types.
  */
 public enum DamageTypes {
-  FIRE, MAGIC, PHYSICAL, POISON;
+  FIRE, ICE, LIGHTNING, PHYSICAL, POISON, WATER;
 
   @Override
   public String toString() {

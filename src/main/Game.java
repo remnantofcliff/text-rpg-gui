@@ -2,9 +2,9 @@ package main;
 
 import entity.Area;
 import entity.Entity;
-import entity.enemies.Player;
 import entity.events.NewGame;
 import entity.interfaces.Leavable;
+import entity.player.Player;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

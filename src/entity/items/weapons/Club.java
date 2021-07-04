@@ -1,9 +1,10 @@
 package entity.items.weapons;
 
+import core.DamageTypes;
 import entity.Weapon;
-import entity.enemies.Player;
 import entity.interfaces.Droppable;
 import entity.interfaces.Equippable;
+import entity.player.Player;
 
 /**
  * Club-weapon.
@@ -15,10 +16,11 @@ public class Club extends Weapon implements Droppable, Equippable {
   public Club() {
     name = "Club";
     baseDamage = 5;
-    dexterityModifier = 0.5;
+    dexterityModifier = 0.5f;
     magicModifier = 0;
     strengthModifier = 2;
-    range = 0.8;
+    range = 0.8f;
+    damageTypeMap.put(DamageTypes.PHYSICAL, 1f);
   }
   
   @Override

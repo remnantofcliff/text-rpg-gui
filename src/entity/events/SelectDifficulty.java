@@ -1,7 +1,7 @@
 package entity.events;
 
+import core.Difficulties;
 import entity.Event;
-import main.Difficulties;
 import main.Game;
 
 /**

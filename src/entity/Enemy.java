@@ -2,6 +2,7 @@ package entity;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import main.Game;
 
 /**
  * Enemy-class, subclass of BattleEntity.
@@ -25,4 +26,6 @@ public abstract class Enemy extends BattleEntity {
     }
     return null;
   }
+
+  public abstract void chooseAttack(Game game);
 }

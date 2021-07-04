@@ -1,9 +1,10 @@
 package entity.items.weapons;
 
+import core.DamageTypes;
 import entity.Weapon;
-import entity.enemies.Player;
 import entity.interfaces.Droppable;
 import entity.interfaces.Equippable;
+import entity.player.Player;
 
 /**
  * Dagger-weapon.
@@ -18,7 +19,8 @@ public class Dagger extends Weapon implements Droppable, Equippable {
     dexterityModifier = 2;
     magicModifier = 0;
     strengthModifier = 1;
-    range = 0.5;
+    range = 0.5f;
+    damageTypeMap.put(DamageTypes.PHYSICAL, 1f);
   }
 
   @Override

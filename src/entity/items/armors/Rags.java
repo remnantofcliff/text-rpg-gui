@@ -1,9 +1,17 @@
 package entity.items.armors;
 
+import static core.DamageTypes.FIRE;
+import static core.DamageTypes.ICE;
+import static core.DamageTypes.LIGHTNING;
+import static core.DamageTypes.PHYSICAL;
+import static core.DamageTypes.POISON;
+import static core.DamageTypes.WATER;
+
 import entity.Armor;
-import entity.enemies.Player;
 import entity.interfaces.Droppable;
 import entity.interfaces.Equippable;
+import entity.player.Player;
+import java.util.Map;
 
 /**
  * Rags-armor.
@@ -15,8 +23,14 @@ public class Rags extends Armor implements Droppable, Equippable {
   public Rags() {
     name = "Rags";
     flatAbsorption = 0;
-    physicalAbsorption = 0;
-    magicAbsorption = 0.1;
+    absorptionMap.putAll(Map.of(
+        FIRE, 0f,
+        ICE, 0.05f,
+        LIGHTNING, 0f,
+        PHYSICAL, 0.05f,
+        POISON, 0f,
+        WATER, 0.05f
+    ));
   }
 
   @Override

@@ -1,5 +1,6 @@
 package entity.items.weapons;
 
+import core.DamageTypes;
 import entity.Weapon;
 
 /**
@@ -15,6 +16,7 @@ public class CrawlerBite extends Weapon {
     dexterityModifier = 1;
     magicModifier = 0;
     strengthModifier = 1;
-    range = 0.5;
+    range = 0.5f;
+    damageTypeMap.put(DamageTypes.PHYSICAL, 1f);
   }
 }

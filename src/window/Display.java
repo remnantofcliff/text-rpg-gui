@@ -14,6 +14,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -61,9 +62,8 @@ public class Display extends JPanel implements MouseWheelListener {
   private static final Color PANEL_COLOR = new Color(100, 100, 255, 230);
   private static final Color TEXT_COLOR = App.getMainWindow().getUiColor();
   private static final List<Integer> SELECTABLE_LINES = new ArrayList<>();
-  private static final List<Integer> CHARACTER_LINE_INTEGERS = List.of(0, 3, 7, 11);
-  private static final String[] CHARACTER_STRINGS = {"||Character||", "Name:", "Difficulty:", "",
-    "Health:", "Mana:", "Stamina:", "", "Dexterity:", "Magic:", "Strength:", "", "Speed:"};
+  private static final Set<Integer> CHARACTER_LINE_INTEGERS = Set.of(0, 3, 7, 11);
+  private static final String[] CHARACTER_STRINGS = {"||Character||", "Name:", "Difficulty:", "", "Health:", "Mana:", "Stamina:", "", "Dexterity:", "Magic:", "Strength:"};
   private static final String[] UI_STRINGS = {"Character", "Equipment", "Menu"};
 
   /**
@@ -184,7 +184,8 @@ public class Display extends JPanel implements MouseWheelListener {
           }
           g.drawString(CHARACTER_STRINGS[i], spTextX, spTextY + fontHeight * j);
           g.drawString(
-              switch (i) { case 1 -> player.getName();
+              switch (i) {
+              case 1 -> player.getName();
               case 2 -> player.getDifficulty().toString();
               case 4 -> player.getHp() + " / " + player.getMaxHp();
               case 5 -> player.getMp() + " / " + player.getMaxMp();
@@ -192,7 +193,6 @@ public class Display extends JPanel implements MouseWheelListener {
               case 8 -> Integer.toString(player.getDexterity());
               case 9 -> Integer.toString(player.getMagic());
               case 10 -> Integer.toString(player.getStrength());
-              case 12 -> Double.toString(player.getSpeed());
               default -> "";
             }, spHalfway, spTextY + fontHeight * j);
         }

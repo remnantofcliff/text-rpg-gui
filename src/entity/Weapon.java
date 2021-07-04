@@ -1,22 +1,32 @@
 package entity;
 
+import core.DamageTypes;
+import java.util.EnumMap;
+import java.util.Map;
+import utilities.Utilities;
+
 /**
  * Abstract weapon class.
  */
 public abstract class Weapon extends Item {
-  protected double baseDamage;
-  protected double dexterityModifier;
-  protected double magicModifier;
-  protected double strengthModifier;
-  protected double range;
+  protected EnumMap<DamageTypes, Float> damageTypeMap = new EnumMap<>(DamageTypes.class);
+  protected float baseDamage;
+  protected float dexterityModifier;
+  protected float magicModifier;
+  protected float strengthModifier;
+  protected float range;
+
+  public Map<DamageTypes, Float> getDamageTypeMap() {
+    return damageTypeMap;
+  }
   /**
    * Calculates the damage that the weapon does given battleEntity stats.
 
    * @param e The BattleEntity 
-   * @return (double)
+   * @return (float)
    */
-  public double calculateDamage(BattleEntity e) {
-    return Math.floor(baseDamage + dexterityModifier * e.getDexterity() + magicModifier * e.getMagic() + strengthModifier * e.getStrength());
+  public float calculateDamage(BattleEntity e) {
+    return Utilities.round(baseDamage + dexterityModifier * e.getDexterity() + magicModifier * e.getMagic() + strengthModifier * e.getStrength());
   }
 
   @Override

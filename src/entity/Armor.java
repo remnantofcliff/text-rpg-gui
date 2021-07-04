@@ -1,28 +1,33 @@
 package entity;
 
+import core.DamageTypes;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 /**
  * Abstract armor class.
  */
 public abstract class Armor extends Item {
   protected int flatAbsorption;
-  protected double physicalAbsorption;
-  protected double magicAbsorption;
+  protected EnumMap<DamageTypes, Float> absorptionMap = new EnumMap<>(DamageTypes.class);
   /**
    * Returns damage after calculating negation by armor.
 
-   * @param damage (double)
-   * @param magic true if magic, false if physical damage type (boolean)
-   * @return (double)
+   * @param damage (float)
+   * @param damageTypeMap contains attacks damagetypes and float numbers as percentage of damage.
+   * @return (float)
    */
-  public double absorb(double damage, boolean magic) {
-    double flat = damage - flatAbsorption;
+  public float absorb(float damage, Map<DamageTypes, Float> damageTypeMap) {
+    float flat = damage - flatAbsorption;
     if (flat <= 0) {
       return 0;
     }
-    if (magic) {
-      return flat * (1 - magicAbsorption);
+    damage = 0;
+    for (Entry<DamageTypes, Float> entry : damageTypeMap.entrySet()) {
+      damage = flat * entry.getValue() * (1 - absorptionMap.get(entry.getKey()));
     }
-    return flat * (1 - physicalAbsorption);
+    return damage;
   }
   
   @Override

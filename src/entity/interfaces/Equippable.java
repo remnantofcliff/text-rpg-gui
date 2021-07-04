@@ -1,6 +1,6 @@
 package entity.interfaces;
 
-import entity.enemies.Player;
+import entity.player.Player;
 
 /**
  * For items that can be equipped.
