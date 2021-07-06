@@ -22,26 +22,21 @@ public class Crawler extends Enemy implements Stunnable {
   @Override
   public void setDefaultValues() {
     name = "Crawler";
-    maxHp = 50;
-    maxMp = 0;
-    maxSp = 0;
-    hp = 50;
-    mp = 0;
-    sp = 0;
-    dexterity = 1;
-    magic = 0;
-    strength = 1;
     weapon = new CrawlerBite();
     armor = new CrawlerScales();
     specials.add(new Rush());
     dropTable.put(0.2f, new CrawlerScale());
+    setMaxResources(50, 0, 4);
+    setStats(1, 0, 1);
   }
 
   @Override
-  public void chooseAttack(Game game) {
-    if (game.getPlayer().getHp() < 50 && sp > specials.get(0).getResourceCost()) {
+  public boolean chooseAbility(Game game) {
+    if (game.getPlayer().getHp() < 50 && sp >= specials.get(0).getResourceCost()) {
       specials.get(0).use(this, game, game.getPlayer());
+      return true;
     }
+    return false;
   }
 
   @Override

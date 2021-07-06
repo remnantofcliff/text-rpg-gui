@@ -2,9 +2,11 @@ package entity.events;
 
 import static utilities.Utilities.round;
 
+import entity.Ability;
 import entity.Enemy;
 import entity.Event;
 import entity.Special;
+import entity.interfaces.Stunnable;
 import entity.player.Player;
 import java.util.Objects;
 import java.util.Random;
@@ -36,6 +38,8 @@ public class Battle extends Event {
   @Override
   public void event(Game game) {
     var player = game.getPlayer();
+    Stream.of(enemies).forEach(Enemy::regenerateSp);
+    player.regenerateSp();
     game.clear();
     int temp = game.addText(
         player.getName() 
@@ -48,9 +52,9 @@ public class Battle extends Event {
     switch (temp) {
       case 0:attack(game, player);
         break;
-      case 1:special(game, player);
+      case 1:ability(game, player, player.getSpecials());
         break;
-      case 2:
+      case 2:ability(game, player, player.getSpells());
         break;
       case 3:
         break;
@@ -101,26 +105,38 @@ public class Battle extends Event {
   }
 
   private void enemyAttack(Game game, Player player) {
-    for (Enemy e : enemies) {
-      float damage = round(player.getArmor().absorb(e.getWeapon().calculateDamage(e), e.getWeapon().getDamageTypeMap()));
+    Stream.of(enemies).filter(x -> !x.getStatusEffects().contains(Stunnable.STUNNED)).filter(x -> !x.chooseAbility(game)).forEach(x -> {
+      float damage = round(player.getArmor().absorb(x.getWeapon().calculateDamage(x), x.getWeapon().getDamageTypeMap()));
       player.removeHp(damage);
-      game.addText(e.getName() + " dealt " + damage + " damage to you!\n");
-    }
+      game.addText(x.getName() + " dealt " + damage + " damage to you!\n");
+    });
   }
 
-  private void special(Game game, Player player) {
-    var sb = new StringBuilder();
-    Special[] specials = player.getSpecials();
-    Stream.of(specials).forEach(x -> sb.append("-" + x.getName() + "  " + x.getResourceCost() + "\n"));
+  private void ability(Game game, Player player, Ability[] abilities) {
+    String choose;
+    String stat;
+    int resource;
+    if (abilities instanceof Special[]) {
+      choose = "special ability";
+      resource = player.getSp();
+      stat = "SP";
+    } else {
+      choose = "spell";
+      resource = (int) player.getMp();
+      stat = "MP";
+    }
+    var sb = new StringBuilder("Choose " + choose + ":\n");
+    Stream.of(abilities).forEach(x -> sb.append("-" + x.getName() + " " + x.getResourceCost() + stat + "\n"));
     int index = game.addText(sb.append(BACK).toString());
-    if (index == specials.length) {
+    if (index == abilities.length) {
       return;
     }
     game.clear();
-    if (specials[index].getResourceCost() <= player.getSp()) {
-      specials[index].use(player, game, enemies);
+    if (abilities[index].getResourceCost() <= resource) {
+      abilities[index].use(player, game, enemies);
+      enemyAttack(game, player);
     } else {
-      game.addText("Not enough SP: " + player.getSp() + " / " + specials[index].getResourceCost() + " required.");
+      game.addText("Not enough " + stat + ": " + resource + " / " + abilities[index].getResourceCost() + " required.");
     }
   }
 }

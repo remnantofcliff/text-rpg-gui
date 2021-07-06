@@ -142,7 +142,7 @@ public class Display extends JPanel implements MouseWheelListener {
             }
           } else {
             mouseOverSelection = 3;
-            int select = y / fontHeight - 1;
+            int select = (y + maxDescent) / fontHeight - 1;
             if (SELECTABLE_LINES.contains(select)) {
               selectedIndex = SELECTABLE_LINES.indexOf(select);
               repaint = true;
@@ -180,7 +180,8 @@ public class Display extends JPanel implements MouseWheelListener {
         for (var i = 0; i < CHARACTER_STRINGS.length; i++) {
           int j = i + 1;
           if (CHARACTER_LINE_INTEGERS.contains(i)) {
-            g.drawLine(spX, spLineY + fontHeight * j, spMaxX, spLineY + fontHeight * j);
+            int tempY = spLineY + fontHeight * j;
+            g.drawLine(spX, tempY, spMaxX, tempY);
           }
           g.drawString(CHARACTER_STRINGS[i], spTextX, spTextY + fontHeight * j);
           g.drawString(
@@ -218,7 +219,7 @@ public class Display extends JPanel implements MouseWheelListener {
       g.fillRect(borderWidth, borderHeight + 5 + SELECTABLE_LINES.get(selectedIndex) * fontHeight + maxDescent, wdtOffset2, fontHeight);
     }
   }
- 
+
   private void drawText(Graphics g) {
     g.setColor(TEXT_COLOR);
     g.setFont(textFont);
@@ -358,17 +359,21 @@ public class Display extends JPanel implements MouseWheelListener {
 
   @Override
   public void mouseWheelMoved(MouseWheelEvent e) {
-    if (e.getWheelRotation() == -1 && smallFontHeight < borderHeight + 1) {
-      fontSize++;
-      fontSizeSmall++;
-    } else if (e.getWheelRotation() == 1 && 18 < smallFontHeight) {
-      fontSize--;
-      fontSizeSmall--;
+    if (e.isControlDown()) {
+      if (e.getWheelRotation() == -1 && smallFontHeight < borderHeight + 1) {
+        fontSize++;
+        fontSizeSmall++;
+      } else if (e.getWheelRotation() == 1 && 18 < smallFontHeight) {
+        fontSize--;
+        fontSizeSmall--;
+      }
+      smallFont = smallFont.deriveFont((float) fontSizeSmall);
+      textFont = textFont.deriveFont((float) fontSize);
+      setup();
+      repaint();
+    } else {
+      
     }
-    smallFont = smallFont.deriveFont((float) fontSizeSmall);
-    textFont = textFont.deriveFont((float) fontSize);
-    setup();
-    repaint();
   }
 
   public void resetFont() {

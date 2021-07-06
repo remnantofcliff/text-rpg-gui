@@ -1,5 +1,7 @@
 package entity.abilities.specials;
 
+import static utilities.Utilities.round;
+
 import entity.BattleEntity;
 import entity.Special;
 import entity.interfaces.Stunnable;
@@ -19,12 +21,13 @@ public class Rush extends Special {
   @Override
   public void use(BattleEntity user, Game game, BattleEntity... targets) {
     float damage = 25f + user.getStrength() * 2;
+    user.removeSp(resourceCost);
     if (user instanceof Player) {
       game.clear();
       var sb = new StringBuilder("Choose target:\n");
       Stream.of(targets).forEach(x -> sb.append("-" + x.getName() + "\n"));
       int index = game.addText(sb.toString());
-      damage = targets[index].getArmor().absorb(damage, user.getWeapon().getDamageTypeMap());
+      damage = round(targets[index].getArmor().absorb(damage, user.getWeapon().getDamageTypeMap()));
       targets[index].removeHp(damage);
       game.clear();
       String name = targets[index].getName();
@@ -35,9 +38,10 @@ public class Rush extends Special {
         game.addText("Stunned " + name + ".");
       }
     } else {
-      damage = targets[0].getArmor().absorb(damage, user.getWeapon().getDamageTypeMap());
+      damage = round(targets[0].getArmor().absorb(damage, user.getWeapon().getDamageTypeMap()));
       targets[0].removeHp(damage);
-      game.addText("You were dealt " + damage + ".\n");
+      game.addText(user.getName() + " used " + getName() + ".\n");
+      game.addText("You were dealt " + damage + ".");
     }
   }
 }

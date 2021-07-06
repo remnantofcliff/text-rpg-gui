@@ -1,17 +1,12 @@
 package main;
 
-import entity.Area;
-import entity.Entity;
+import entity.events.AreaEvent;
 import entity.events.NewGame;
-import entity.interfaces.Leavable;
 import entity.player.Player;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.Map.Entry;
-import java.util.stream.Stream;
 import window.Display;
 
 /**
@@ -22,7 +17,7 @@ public class Game extends Thread {
   private Player player;
   private boolean newgame;
   private int input = -1;
-  public static final String BACK_NL = "\n-Back";
+  
   
   /**
    * Constructor for game.
@@ -32,12 +27,6 @@ public class Game extends Thread {
   public Game(boolean newgame) {
     setName("Game");
     this.newgame = newgame;
-  }
-
-  private String getChoosingStrings(Object[] objects, String string) {
-    var sb = new StringBuilder(string);
-    Stream.of(objects).forEach(x -> sb.append("\n-" + ((Entity) x).getName()));
-    return sb.append(BACK_NL).toString();
   }
 
   private int waitForInput() {
@@ -58,104 +47,6 @@ public class Game extends Thread {
     int temp = input;
     input = -1;
     return temp;
-  }
-
-  private void area(Area area) {
-    player.setArea(area);
-    clear();
-    int temp = addText(area.getName() + " | " + area.getLocation() + "\n-Action\n-Description\n-Talk\n-Shop\n-Leave");
-    var nextArea = area;
-    clear();
-    switch (temp) {
-      case 0:areaEvent(area);
-        break;
-      case 1:addText(area.getDescription());
-        break;
-      case 2:areaTalk(area);
-        break;
-      case 3:areaShop(area);
-        break;
-      case 4: if (area instanceof Leavable l) {
-          var sb = new StringBuilder("Where do you want to go next?");
-          ArrayList<String> directionList = new ArrayList<>();
-          for (String string : l.getDirections()) {
-            directionList.add(string);
-            sb.append("\n-" + string);
-          }
-          int index = addText(sb.append(BACK_NL).toString());
-          if (index != directionList.size()) {
-            nextArea = l.nextLocation(directionList.get(index));
-          }
-        } else {
-          addText("Unable to leave area...");
-        }
-        break;
-      default:App.logWrongInput(temp);
-    }
-    if (input != -2) {
-      area(nextArea);
-    }
-  }
-
-  private void areaEvent(Area area) {
-    if (area.hasEvents()) {
-      var sb = new StringBuilder("What do you want to do?");
-      Stream.of(area.getEvents()).forEach(x -> sb.append("\n-" + x.getName()));
-      int index = addText(sb.append(BACK_NL).toString());
-      if (index != area.getEvents().length) {
-        area.getEvents()[index].event(this);
-      }
-    } else {
-      addText("No actions available in this location.");
-    }
-  }
-
-  private void areaShop(Area area) {
-    clear();
-    if (area.hasVendors()) {
-      int index = addText(getChoosingStrings(area.getVendors(), "Who would you like to barter with?"));
-      if (index != area.getVendors().length) {
-        var vendor = area.getVendors()[index];
-        var sb = new StringBuilder(vendor.greeting());
-        ArrayList<String> nameList = new ArrayList<>();
-        for (Entry<String, Integer> entry : vendor.prices().entrySet()) {
-          String key = entry.getKey();
-          nameList.add(key);
-          sb.append("\n-" + key + ": " + entry.getValue().toString());
-        }
-        clear();
-        index = addText(sb.append(BACK_NL).toString());
-        if (index != nameList.size()) {
-          var selectedString = nameList.get(index);
-          var inventory = player.getInventory();
-          int itemPrice = vendor.prices().get(selectedString);
-          clear();
-          if (inventory.hasGold(itemPrice)) {
-            var item = vendor.getItem(selectedString);
-            inventory.removeGold(itemPrice);
-            inventory.add(item);
-            addText("Bought one " + item.getName());
-          } else {
-            addText("Not enough gold.");
-          }
-        }
-      }
-    } else {
-      addText("No vendors in this location.");
-    }
-  }
-
-  private void areaTalk(Area area) {
-    clear();
-    if (area.hasTalkers()) {
-      int index = addText(getChoosingStrings(area.getTalkers(), "Who do you want to talk to?"));
-      if (index != area.getTalkers().length) {
-        clear();
-        Stream.of(area.getTalkers()[index].getText()).forEach(this::addText);
-      }
-    } else {
-      addText("No one to talk to in this location.");
-    }
   }
 
   /**
@@ -195,7 +86,7 @@ public class Game extends Thread {
         e.printStackTrace();
       }
       new NewGame(this);
-      area(player.getArea());
+      new AreaEvent(player.getArea(), this);
     } else {
       try (var in = new ObjectInputStream(new FileInputStream("saves/save.ser"))) {
         player = (Player) in.readObject();
@@ -204,7 +95,7 @@ public class Game extends Thread {
         newgame = true;
         run();
       }
-      area(player.getArea());
+      new AreaEvent(player.getArea(), this);
     }
   }
   

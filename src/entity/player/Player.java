@@ -5,7 +5,9 @@ import entity.Area;
 import entity.Armor;
 import entity.BattleEntity;
 import entity.Weapon;
+import entity.abilities.specials.Rush;
 import entity.areas.Dretnos;
+import entity.items.CustomItem;
 import entity.items.armors.Rags;
 import entity.items.weapons.Fists;
 import inventory.Inventory;
@@ -23,6 +25,9 @@ public class Player extends BattleEntity {
    */
   public Player() {
     setDefaultValues();
+    for (var i = 0; i < 100; i++) {
+      inventory.add(new CustomItem(Integer.toString(i)));
+    }
   }
 
   public Area getArea() {
@@ -56,19 +61,13 @@ public class Player extends BattleEntity {
   @Override
   public void setDefaultValues() {
     name = "Johnny";
-    maxHp = 100;
-    maxMp = 100;
-    maxSp = 100;
-    hp = 100;
-    mp = 100;
-    sp = 100;
-    dexterity = 1;
-    magic = 1;
-    strength = 1;
     inventory.add(new Fists());
     inventory.add(new Rags());
     weapon = (Weapon) inventory.getItem("Fists");
     armor = (Armor) inventory.getItem("Rags");
+    specials.add(new Rush());
+    setMaxResources(100, 100, 5);
+    setStats(1, 1, 1);
   }
 
   public void setDifficulty(Difficulties difficulty) {

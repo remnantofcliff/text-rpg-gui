@@ -1,7 +1,10 @@
 package entity;
 
+import static utilities.Utilities.round;
+
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Class for characters that can battle.
@@ -14,13 +17,28 @@ public abstract class BattleEntity extends Entity {
   protected Weapon weapon;
   protected float hp;
   protected float mp;
-  protected float sp;
   protected int dexterity;
   protected int magic;
   protected int maxHp;
   protected int maxMp;
   protected int maxSp;
+  protected int sp;
   protected int strength;
+
+  protected void setMaxResources(int hp, int mp, int sp) {
+    maxHp = hp;
+    this.hp = hp;
+    maxMp = mp;
+    this.mp = mp;
+    maxSp = sp;
+    this.sp = sp;
+  }
+
+  protected void setStats(int dex, int mag, int str) {
+    dexterity = dex;
+    magic = mag;
+    strength = str;
+  }
   
   public Armor getArmor() {
     return armor;
@@ -32,6 +50,10 @@ public abstract class BattleEntity extends Entity {
 
   public Spell[] getSpells() {
     return spells.toArray(new Spell[0]);
+  }
+
+  public Set<String> getStatusEffects() {
+    return statusEffects;
   }
 
   public Weapon getWeapon() {
@@ -46,7 +68,7 @@ public abstract class BattleEntity extends Entity {
     return mp;
   }
 
-  public float getSp() {
+  public int getSp() {
     return sp;
   }
 
@@ -82,6 +104,8 @@ public abstract class BattleEntity extends Entity {
     hp += num;
     if (hp > maxHp) {
       hp = maxHp;
+    } else {
+      round(hp);
     }
   }
   /**
@@ -114,6 +138,15 @@ public abstract class BattleEntity extends Entity {
   public void addSpell(Spell spell) {
     spells.add(spell);
   }
+
+  /**
+   * Regenerates sp for character.
+   */
+  public void regenerateSp() {
+    if (sp != maxSp) {
+      sp++;
+    }
+  }
   /**
    * Removes the parameter amount of hp. If smaller than 0, sets hp to 0.
 
@@ -123,6 +156,8 @@ public abstract class BattleEntity extends Entity {
     hp -= num;
     if (hp < 0) {
       hp = 0;
+    } else {
+      round(hp);
     }
   }
   /**
