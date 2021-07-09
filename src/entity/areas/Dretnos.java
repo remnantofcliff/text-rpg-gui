@@ -31,6 +31,7 @@ public class Dretnos extends Area implements Leavable {
     vendors = new Vendor[] {new DretnosVendor1(), new DretnosVendor2()};
     talkers = new Talker[] {new DretnosFarmer()};
     events = new Event[] {new DretnosEvent1(), new Battle(new Crawler())};
+    id = 0;
   }
 
   @Override

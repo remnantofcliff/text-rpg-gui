@@ -30,7 +30,9 @@ public class Display extends JPanel implements MouseWheelListener {
   private FontMetrics fm;
   private MainWindow mw = App.getMainWindow();
   private Rectangle[] buttons = new Rectangle[3];
+  private String overlayText;
   private StringBuilder text = new StringBuilder();
+  private boolean overlay;
   private boolean setupDone;
   private int borderHeight;
   private int borderWidth;
@@ -38,8 +40,10 @@ public class Display extends JPanel implements MouseWheelListener {
   private int fontSize = 34;
   private int fontSizeSmall = 15;
   private int hgt;
-  private int lineOffset = 1;
+  private int lineOffset = -1;
+  private int textRows;
   private int maxDescent;
+  private int maxLines;
   private int maxTextWidth;
   private int mouseOverSelection = 3;
   private int selectedIndex;
@@ -224,9 +228,10 @@ public class Display extends JPanel implements MouseWheelListener {
     g.setColor(TEXT_COLOR);
     g.setFont(textFont);
     String[] arr = getTextRows();
+    textRows = arr.length;
     SELECTABLE_LINES.clear();
-    for (var i = 0; i < arr.length; i++) {
-      g.drawString(arr[i], borderWidth + 5, borderHeight + 5 + fontHeight * (i + lineOffset));
+    for (var i = 0; i < textRows; i++) {
+      g.drawString(arr[i], borderWidth + 5, borderHeight + 5 + fontHeight * (i - lineOffset));
       if (arr[i].startsWith("-")) {
         SELECTABLE_LINES.add(i);
       }
@@ -267,7 +272,7 @@ public class Display extends JPanel implements MouseWheelListener {
   }
 
   public void clear() {
-    text = new StringBuilder();
+    text.setLength(0);
     repaint();
   }
 
@@ -294,6 +299,12 @@ public class Display extends JPanel implements MouseWheelListener {
       drawText(g);
       drawSelection(g);
       drawSecondaryPanel(g);
+      if (overlay) {
+        g.setColor(Color.BLACK);
+        g.fillRect(borderWidth, borderHeight, maxTextWidth, fontHeight + 5 + maxDescent);
+        g.setColor(TEXT_COLOR);
+        g.drawString(overlayText, borderWidth + 5, borderHeight + 5 + fontHeight);
+      }      
     } else {
       int wdt = getWidth();
       borderWidth = (wdt - 4) / 63;
@@ -325,6 +336,7 @@ public class Display extends JPanel implements MouseWheelListener {
       buttons[0] = new Rectangle(0, 0, wdtdiv3, borderHeight);
       buttons[1] = new Rectangle(wdtdiv3, 0, wdtdiv3, borderHeight);
       buttons[2] = new Rectangle(wdtdiv3 * 2, 0, wdtdiv3, borderHeight);
+      maxLines = hgt / fontHeight;
       setupDone = true;
       repaint();
     }
@@ -363,16 +375,22 @@ public class Display extends JPanel implements MouseWheelListener {
       if (e.getWheelRotation() == -1 && smallFontHeight < borderHeight + 1) {
         fontSize++;
         fontSizeSmall++;
-      } else if (e.getWheelRotation() == 1 && 18 < smallFontHeight) {
+      } else if (e.getWheelRotation() == 1 && 19 < smallFontHeight) {
         fontSize--;
         fontSizeSmall--;
       }
       smallFont = smallFont.deriveFont((float) fontSizeSmall);
       textFont = textFont.deriveFont((float) fontSize);
+      lineOffset = -1;
       setup();
       repaint();
     } else {
-      
+      if (e.getWheelRotation() == -1 && lineOffset != -1) {
+        lineOffset--;
+      } else if (e.getWheelRotation() == 1 && lineOffset < textRows - maxLines - 1) {
+        lineOffset++;
+      }
+      repaint();
     }
   }
 
@@ -385,9 +403,20 @@ public class Display extends JPanel implements MouseWheelListener {
    * Returns selection number. Starts from 0.
    */
   public int select() {
-    int temp = selectedIndex;
+    int temp1 = selectedIndex;
+    int temp2 = lineOffset;
     selectedIndex = 0;
-    return temp;
+    lineOffset = -1;
+    return temp1 + temp2 + 1;
+  }
+
+  public void setOverlay(boolean overlay) {
+    this.overlay = overlay;
+  }
+
+  public void setOverlay(boolean overlay, String overlayText) {
+    setOverlay(overlay);
+    this.overlayText = overlayText;
   }
 
   public void setup() {

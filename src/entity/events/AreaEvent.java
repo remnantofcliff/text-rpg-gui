@@ -1,9 +1,17 @@
 package entity.events;
 
+import static entity.events.EventConstants.BACK;
+import static entity.events.EventConstants.BACK_NL;
+
 import entity.Area;
 import entity.Entity;
 import entity.Event;
+import entity.interfaces.Droppable;
+import entity.interfaces.Equippable;
 import entity.interfaces.Leavable;
+import entity.interfaces.Usable;
+import entity.player.Player;
+import inventory.Inventory;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -16,7 +24,7 @@ import main.Game;
  */
 public class AreaEvent extends Event {
   private Area area;
-  private static final String BACK_NL = "\n-Back";
+  private Player player;
 
   /**
    * Calls the event method with the specified area.
@@ -27,6 +35,7 @@ public class AreaEvent extends Event {
   public AreaEvent(Area area, Game game) {
     name = "Area";
     this.area = area;
+    player = game.getPlayer();
     event(game);
   }
 
@@ -38,7 +47,7 @@ public class AreaEvent extends Event {
 
   @Override
   public void event(Game game) {
-    game.getPlayer().setArea(area);
+    player.setArea(area);
     game.clear();
     int temp = game.addText(area.getName() + " | " + area.getLocation() + "\n-Action\n-Description\n-Talk\n-Shop\n-Inventory\n-Leave");
     var nextArea = area;
@@ -77,23 +86,54 @@ public class AreaEvent extends Event {
   }
 
   private void inventory(Game game) {
-    var inventory = game.getPlayer().getInventory();
-    var sb = new StringBuilder();
+    game.clear();
+    var inventory = player.getInventory();
     switch (game.addText("Choose category:\n-Items\n-Weapons\n-Armor\n-Back")) {
-      case 0:
-        game.clear();
-        sb.append("Items:\n");
-        Map<String, Integer> items = inventory.getItems();
-        items.entrySet().stream().forEach(x -> {
-          sb.append("-" + x.getKey() + " - " + x.getValue() + "\n");
-        });
-        game.addText(sb.toString());
+      case 0:invCategory(game, inventory, inventory.getItems(), "Items");
         break;
-      case 1:
+      case 1:invCategory(game, inventory, inventory.getWeapons(), "Weapons");
         break;
-      case 2:
+      case 2:invCategory(game, inventory, inventory.getArmors(), "Armors");
         break;
       default:
+    }
+  }
+
+  private void invCategory(Game game, Inventory inventory, Map<String, Integer> itemMap, String catString) {
+    var sb = new StringBuilder();
+    game.clear();
+    game.setOverlay(catString + " -- Gold: " + inventory.getGold());
+    sb.append("\n");
+    ArrayList<Entry<String, Integer>> entries = new ArrayList<>(itemMap.entrySet());
+    entries.stream().forEach(x -> sb.append("-" + x.getKey() + " -- " + x.getValue() + "\n"));
+    int index = game.addText(sb.append(BACK).toString());
+    game.removeOverlay();
+    if (index != entries.size()) {
+      var item = inventory.getItem(entries.get(index).getKey());
+      sb.setLength(0);
+      sb.append(item.getName() + "\n");
+      ArrayList<Runnable> list = new ArrayList<>(3);
+      if (item instanceof Usable u) {
+        sb.append("-Use\n");
+        list.add(() -> u.use(player));
+      }
+      if (item instanceof Equippable e) {
+        sb.append("-Equip\n");
+        list.add(() -> e.equip(player));
+      }
+      if (item instanceof Droppable d) {
+        sb.append("-Drop\n");
+        list.add(() -> d.drop(player));
+      }
+      game.clear();
+      index = game.addText(sb.append(BACK).toString());
+      if (index != list.size()) {
+        list.get(index).run();
+      } else {
+        invCategory(game, inventory, itemMap, catString);
+      }
+    } else {
+      inventory(game);
     }
   }
 
@@ -127,7 +167,7 @@ public class AreaEvent extends Event {
         index = game.addText(sb.append(BACK_NL).toString());
         if (index != nameList.size()) {
           var selectedString = nameList.get(index);
-          var inventory = game.getPlayer().getInventory();
+          var inventory = player.getInventory();
           int itemPrice = vendor.prices().get(selectedString);
           game.clear();
           if (inventory.hasGold(itemPrice)) {

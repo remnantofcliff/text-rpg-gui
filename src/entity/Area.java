@@ -1,5 +1,6 @@
 package entity;
 
+import entity.areas.Dretnos;
 import entity.interfaces.Talker;
 import entity.interfaces.Vendor;
 
@@ -12,13 +13,10 @@ public abstract class Area extends Entity {
   protected String location;
   protected Talker[] talkers;
   protected Vendor[] vendors;
+  protected int id;
 
   public Event[] getEvents() {
     return events;
-  }
-  
-  private boolean checkIfEmpty(Object[] objects) {
-    return objects.length != 0;
   }
   
   public String getDescription() {
@@ -37,6 +35,10 @@ public abstract class Area extends Entity {
     return vendors;
   }
 
+  private boolean checkIfEmpty(Object[] objects) {
+    return objects.length != 0;
+  }
+
   public boolean hasEvents() {
     return checkIfEmpty(events);
   }
@@ -47,5 +49,23 @@ public abstract class Area extends Entity {
 
   public boolean hasVendors() {
     return checkIfEmpty(vendors);
+  }
+
+  public int getId() {
+    return id;
+  }
+
+  /**
+   * Returns the approppriate area with the given id.
+
+   * @param id (int)
+   * @return (Area)
+   */
+  public static Area loadArea(int id) {
+    return switch (id) {
+      case 0 -> new Dretnos();
+      case 1 -> new Area(){};
+      default -> new Dretnos();
+    };
   }
 }

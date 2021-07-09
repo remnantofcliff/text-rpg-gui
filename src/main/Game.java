@@ -1,5 +1,6 @@
 package main;
 
+import entity.Area;
 import entity.events.AreaEvent;
 import entity.events.NewGame;
 import entity.player.Player;
@@ -85,6 +86,7 @@ public class Game extends Thread {
       } catch (IOException e) {
         e.printStackTrace();
       }
+      player.setArea(Area.loadArea(player.getAreaId()));
       new NewGame(this);
       new AreaEvent(player.getArea(), this);
     } else {
@@ -95,10 +97,19 @@ public class Game extends Thread {
         newgame = true;
         run();
       }
+      player.setArea(Area.loadArea(player.getAreaId()));
       new AreaEvent(player.getArea(), this);
     }
   }
-  
+
+  public void removeOverlay() {
+    display.setOverlay(false);
+  }
+
+  public void setOverlay(String overlayText) {
+    display.setOverlay(true, overlayText);
+  }
+
   public synchronized Player getPlayer() {
     return player;
   }

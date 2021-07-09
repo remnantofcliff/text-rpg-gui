@@ -1,7 +1,7 @@
 package entity;
 
 /**
- * Abstract item-class implements Comparable as well as overriding equals- and hashCode-methods.
+ * Abstract item-class implements Comparable as well as overriding equals- and hashCode-methods to those of its name.
  */
 public abstract class Item extends Entity implements Comparable<Item> {
   @Override

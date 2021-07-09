@@ -32,10 +32,6 @@ public class App {
     return mainWindow;
   }
 
-  public static void logNoItemFound(String name) {
-    LOGGER.log(Level.WARNING, "No item found in inventory: {0}", name);
-  }
-
   public static void logNoSaveFound() {
     LOGGER.log(Level.WARNING, "No save-game found. Starting new game.");
   }

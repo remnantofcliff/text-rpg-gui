@@ -6,8 +6,6 @@ import entity.Armor;
 import entity.BattleEntity;
 import entity.Weapon;
 import entity.abilities.specials.Rush;
-import entity.areas.Dretnos;
-import entity.items.CustomItem;
 import entity.items.armors.Rags;
 import entity.items.weapons.Fists;
 import inventory.Inventory;
@@ -15,19 +13,17 @@ import inventory.Inventory;
 /**
  * Player character class.
  */
-public class Player extends BattleEntity {
-  private Area area = new Dretnos();
+public final class Player extends BattleEntity {
+  private transient Area area;
   private Difficulties difficulty = Difficulties.NORMAL;
   private Inventory inventory = new Inventory();
+  private int areaId = 0;
   
   /**
    * Creates a new player-object.
    */
   public Player() {
     setDefaultValues();
-    for (var i = 0; i < 100; i++) {
-      inventory.add(new CustomItem(Integer.toString(i)));
-    }
   }
 
   public Area getArea() {
@@ -40,6 +36,10 @@ public class Player extends BattleEntity {
 
   public Inventory getInventory() {
     return inventory;
+  }
+
+  public int getAreaId() {
+    return areaId;
   }
 
   public void incrementStrength() {
@@ -56,6 +56,11 @@ public class Player extends BattleEntity {
 
   public void setArea(Area area) {
     this.area = area;
+    setAreaId(area.getId());
+  }
+
+  public void setAreaId(int id) {
+    areaId = id;
   }
 
   @Override

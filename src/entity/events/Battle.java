@@ -1,5 +1,7 @@
 package entity.events;
 
+import static entity.events.EventConstants.BACK;
+import static entity.events.EventConstants.RANDOM;
 import static utilities.Utilities.round;
 
 import entity.Ability;
@@ -9,7 +11,6 @@ import entity.Special;
 import entity.interfaces.Stunnable;
 import entity.player.Player;
 import java.util.Objects;
-import java.util.Random;
 import java.util.stream.Stream;
 import javax.swing.SwingUtilities;
 import main.App;
@@ -20,9 +21,7 @@ import main.Game;
  */
 public class Battle extends Event {
   private Enemy[] enemies;
-  private Random random = new Random();
   private int turns = 1;
-  private static final String BACK = "-Back";
 
   /**
    * Creates a new battle event. Takes in the enemies as a parameter.
@@ -77,7 +76,7 @@ public class Battle extends Event {
     if (Stream.of(enemies).allMatch(x -> x.getHp() == 0)) {
       game.clear();
       game.addText("Victory!");
-      Stream.of(enemies).map(x -> x.getDrop(random.nextFloat())).filter(Objects::nonNull).forEach(x -> {
+      Stream.of(enemies).map(x -> x.getDrop(RANDOM.nextFloat())).filter(Objects::nonNull).forEach(x -> {
         player.getInventory().add(x);
         game.addText("Obtained: " + x.getName());
       });
@@ -122,7 +121,7 @@ public class Battle extends Event {
       stat = "SP";
     } else {
       choose = "spell";
-      resource = (int) player.getMp();
+      resource = player.getMp();
       stat = "MP";
     }
     var sb = new StringBuilder("Choose " + choose + ":\n");

@@ -16,7 +16,7 @@ public abstract class BattleEntity extends Entity {
   protected HashSet<String> statusEffects = new HashSet<>();
   protected Weapon weapon;
   protected float hp;
-  protected float mp;
+  protected int mp;
   protected int dexterity;
   protected int magic;
   protected int maxHp;
@@ -64,7 +64,7 @@ public abstract class BattleEntity extends Entity {
     return hp;
   }
 
-  public float getMp() {
+  public int getMp() {
     return mp;
   }
 
@@ -105,7 +105,7 @@ public abstract class BattleEntity extends Entity {
     if (hp > maxHp) {
       hp = maxHp;
     } else {
-      round(hp);
+      hp = round(hp);
     }
   }
   /**
@@ -157,7 +157,7 @@ public abstract class BattleEntity extends Entity {
     if (hp < 0) {
       hp = 0;
     } else {
-      round(hp);
+      hp = round(hp);
     }
   }
   /**
