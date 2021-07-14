@@ -4,26 +4,35 @@ import core.Difficulties;
 import entity.Area;
 import entity.Armor;
 import entity.BattleEntity;
+import entity.Item;
 import entity.Weapon;
 import entity.abilities.specials.Rush;
+import entity.items.Antidote;
+import entity.items.HealthPotion;
 import entity.items.armors.Rags;
 import entity.items.weapons.Fists;
 import inventory.Inventory;
+import save.Save;
 
 /**
  * Player character class.
  */
 public final class Player extends BattleEntity {
-  private transient Area area;
   private Difficulties difficulty = Difficulties.NORMAL;
   private Inventory inventory = new Inventory();
+  private Item[] quickItems = new Item[3];
+  private Save save;
   private int areaId = 0;
+  private static Player instance;
+  private transient Area area;
   
   /**
    * Creates a new player-object.
    */
-  public Player() {
+  private Player() {
     setDefaultValues();
+    inventory.add(new HealthPotion());
+    inventory.add(new Antidote());
   }
 
   public Area getArea() {
@@ -36,6 +45,14 @@ public final class Player extends BattleEntity {
 
   public Inventory getInventory() {
     return inventory;
+  }
+
+  public Item[] getQuickItems() {
+    return quickItems;
+  }
+
+  public Save getSave() {
+    return save;
   }
 
   public int getAreaId() {
@@ -77,5 +94,21 @@ public final class Player extends BattleEntity {
 
   public void setDifficulty(Difficulties difficulty) {
     this.difficulty = difficulty;
+  }
+
+  public void setToMaxSp() {
+    sp = maxSp;
+  }
+
+  /**
+   * Returns the current single instance of player.
+
+   * @return (Player)
+   */
+  public static Player getInstance() {
+    if (instance == null) {
+      instance = new Player();
+    }
+    return instance;
   }
 }

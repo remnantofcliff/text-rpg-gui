@@ -7,19 +7,20 @@ import entity.interfaces.Equippable;
 import entity.player.Player;
 
 /**
- * Dagger-weapon.
+ * Cane-weapon.
  */
-public class Dagger extends Weapon implements Droppable, Equippable {
+public class Cane extends Weapon implements Droppable, Equippable {
+
   /**
-   * Sets initial values for dagger.
+   * Sets the initial values.
    */
-  public Dagger() {
-    name = "Dagger";
-    baseDamage = 2;
-    dexterityModifier = 2;
+  public Cane() {
+    name = "Cane";
+    baseDamage = 10;
+    dexterityModifier = 1;
     magicModifier = 0;
     strengthModifier = 1;
-    range = 0.5f;
+    range = 1;
     damageTypeMap.put(DamageTypes.PHYSICAL, 1f);
   }
 

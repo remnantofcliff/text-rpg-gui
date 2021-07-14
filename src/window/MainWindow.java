@@ -1,5 +1,6 @@
 package window;
 
+import entity.player.Player;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -63,33 +64,33 @@ public class MainWindow extends JFrame implements ActionListener {
       @Override
       public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
-          case KeyEvent.VK_W:display.moveSelection(Directions.UP);
+          case KeyEvent.VK_ENTER:game.setInput(display.select());
+            break;
+          case KeyEvent.VK_ESCAPE: if (inGame) {
+              display.exit(true);
+            }
+            break;
+          case KeyEvent.VK_LEFT:display.moveSelection(Directions.LEFT);
             break;
           case KeyEvent.VK_UP:display.moveSelection(Directions.UP);
             break;
-          case KeyEvent.VK_S:display.moveSelection(Directions.DOWN);
+          case KeyEvent.VK_RIGHT:display.moveSelection(Directions.RIGHT);
             break;
           case KeyEvent.VK_DOWN:display.moveSelection(Directions.DOWN);
             break;
           case KeyEvent.VK_A:display.moveSelection(Directions.LEFT);
             break;
-          case KeyEvent.VK_LEFT:display.moveSelection(Directions.LEFT);
+          case KeyEvent.VK_C:display.changeDisplayState(DisplayStates.CHARACTER);
             break;
           case KeyEvent.VK_D:display.moveSelection(Directions.RIGHT);
             break;
-          case KeyEvent.VK_RIGHT:display.moveSelection(Directions.RIGHT);
-            break;
-          case KeyEvent.VK_ENTER:game.setInput(display.select());
-            break;
           case KeyEvent.VK_E:display.changeDisplayState(DisplayStates.EQUIPMENT);
             break;
-          case KeyEvent.VK_C:display.changeDisplayState(DisplayStates.CHARACTER);
+          case KeyEvent.VK_S:display.moveSelection(Directions.DOWN);
             break;
-          case KeyEvent.VK_ESCAPE: if (inGame) {
-              display.exit();
-            }
+          case KeyEvent.VK_W:display.moveSelection(Directions.UP);
             break;
-          default:break;
+          default:
         }
       }
     });
@@ -110,7 +111,7 @@ public class MainWindow extends JFrame implements ActionListener {
    */
   public void serialize() {
     try (var out = new ObjectOutputStream(new FileOutputStream("saves/save.ser"))) {
-      out.writeObject(game.getPlayer());
+      out.writeObject(Player.getInstance());
     } catch (IOException e) {
       App.logNoSaveFound();
     }

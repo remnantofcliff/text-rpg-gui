@@ -2,6 +2,7 @@ package entity.events;
 
 import core.Difficulties;
 import entity.Event;
+import entity.player.Player;
 import main.Game;
 
 /**
@@ -21,7 +22,7 @@ public class SelectDifficulty extends Event {
   public void event(Game game) {
     game.clear();
     if (game.addText("Select difficulty:\n-Normal\n-Critical") == 1) {
-      game.getPlayer().setDifficulty(Difficulties.CRITICAL);
+      Player.getInstance().setDifficulty(Difficulties.CRITICAL);
     }
   }
 }

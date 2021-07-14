@@ -34,12 +34,13 @@ public class Rags extends Armor implements Droppable, Equippable {
   }
 
   @Override
-  public void equip(Player player) {
-    player.setArmor(this);
+  public void equip() {
+    Player.getInstance().setArmor(this);
   }
 
   @Override
-  public void drop(Player player) {
+  public void drop() {
+    var player = Player.getInstance();
     if (player.getArmor() == this) {
       player.setArmor(Naked.getInstance());
     }

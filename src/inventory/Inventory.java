@@ -3,12 +3,13 @@ package inventory;
 import entity.Armor;
 import entity.Item;
 import entity.Weapon;
+import entity.interfaces.BattleItem;
 import entity.items.CustomItem;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 
 /**
  * Player's inventory.
@@ -17,10 +18,14 @@ public class Inventory implements Serializable {
   private ArrayList<Item> container = new ArrayList<>();
   private int gold;
 
-  private Map<String, Integer> getType(Class<?> classToGet) {
+  private Map<String, Integer> generateMap(Predicate<? super Item> filter) {
     Map<String, Integer> tempMap = new TreeMap<>();
-    container.stream().filter(x -> x.getClass().getSuperclass() == classToGet).forEach(x -> putItemInMap(tempMap, x));
+    container.stream().filter(filter).forEach(x -> putItemInMap(tempMap, x));
     return tempMap;
+  }
+
+  private Map<String, Integer> getType(Class<?> classToGet) {
+    return generateMap(x -> x.getClass().getSuperclass() == classToGet);
   }
 
   private void putItemInMap(Map<String, Integer> tempMap, Item x) {
@@ -43,6 +48,10 @@ public class Inventory implements Serializable {
     return getType(Armor.class);
   }
   
+  public Map<String, Integer> getBattleItems() {
+    return generateMap(BattleItem.class::isInstance);
+  }
+  
   public Map<String, Integer> getItems() {
     return getType(Item.class);
   }
@@ -61,7 +70,6 @@ public class Inventory implements Serializable {
 
   public void add(Item item) {
     container.add(item);
-    Collections.sort(container);
   }
 
   public void addGold(int gold) {

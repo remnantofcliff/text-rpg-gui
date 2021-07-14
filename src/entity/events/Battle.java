@@ -1,27 +1,34 @@
 package entity.events;
 
 import static entity.events.EventConstants.BACK;
+import static entity.events.EventConstants.BACK_NL;
+import static entity.events.EventConstants.EMPTY;
 import static entity.events.EventConstants.RANDOM;
 import static utilities.Utilities.round;
 
 import entity.Ability;
+import entity.BattleEntity;
 import entity.Enemy;
 import entity.Event;
+import entity.Item;
 import entity.Special;
 import entity.interfaces.Stunnable;
+import entity.interfaces.Usable;
 import entity.player.Player;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Stream;
-import javax.swing.SwingUtilities;
 import main.App;
 import main.Game;
+import window.Display;
 
 /**
  * Battle.
  */
 public class Battle extends Event {
   private Enemy[] enemies;
-  private int turns = 1;
+  private ArrayList<BattleEntity> usedSpecial = new ArrayList<>();
+  private Player player;
 
   /**
    * Creates a new battle event. Takes in the enemies as a parameter.
@@ -31,14 +38,12 @@ public class Battle extends Event {
   public Battle(Enemy... enemies) {
     name = "Battle";
     this.enemies = enemies;
-    Stream.of(enemies).forEach(Enemy::setDefaultValues);
+    player = Player.getInstance();
   }
 
   @Override
   public void event(Game game) {
-    var player = game.getPlayer();
-    Stream.of(enemies).forEach(Enemy::regenerateSp);
-    player.regenerateSp();
+    newTurn();
     game.clear();
     int temp = game.addText(
         player.getName() 
@@ -49,13 +54,13 @@ public class Battle extends Event {
     );
     game.clear();
     switch (temp) {
-      case 0:attack(game, player);
+      case 0:attack(game);
         break;
-      case 1:ability(game, player, player.getSpecials());
+      case 1:ability(game, player.getSpecials());
         break;
-      case 2:ability(game, player, player.getSpells());
+      case 2:ability(game, player.getSpells());
         break;
-      case 3:
+      case 3:item(game);
         break;
       default:App.logWrongInput(temp);
     }
@@ -65,12 +70,7 @@ public class Battle extends Event {
       game.addText(".");
       game.addText(".");
       game.addText(".");
-      game.clear();
-      game.interrupt();
-      SwingUtilities.invokeLater(() -> {
-        App.getMainWindow().reset();
-        App.getMainWindow().menuScreen();
-      });
+      Display.getInstance().exit(false);
       return;
     }
     if (Stream.of(enemies).allMatch(x -> x.getHp() == 0)) {
@@ -80,15 +80,39 @@ public class Battle extends Event {
         player.getInventory().add(x);
         game.addText("Obtained: " + x.getName());
       });
+      player.setToMaxSp();
       return;
     }
-    turns++;
     if (game.getInput() != -2) {
       event(game);
     }
   }
 
-  private void attack(Game game, Player player) {
+  private void item(Game game) {
+    game.clear();
+    Item[] quickItems = player.getQuickItems();
+    int index = game.addText("Choose item to use:"
+        + "\n-" + (quickItems[0] == null ? EMPTY :  quickItems[0].getName())
+        + "\n-" + (quickItems[1] == null ? EMPTY :  quickItems[1].getName())
+        + "\n-" + (quickItems[2] == null ? EMPTY :  quickItems[2].getName())
+        + BACK_NL
+    );
+    if (index != 3 && quickItems[index] != null) {
+      ((Usable) quickItems[index]).use();
+      quickItems[index] = null;
+      enemyAttack(game);
+    }
+  }
+
+  private void newTurn() {
+    Stream.of(enemies).filter(x -> !usedSpecial.contains(x)).forEach(Enemy::regenerateSp);
+    if (!usedSpecial.contains(player)) {
+      player.regenerateSp();
+    }
+    usedSpecial.clear();
+  }
+
+  private void attack(Game game) {
     var sb = new StringBuilder("Choose who to attack:\n");
     Stream.of(enemies).forEach(x -> sb.append("-" + x.getName() + " " + x.getHp() + " / " + x.getMaxHp() + "\n"));
     int index = game.addText(sb.append(BACK).toString());
@@ -100,10 +124,10 @@ public class Battle extends Event {
     game.clear();
     game.addText("Dealt " + damage + " damage to " + enemies[index].getName());
     game.clear();
-    enemyAttack(game, player);
+    enemyAttack(game);
   }
 
-  private void enemyAttack(Game game, Player player) {
+  private void enemyAttack(Game game) {
     Stream.of(enemies).filter(x -> !x.getStatusEffects().contains(Stunnable.STUNNED)).filter(x -> !x.chooseAbility(game)).forEach(x -> {
       float damage = round(player.getArmor().absorb(x.getWeapon().calculateDamage(x), x.getWeapon().getDamageTypeMap()));
       player.removeHp(damage);
@@ -111,7 +135,7 @@ public class Battle extends Event {
     });
   }
 
-  private void ability(Game game, Player player, Ability[] abilities) {
+  private void ability(Game game, Ability[] abilities) {
     String choose;
     String stat;
     int resource;
@@ -133,7 +157,8 @@ public class Battle extends Event {
     game.clear();
     if (abilities[index].getResourceCost() <= resource) {
       abilities[index].use(player, game, enemies);
-      enemyAttack(game, player);
+      enemyAttack(game);
+      usedSpecial.add(player);
     } else {
       game.addText("Not enough " + stat + ": " + resource + " / " + abilities[index].getResourceCost() + " required.");
     }

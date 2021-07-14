@@ -1,6 +1,7 @@
 package entity.events;
 
 import entity.Event;
+import entity.player.Player;
 import javax.swing.JOptionPane;
 import main.App;
 import main.Game;
@@ -20,7 +21,7 @@ public class NameChange extends Event {
 
   @Override
   public void event(Game game) {
-    var player = game.getPlayer();
+    var player = Player.getInstance();
     while (game.getInput() != -2) {
       String newName = JOptionPane.showInputDialog(App.getMainWindow(), "What is your name?", player.getName());
       if (newName != null) {

@@ -24,7 +24,7 @@ public class Fists extends Weapon implements Equippable {
   }
 
   @Override
-  public void equip(Player player) {
-    player.setWeapon(this);
+  public void equip() {
+    Player.getInstance().setWeapon(this);
   }
 }

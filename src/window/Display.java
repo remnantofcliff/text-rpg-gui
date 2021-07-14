@@ -1,5 +1,6 @@
 package window;
 
+import entity.player.Player;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -112,7 +113,7 @@ public class Display extends JPanel implements MouseWheelListener {
           } else if (x <= buttons[1].getMaxX()) {
             changeDisplayState(DisplayStates.EQUIPMENT);
           } else {
-            exit();
+            exit(true);
           }
         } else if (borderWidth < x && x < wdtOffset1) {
           mw.getGame().setInput(select());
@@ -179,7 +180,7 @@ public class Display extends JPanel implements MouseWheelListener {
       g.setColor(PANEL_COLOR);
       g.fillRect(spX, spY, spW, spH);
       g.setColor(Color.WHITE);
-      var player = mw.getGame().getPlayer();
+      var player = Player.getInstance();
       if (ds == DisplayStates.CHARACTER) {
         for (var i = 0; i < CHARACTER_STRINGS.length; i++) {
           int j = i + 1;
@@ -279,10 +280,13 @@ public class Display extends JPanel implements MouseWheelListener {
   /**
    * Close the game and reset MainWindow to main menu.
    */
-  public void exit() {
+  public void exit(boolean serialize) {
     if (JOptionPane.showConfirmDialog(mw, "Quit to main menu?", "Quit?", JOptionPane.YES_NO_OPTION) == 0) {
       clear();
-      mw.serialize();
+      ds = DisplayStates.DEFAULT;
+      if (serialize) {
+        mw.serialize();
+      }
       mw.getGame().interrupt();
       mw.reset();
       mw.menuScreen();

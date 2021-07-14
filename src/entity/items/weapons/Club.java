@@ -24,7 +24,8 @@ public class Club extends Weapon implements Droppable, Equippable {
   }
   
   @Override
-  public void drop(Player player) {
+  public void drop() {
+    var player = Player.getInstance();
     if (player.getWeapon() == this) {
       player.setWeapon(new Fists());
     }
@@ -32,7 +33,7 @@ public class Club extends Weapon implements Droppable, Equippable {
   }
 
   @Override
-  public void equip(Player player) {
-    player.setWeapon(this);
+  public void equip() {
+    Player.getInstance().setWeapon(this);
   }
 }

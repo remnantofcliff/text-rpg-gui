@@ -54,7 +54,7 @@ public class Game extends Thread {
    * Adds text to the display and waits for input.
 
    * @param text Text to be added (String)
-   * @return The input (int)
+   * @return The input which is the selectable line number, starting from 0 (int)
    */
   public int addText(String text) {
     if (input == -2) {
@@ -77,7 +77,7 @@ public class Game extends Thread {
   @Override
   public void run() {
     if (newgame) {
-      player = new Player();
+      player = Player.getInstance();
       var file = new File("saves/save.ser");
       try {
         if (file.createNewFile()) {
@@ -108,10 +108,6 @@ public class Game extends Thread {
 
   public void setOverlay(String overlayText) {
     display.setOverlay(true, overlayText);
-  }
-
-  public synchronized Player getPlayer() {
-    return player;
   }
 
   public synchronized int getInput() {

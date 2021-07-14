@@ -2,6 +2,7 @@ package entity;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 import main.Game;
 
 /**
@@ -17,11 +18,12 @@ public abstract class Enemy extends BattleEntity {
    * @return (Item)
    */
   public Item getDrop(float f) {
-    Iterator<Float> i = dropTable.keySet().iterator();
+    Iterator<Entry<Float, Item>> i = dropTable.entrySet().iterator();
     while (i.hasNext()) {
-      float temp = i.next();
+      Entry<Float, Item> entry = i.next();
+      float temp = entry.getKey();
       if (f < temp) {
-        return dropTable.get(temp);
+        return entry.getValue();
       }
     }
     return null;

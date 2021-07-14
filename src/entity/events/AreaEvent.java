@@ -6,6 +6,7 @@ import static entity.events.EventConstants.BACK_NL;
 import entity.Area;
 import entity.Entity;
 import entity.Event;
+import entity.Item;
 import entity.interfaces.Droppable;
 import entity.interfaces.Equippable;
 import entity.interfaces.Leavable;
@@ -35,7 +36,7 @@ public class AreaEvent extends Event {
   public AreaEvent(Area area, Game game) {
     name = "Area";
     this.area = area;
-    player = game.getPlayer();
+    player = Player.getInstance();
     event(game);
   }
 
@@ -65,7 +66,7 @@ public class AreaEvent extends Event {
         break;
       case 5: if (area instanceof Leavable l) {
           var sb = new StringBuilder("Where do you want to go next?");
-          ArrayList<String> directionList = new ArrayList<>();
+          ArrayList<String> directionList = new ArrayList<>(4);
           for (String string : l.getDirections()) {
             directionList.add(string);
             sb.append("\n-" + string);
@@ -88,15 +89,42 @@ public class AreaEvent extends Event {
   private void inventory(Game game) {
     game.clear();
     var inventory = player.getInventory();
-    switch (game.addText("Choose category:\n-Items\n-Weapons\n-Armor\n-Back")) {
+    switch (game.addText("Choose category:\n-Items\n-Weapons\n-Armor\n-Choose items to keep with you.\n-Back")) {
       case 0:invCategory(game, inventory, inventory.getItems(), "Items");
         break;
       case 1:invCategory(game, inventory, inventory.getWeapons(), "Weapons");
         break;
       case 2:invCategory(game, inventory, inventory.getArmors(), "Armors");
         break;
+      case 3:quickItems(game, inventory);
+        break;
       default:
     }
+  }
+
+  private void quickItems(Game game, Inventory inventory) {
+    Item[] quickItems = player.getQuickItems();
+    game.clear();
+    int qiIndex = game.addText("Add item to quick items:"
+        + "\n-Item 1: " + (quickItems[0] == null ? "" : quickItems[0].getName())
+        + "\n-Item 2: " + (quickItems[1] == null ? "" : quickItems[1].getName())
+        + "\n-Item 3: " + (quickItems[2] == null ? "" : quickItems[2].getName())
+        + BACK_NL
+    );
+    if (qiIndex != 3) {
+      game.clear();
+      var sb = new StringBuilder();
+      ArrayList<Entry<String, Integer>> entries = new ArrayList<>(inventory.getBattleItems().entrySet());
+      int index = displayInvCategory(game, entries, sb);
+      if (index != entries.size()) {
+        quickItems[qiIndex] = inventory.getItem(entries.get(index).getKey());
+      }
+    }
+  }
+
+  private int displayInvCategory(Game game, ArrayList<Entry<String, Integer>> entries, StringBuilder sb) {
+    entries.stream().forEach(x -> sb.append("-" + x.getKey() + " -- " + x.getValue() + "\n"));
+    return game.addText(sb.append(BACK).toString());
   }
 
   private void invCategory(Game game, Inventory inventory, Map<String, Integer> itemMap, String catString) {
@@ -105,8 +133,7 @@ public class AreaEvent extends Event {
     game.setOverlay(catString + " -- Gold: " + inventory.getGold());
     sb.append("\n");
     ArrayList<Entry<String, Integer>> entries = new ArrayList<>(itemMap.entrySet());
-    entries.stream().forEach(x -> sb.append("-" + x.getKey() + " -- " + x.getValue() + "\n"));
-    int index = game.addText(sb.append(BACK).toString());
+    int index = displayInvCategory(game, entries, sb);
     game.removeOverlay();
     if (index != entries.size()) {
       var item = inventory.getItem(entries.get(index).getKey());
@@ -115,15 +142,15 @@ public class AreaEvent extends Event {
       ArrayList<Runnable> list = new ArrayList<>(3);
       if (item instanceof Usable u) {
         sb.append("-Use\n");
-        list.add(() -> u.use(player));
+        list.add(u::use);
       }
       if (item instanceof Equippable e) {
         sb.append("-Equip\n");
-        list.add(() -> e.equip(player));
+        list.add(e::equip);
       }
       if (item instanceof Droppable d) {
         sb.append("-Drop\n");
-        list.add(() -> d.drop(player));
+        list.add(d::drop);
       }
       game.clear();
       index = game.addText(sb.append(BACK).toString());

@@ -2,6 +2,7 @@ package entity.areas;
 
 import entity.Area;
 import entity.Event;
+import entity.characters.DretnosCitizen;
 import entity.characters.DretnosFarmer;
 import entity.characters.DretnosVendor1;
 import entity.characters.DretnosVendor2;
@@ -29,7 +30,7 @@ public class Dretnos extends Area implements Leavable {
       """;
     location = "Western Dereliquerat";
     vendors = new Vendor[] {new DretnosVendor1(), new DretnosVendor2()};
-    talkers = new Talker[] {new DretnosFarmer()};
+    talkers = new Talker[] {new DretnosFarmer(), new DretnosCitizen()};
     events = new Event[] {new DretnosEvent1(), new Battle(new Crawler())};
     id = 0;
   }
