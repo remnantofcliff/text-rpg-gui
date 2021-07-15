@@ -12,11 +12,14 @@ import entity.Enemy;
 import entity.Event;
 import entity.Item;
 import entity.Special;
+import entity.abilities.spells.PolymorphSelf;
 import entity.interfaces.Stunnable;
 import entity.interfaces.Usable;
 import entity.player.Player;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import main.App;
 import main.Game;
@@ -27,23 +30,25 @@ import window.Display;
  */
 public class Battle extends Event {
   private Enemy[] enemies;
-  private ArrayList<BattleEntity> usedSpecial = new ArrayList<>();
-  private Player player;
+  private Player player = Player.getInstance();
+  private boolean newTurn = true;
 
   /**
    * Creates a new battle event. Takes in the enemies as a parameter.
 
-   * @param enemies enemies to be fought. Can be an arbitary number or array.
+   * @param enemies enemies to be fought. Can be an arbitary amount or array.
    */
   public Battle(Enemy... enemies) {
     name = "Battle";
     this.enemies = enemies;
-    player = Player.getInstance();
+    (new PolymorphSelf()).use(App.getMainWindow().getGame(), 0, enemies);
   }
 
   @Override
   public void event(Game game) {
-    newTurn();
+    if (newTurn) {
+      newTurn();
+    }
     game.clear();
     int temp = game.addText(
         player.getName() 
@@ -64,6 +69,7 @@ public class Battle extends Event {
         break;
       default:App.logWrongInput(temp);
     }
+    IntStream.range(0, enemies.length).filter(i -> enemies[i].getHp() == 0 && enemies[i].getSpawnOnDeath() != null).forEach(i -> enemies[i] = (Enemy) enemies[i].getSpawnOnDeath());
     if (player.getHp() == 0) {
       game.clear();
       game.addText("You were defeated");
@@ -105,11 +111,10 @@ public class Battle extends Event {
   }
 
   private void newTurn() {
-    Stream.of(enemies).filter(x -> !usedSpecial.contains(x)).forEach(Enemy::regenerateSp);
-    if (!usedSpecial.contains(player)) {
-      player.regenerateSp();
-    }
-    usedSpecial.clear();
+    newTurn = false;
+    ArrayList<BattleEntity> list = new ArrayList<>(List.of(enemies));
+    list.add(player);
+    list.stream().forEach(BattleEntity::regenerateSp);
   }
 
   private void attack(Game game) {
@@ -119,7 +124,8 @@ public class Battle extends Event {
     if (index == enemies.length) {
       return;
     }
-    float damage = round(enemies[index].getArmor().absorb(player.getWeapon().calculateDamage(player), player.getWeapon().getDamageTypeMap()));
+    var weapon = player.getWeapon();
+    float damage = round(enemies[index].getArmor().absorb(weapon.calculateDamage(player), weapon.getDamageTypeMap()));
     enemies[index].removeHp(damage);
     game.clear();
     game.addText("Dealt " + damage + " damage to " + enemies[index].getName());
@@ -128,10 +134,12 @@ public class Battle extends Event {
   }
 
   private void enemyAttack(Game game) {
-    Stream.of(enemies).filter(x -> !x.getStatusEffects().contains(Stunnable.STUNNED)).filter(x -> !x.chooseAbility(game)).forEach(x -> {
-      float damage = round(player.getArmor().absorb(x.getWeapon().calculateDamage(x), x.getWeapon().getDamageTypeMap()));
+    newTurn = true;
+    IntStream.range(0, enemies.length).filter(i -> enemies[i].getStatusEffects().contains(Stunnable.STUNNED) && !enemies[i].chooseAbility(game, i, enemies)).forEach(i -> {
+      var weapon = enemies[i].getWeapon();
+      float damage = round(player.getArmor().absorb(weapon.calculateDamage(enemies[i]), weapon.getDamageTypeMap()));
       player.removeHp(damage);
-      game.addText(x.getName() + " dealt " + damage + " damage to you!\n");
+      game.addText(enemies[i].getName() + " dealt " + damage + " damage to you!\n");
     });
   }
 
@@ -156,9 +164,8 @@ public class Battle extends Event {
     }
     game.clear();
     if (abilities[index].getResourceCost() <= resource) {
-      abilities[index].use(player, game, enemies);
+      abilities[index].use(game, EventConstants.PLAYER_INDEX, enemies);
       enemyAttack(game);
-      usedSpecial.add(player);
     } else {
       game.addText("Not enough " + stat + ": " + resource + " / " + abilities[index].getResourceCost() + " required.");
     }

@@ -12,5 +12,5 @@ public abstract class Ability extends Entity {
     return resourceCost;
   }
 
-  public abstract void use(BattleEntity user, Game game, BattleEntity... targets);
+  public abstract void use(Game game, int user, Enemy[] enemies);
 }

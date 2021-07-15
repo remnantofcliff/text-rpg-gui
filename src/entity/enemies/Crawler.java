@@ -58,10 +58,10 @@ public class Crawler extends Enemy implements Poisonable, Stunnable {
   }
 
   @Override
-  public boolean chooseAbility(Game game) {
+  public boolean chooseAbility(Game game, int userIndex, Enemy[] enemies) {
     var player = Player.getInstance();
     if (player.getHp() < 50 && sp >= specials.get(0).getResourceCost()) {
-      specials.get(0).use(this, game, player);
+      specials.get(0).use(game, userIndex, enemies);
       return true;
     }
     return false;

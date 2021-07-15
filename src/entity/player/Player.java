@@ -21,7 +21,7 @@ public final class Player extends BattleEntity {
   private Difficulties difficulty = Difficulties.NORMAL;
   private Inventory inventory = new Inventory();
   private Item[] quickItems = new Item[3];
-  private Save save;
+  private Save save = new Save();
   private int areaId = 0;
   private static Player instance;
   private transient Area area;
@@ -89,7 +89,7 @@ public final class Player extends BattleEntity {
     armor = (Armor) inventory.getItem("Rags");
     specials.add(new Rush());
     setMaxResources(100, 100, 5);
-    setStats(1, 1, 1);
+    setStats(1, 1, 200);
   }
 
   public void setDifficulty(Difficulties difficulty) {

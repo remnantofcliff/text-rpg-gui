@@ -37,10 +37,11 @@ public class Bear extends Enemy implements Poisonable, Stunnable {
     }
 
     @Override
-    public void use(BattleEntity user, Game game, BattleEntity... targets) {
+    public void use(Game game, int userIndex, Enemy[] enemies) {
       game.addText("The bear bites you!\n");
-      float damage = round(targets[0].getArmor().absorb(20, weapon.getDamageTypeMap()));
-      targets[0].removeHp(damage);
+      var player = Player.getInstance();
+      float damage = round(player.getArmor().absorb(20, weapon.getDamageTypeMap()));
+      player.removeHp(damage);
       game.addText("You were dealt " + damage + ".");
     }
   }
@@ -73,11 +74,11 @@ public class Bear extends Enemy implements Poisonable, Stunnable {
   }
 
   @Override
-  public boolean chooseAbility(Game game) {
+  public boolean chooseAbility(Game game, int userIndex, Enemy[] enemies) {
     if (sp >= specials.get(0).getResourceCost() && hp > 50) {
-      specials.get(0).use(this, game, Player.getInstance());
+      specials.get(0).use(game, userIndex, enemies);
     } else if (sp >= specials.get(1).getResourceCost() && hp < 50) {
-      specials.get(1).use(this, game, Player.getInstance());
+      specials.get(1).use(game, userIndex, enemies);
     }
     return false;
   }

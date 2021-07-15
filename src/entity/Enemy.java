@@ -29,5 +29,5 @@ public abstract class Enemy extends BattleEntity {
     return null;
   }
 
-  public abstract boolean chooseAbility(Game game);
+  public abstract boolean chooseAbility(Game game, int userIndex, Enemy[] enemies);
 }

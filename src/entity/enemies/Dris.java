@@ -40,7 +40,7 @@ public class Dris extends Enemy implements Poisonable, Stunnable {
   }
 
   @Override
-  public boolean chooseAbility(Game game) {
+  public boolean chooseAbility(Game game, int userIndex, Enemy[] enemies) {
     // TODO Auto-generated method stub
     return false;
   }
