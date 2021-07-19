@@ -19,7 +19,6 @@ public class Dagger extends Weapon implements Droppable, Equippable {
     dexterityModifier = 2;
     magicModifier = 0;
     strengthModifier = 1;
-    range = 0.5f;
     damageTypeMap.put(DamageTypes.PHYSICAL, 1f);
   }
 

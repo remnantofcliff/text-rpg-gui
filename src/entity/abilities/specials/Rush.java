@@ -2,13 +2,16 @@ package entity.abilities.specials;
 
 import static utilities.Utilities.round;
 
+import core.DamageTypes;
 import entity.BattleEntity;
 import entity.Enemy;
 import entity.Special;
+import entity.events.Battle;
 import entity.events.EventConstants;
 import entity.interfaces.Stunnable;
 import entity.player.Player;
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.Map;
 import main.Game;
 
 /**
@@ -21,22 +24,21 @@ public class Rush extends Special {
   }
 
   @Override
-  public void use(Game game, int userIndex, Enemy[] enemies) {
+  public void use(Game game, int userIndex, List<Enemy> enemies) {
     BattleEntity user;
     if (userIndex == EventConstants.PLAYER_INDEX) {
       user = Player.getInstance();
       user.removeSp(resourceCost);
       game.clear();
-      var sb = new StringBuilder("Choose target:\n");
-      Stream.of(enemies).forEach(x -> sb.append("-" + x.getName() + "\n"));
-      int index = game.addText(sb.toString());
+      int index = Battle.selectEnemies(game, enemies, "Choose target:");
       float damage = 25f + user.getStrength() * 2;
-      damage = round(enemies[index].getArmor().absorb(damage, user.getWeapon().getDamageTypeMap()));
-      enemies[index].removeHp(damage);
+      Enemy target = enemies.get(index);
+      damage = round(target.getArmor().absorb(damage, Map.of(DamageTypes.PHYSICAL, 1f)));
+      target.removeHp(damage);
       game.clear();
-      String name = enemies[index].getName();
+      String name = target.getName();
       game.addText("Dealt " + damage + " to " + name + ".");
-      if (enemies[index] instanceof Stunnable s) {
+      if (target instanceof Stunnable s) {
         s.stun();
         game.clear();
         game.addText("Stunned " + name + ".");
@@ -44,8 +46,8 @@ public class Rush extends Special {
     } else {
       var player = Player.getInstance();
       float damage = 20;
-      user = enemies[userIndex];
-      damage = round(player.getArmor().absorb(damage, user.getWeapon().getDamageTypeMap()));
+      user = enemies.get(userIndex);
+      damage = round(player.getArmor().absorb(damage, Map.of(DamageTypes.PHYSICAL, 1f)));
       player.removeHp(damage);
       game.addText(user.getName() + " used " + getName() + ".\n");
       game.addText("You were dealt " + damage + ".");

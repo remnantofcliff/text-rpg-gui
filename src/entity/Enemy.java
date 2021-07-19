@@ -2,6 +2,7 @@ package entity;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import main.Game;
 
@@ -9,6 +10,7 @@ import main.Game;
  * Enemy-class, subclass of BattleEntity.
  */
 public abstract class Enemy extends BattleEntity {
+  protected Enemy spawnOnDeath;
   protected static final LinkedHashMap<Float, Item> dropTable = new LinkedHashMap<>();
   
   /**
@@ -29,5 +31,13 @@ public abstract class Enemy extends BattleEntity {
     return null;
   }
 
-  public abstract boolean chooseAbility(Game game, int userIndex, Enemy[] enemies);
+  public Enemy getSpawnOnDeath() {
+    return spawnOnDeath;
+  }
+
+  public void setSpawnOnDeath(Enemy spawnOnDeath) {
+    this.spawnOnDeath = spawnOnDeath;
+  }
+
+  public abstract boolean chooseAbility(Game game, int userIndex, List<Enemy> enemies);
 }

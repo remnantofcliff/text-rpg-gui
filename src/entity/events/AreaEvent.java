@@ -31,13 +31,11 @@ public class AreaEvent extends Event {
    * Calls the event method with the specified area.
 
    * @param area (Area)
-   * @param game (Game)
    */
-  public AreaEvent(Area area, Game game) {
+  public AreaEvent(Area area) {
     name = "Area";
     this.area = area;
     player = Player.getInstance();
-    event(game);
   }
 
   private String getChoosingStrings(Object[] objects, String string) {
@@ -82,7 +80,7 @@ public class AreaEvent extends Event {
       default:App.logWrongInput(temp);
     }
     if (game.getInput() != -2) {
-      new AreaEvent(nextArea, game);
+      new AreaEvent(nextArea).event(game);
     }
   }
 
@@ -106,10 +104,10 @@ public class AreaEvent extends Event {
     Item[] quickItems = player.getQuickItems();
     game.clear();
     int qiIndex = game.addText("Add item to quick items:"
-        + "\n-Item 1: " + (quickItems[0] == null ? "" : quickItems[0].getName())
-        + "\n-Item 2: " + (quickItems[1] == null ? "" : quickItems[1].getName())
-        + "\n-Item 3: " + (quickItems[2] == null ? "" : quickItems[2].getName())
-        + BACK_NL
+      + "\n-Item 1: " + (quickItems[0] == null ? "" : quickItems[0].getName())
+      + "\n-Item 2: " + (quickItems[1] == null ? "" : quickItems[1].getName())
+      + "\n-Item 3: " + (quickItems[2] == null ? "" : quickItems[2].getName())
+      + BACK_NL
     );
     if (qiIndex != 3) {
       game.clear();

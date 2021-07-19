@@ -9,13 +9,8 @@ import main.Game;
  * Event for changing the difficulty of the game.
  */
 public class SelectDifficulty extends Event {
-  private SelectDifficulty() {
+  public SelectDifficulty() {
     name = "Select Difficulty";
-  }
-
-  public SelectDifficulty(Game game) {
-    this();
-    event(game);
   }
 
   @Override

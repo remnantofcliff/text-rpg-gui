@@ -1,5 +1,6 @@
 package entity;
 
+import java.util.List;
 import main.Game;
 
 /**
@@ -12,5 +13,5 @@ public abstract class Ability extends Entity {
     return resourceCost;
   }
 
-  public abstract void use(Game game, int user, Enemy[] enemies);
+  public abstract void use(Game game, int userIndex, List<Enemy> enemies);
 }

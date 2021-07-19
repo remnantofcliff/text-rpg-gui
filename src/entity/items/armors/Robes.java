@@ -24,12 +24,12 @@ public class Robes extends Armor implements Droppable, Equippable {
     name = "Robes";
     flatAbsorption = 2;
     absorptionMap.putAll(Map.of(
-        FIRE, 0.1f,
-        ICE, 0.2f,
-        LIGHTNING, 0f,
-        PHYSICAL, 0.1f,
-        POISON, 0f,
-        WATER, 0.2f
+      FIRE, 0.1f,
+      ICE, 0.2f,
+      LIGHTNING, 0f,
+      PHYSICAL, 0.1f,
+      POISON, 0f,
+      WATER, 0.2f
     ));
   }
 

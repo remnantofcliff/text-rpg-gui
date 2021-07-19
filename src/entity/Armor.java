@@ -19,15 +19,11 @@ public abstract class Armor extends Item {
    * @return (float)
    */
   public float absorb(float damage, Map<DamageTypes, Float> damageTypeMap) {
-    float flat = damage - flatAbsorption;
-    if (flat <= 0) {
-      return 0;
-    }
-    damage = 0;
+    float temp = 0;
     for (Entry<DamageTypes, Float> entry : damageTypeMap.entrySet()) {
-      damage = flat * entry.getValue() * (1 - absorptionMap.get(entry.getKey()));
+      temp += damage * entry.getValue() * (1 - absorptionMap.get(entry.getKey()));
     }
-    return damage;
+    return (temp <= flatAbsorption) ? 0 : temp - flatAbsorption;
   }
   
   @Override

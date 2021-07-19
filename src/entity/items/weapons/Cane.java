@@ -20,7 +20,6 @@ public class Cane extends Weapon implements Droppable, Equippable {
     dexterityModifier = 1;
     magicModifier = 0;
     strengthModifier = 1;
-    range = 1;
     damageTypeMap.put(DamageTypes.PHYSICAL, 1f);
   }
 

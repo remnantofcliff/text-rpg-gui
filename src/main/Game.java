@@ -87,8 +87,8 @@ public class Game extends Thread {
         e.printStackTrace();
       }
       player.setArea(Area.loadArea(player.getAreaId()));
-      new NewGame(this);
-      new AreaEvent(player.getArea(), this);
+      new NewGame().event(this);
+      new AreaEvent(player.getArea()).event(this);
     } else {
       try (var in = new ObjectInputStream(new FileInputStream("saves/save.ser"))) {
         player = (Player) in.readObject();
@@ -98,7 +98,7 @@ public class Game extends Thread {
         run();
       }
       player.setArea(Area.loadArea(player.getAreaId()));
-      new AreaEvent(player.getArea(), this);
+      new AreaEvent(player.getArea()).event(this);
     }
   }
 

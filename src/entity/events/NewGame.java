@@ -8,13 +8,8 @@ import main.Game;
  */
 public class NewGame extends Event {
 
-  private NewGame() {
+  public NewGame() {
     name = "New Game";
-  }
-
-  public NewGame(Game game) {
-    this();
-    event(game);
   }
 
   @Override
@@ -78,8 +73,8 @@ public class NewGame extends Event {
     game.clear();
     game.addText("You can't remember your name... ");
     game.addText("How should you introduce yourself? ");
-    new NameChange(game);
-    new SelectDifficulty(game);
+    new NameChange().event(game);
+    new SelectDifficulty().event(game);
   }
   
 }

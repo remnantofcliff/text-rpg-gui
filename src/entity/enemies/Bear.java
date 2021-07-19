@@ -10,7 +10,6 @@ import static utilities.Utilities.round;
 
 import core.DamageTypes;
 import entity.Armor;
-import entity.BattleEntity;
 import entity.Enemy;
 import entity.Special;
 import entity.Weapon;
@@ -37,7 +36,7 @@ public class Bear extends Enemy implements Poisonable, Stunnable {
     }
 
     @Override
-    public void use(Game game, int userIndex, Enemy[] enemies) {
+    public void use(Game game, int userIndex, List<Enemy> enemies) {
       game.addText("The bear bites you!\n");
       var player = Player.getInstance();
       float damage = round(player.getArmor().absorb(20, weapon.getDamageTypeMap()));
@@ -53,7 +52,6 @@ public class Bear extends Enemy implements Poisonable, Stunnable {
       dexterityModifier = 0;
       magicModifier = 0;
       strengthModifier = 2;
-      range = 1;
       damageTypeMap.put(DamageTypes.PHYSICAL, 1f);
     }
   }
@@ -63,22 +61,24 @@ public class Bear extends Enemy implements Poisonable, Stunnable {
       name = "Leather Armor";
       flatAbsorption = 5;
       absorptionMap.putAll(Map.of(
-          FIRE, 0f,
-          ICE, 0.25f,
-          LIGHTNING, 0f,
-          PHYSICAL, 0.05f,
-          POISON, 0f,
-          WATER, 0.3f
+        FIRE, 0f,
+        ICE, 0.25f,
+        LIGHTNING, 0f,
+        PHYSICAL, 0.05f,
+        POISON, 0f,
+        WATER, 0.3f
       ));
     }
   }
 
   @Override
-  public boolean chooseAbility(Game game, int userIndex, Enemy[] enemies) {
+  public boolean chooseAbility(Game game, int userIndex, List<Enemy> enemies) {
     if (sp >= specials.get(0).getResourceCost() && hp > 50) {
       specials.get(0).use(game, userIndex, enemies);
+      return true;
     } else if (sp >= specials.get(1).getResourceCost() && hp < 50) {
       specials.get(1).use(game, userIndex, enemies);
+      return true;
     }
     return false;
   }

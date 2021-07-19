@@ -3,7 +3,6 @@ package entity;
 import core.DamageTypes;
 import java.util.EnumMap;
 import java.util.Map;
-import utilities.Utilities;
 
 /**
  * Abstract weapon class.
@@ -14,7 +13,6 @@ public abstract class Weapon extends Item {
   protected float dexterityModifier;
   protected float magicModifier;
   protected float strengthModifier;
-  protected float range;
 
   public Map<DamageTypes, Float> getDamageTypeMap() {
     return damageTypeMap;
@@ -26,7 +24,7 @@ public abstract class Weapon extends Item {
    * @return (float)
    */
   public float calculateDamage(BattleEntity e) {
-    return Utilities.round(baseDamage + dexterityModifier * e.getDexterity() + magicModifier * e.getMagic() + strengthModifier * e.getStrength());
+    return baseDamage + dexterityModifier * e.getDexterity() + magicModifier * e.getMagic() + strengthModifier * e.getStrength();
   }
 
   @Override

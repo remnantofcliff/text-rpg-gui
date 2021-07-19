@@ -19,7 +19,6 @@ public class Club extends Weapon implements Droppable, Equippable {
     dexterityModifier = 0.5f;
     magicModifier = 0;
     strengthModifier = 2;
-    range = 0.8f;
     damageTypeMap.put(DamageTypes.PHYSICAL, 1f);
   }
   

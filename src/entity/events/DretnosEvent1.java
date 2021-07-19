@@ -1,19 +1,22 @@
 package entity.events;
 
 import entity.Event;
+import entity.enemies.Dris;
 import entity.player.Player;
 import main.Game;
+import save.Save;
 
 /**
  * First action in dretnos. "Explore cave"
  */
 public class DretnosEvent1 extends Event {
+  private Save save = Player.getInstance().getSave();
 
   /**
-   * First event in Dretnos. "Explore cave" / "Visit the gnome in the cave"
+   * First event in Dretnos. "Explore cave" / "Visit the gnome in the cave" / "Visit old shack"
    */
   public DretnosEvent1() {
-    if (Player.getInstance().getSave().dretnosExploredCave()) {
+    if (save.dretnosExploredCave()) {
       name = "Visit the gnome in the cave";
     } else {
       name = "Explore cave";
@@ -37,7 +40,7 @@ public class DretnosEvent1 extends Event {
       game.addText("Continuing into the cavern, you don't notice anything unusual. ");
       game.addText("The light from the lantern is fading slowly as you continue. ");
       game.addText("Suddenly, around a corner, there is a bright light at the end of the tunnel. ");
-      game.addText("As you continue, you notice that there is a green field of grass, illuminated by the light.");
+      game.addText("As you continue, you notice that there is a green field of grass, illuminated by the light. ");
       game.addText("In the middle of the small field, there is a small house. ");
       game.clear();
       if (game.addText("Continue?\n-Yes\n-No") == 0) {
@@ -51,23 +54,24 @@ public class DretnosEvent1 extends Event {
   }
 
   private void afterCave(Game game) {
+    game.clear();
     game.addText("You carefully try the door.. ");
     game.addText("as you do the door opens and a small man greets you. ");
     game.addText("He is wearing a green robe and has a bald, round head. ");
     game.clear();
-    game.addText("\"What are you doing here?");
-    game.addText("You people are not allowed here!\"");
-    game.addText("\"Need I remind you what happened the last time you people came here\"");
+    game.addText("\"What are you doing here? ");
+    game.addText("You people are not allowed here!\" ");
+    game.addText("\n\"Need I remind you what happened the last time you people came here\" ");
     if (game.addText("\n-Yes\n-No") == 0) {
       game.clear();
-      game.addText("Well you get what you ask for!");
-      new Battle();
+      game.addText("Well you get what you ask for! ");
+      new Battle(new Dris()).event(game);
     } else {
-      Player.getInstance().getSave().setDretnosExploredCave(true);
+      save.setDretnosExploredCave(true);
       setName("Visit the gnome in the cave");
-      game.addText("\"Sigh..");
-      game.addText("Just leave please.");
-      game.addText("And don't tell the other townsfolk about me..");
+      game.addText("\"Sigh.. ");
+      game.addText("Just leave please. ");
+      game.addText("And don't tell the other townsfolk about me.. ");
       game.addText("");
     }
   }

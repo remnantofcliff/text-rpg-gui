@@ -24,12 +24,12 @@ public class LeatherArmor extends Armor implements Droppable, Equippable {
     name = "Leather Armor";
     flatAbsorption = 5;
     absorptionMap.putAll(Map.of(
-        FIRE, 0.1f,
-        ICE, 0.4f,
-        LIGHTNING, 0f,
-        PHYSICAL, 0.15f,
-        POISON, 0f,
-        WATER, 0.2f
+      FIRE, 0.1f,
+      ICE, 0.4f,
+      LIGHTNING, 0f,
+      PHYSICAL, 0.15f,
+      POISON, 0f,
+      WATER, 0.2f
     ));
   }
 

@@ -24,12 +24,12 @@ public class Rags extends Armor implements Droppable, Equippable {
     name = "Rags";
     flatAbsorption = 0;
     absorptionMap.putAll(Map.of(
-        FIRE, 0f,
-        ICE, 0.05f,
-        LIGHTNING, 0f,
-        PHYSICAL, 0.05f,
-        POISON, 0f,
-        WATER, 0.05f
+      FIRE, 0f,
+      ICE, 0.05f,
+      LIGHTNING, 0f,
+      PHYSICAL, 0.05f,
+      POISON, 0f,
+      WATER, 0.05f
     ));
   }
 

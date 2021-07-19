@@ -13,7 +13,6 @@ public abstract class BattleEntity extends Entity {
   protected Armor armor;
   protected ArrayList<Special> specials = new ArrayList<>();
   protected ArrayList<Spell> spells = new ArrayList<>();
-  protected BattleEntity spawnOnDeath;
   protected HashSet<String> statusEffects = new HashSet<>();
   protected Weapon weapon;
   protected float hp;
@@ -45,9 +44,7 @@ public abstract class BattleEntity extends Entity {
     return armor;
   }
 
-  public BattleEntity getSpawnOnDeath() {
-    return spawnOnDeath;
-  }
+  
 
   public Special[] getSpecials() {
     return specials.toArray(new Special[0]);
@@ -145,6 +142,15 @@ public abstract class BattleEntity extends Entity {
   }
 
   /**
+   * Regenerates mp for character.
+   */
+  public void regenerateMp() {
+    if (mp < maxMp) {
+      addMp(10);
+    }
+  }
+
+  /**
    * Regenerates sp for character.
    */
   public void regenerateSp() {
@@ -190,10 +196,6 @@ public abstract class BattleEntity extends Entity {
   
   public void setArmor(Armor armor) {
     this.armor = armor;
-  }
-
-  public void setSpawnOnDeath(BattleEntity spawnOnDeath) {
-    this.spawnOnDeath = spawnOnDeath;
   }
 
   public void setWeapon(Weapon weapon) {

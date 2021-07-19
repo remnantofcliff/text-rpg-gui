@@ -10,13 +10,8 @@ import main.Game;
  * Event for changing the player character name.
  */
 public class NameChange extends Event {
-  private NameChange() {
+  public NameChange() {
     name = "Name Change";
-  }
-
-  public NameChange(Game game) {
-    this();
-    event(game);
   }
 
   @Override

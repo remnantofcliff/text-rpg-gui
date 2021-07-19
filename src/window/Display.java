@@ -190,7 +190,7 @@ public class Display extends JPanel implements MouseWheelListener {
           }
           g.drawString(CHARACTER_STRINGS[i], spTextX, spTextY + fontHeight * j);
           g.drawString(
-              switch (i) {
+            switch (i) {
               case 1 -> player.getName();
               case 2 -> player.getDifficulty().toString();
               case 4 -> player.getHp() + " / " + player.getMaxHp();
@@ -204,7 +204,7 @@ public class Display extends JPanel implements MouseWheelListener {
         }
       } else {
         IntStream.range(1, 4).forEach(i -> g.drawString(
-            switch (i) {
+          switch (i) {
             case 1 -> "||Equipment||";
             case 2 -> "Armor: " + player.getArmor().getName();
             case 3 -> "Weapon: " + player.getWeapon().getName();

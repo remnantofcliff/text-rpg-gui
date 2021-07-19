@@ -23,12 +23,12 @@ public class Naked extends Armor {
     name = "Naked";
     flatAbsorption = 0;
     absorptionMap.putAll(Map.of(
-        FIRE, 0f,
-        ICE, 0f,
-        LIGHTNING, 0f,
-        PHYSICAL, 0f,
-        POISON, 0f,
-        WATER, 0f
+      FIRE, 0f,
+      ICE, 0f,
+      LIGHTNING, 0f,
+      PHYSICAL, 0f,
+      POISON, 0f,
+      WATER, 0f
     ));
   }
 

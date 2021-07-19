@@ -16,6 +16,7 @@ import entity.interfaces.Poisonable;
 import entity.interfaces.Stunnable;
 import entity.items.CrawlerScale;
 import entity.player.Player;
+import java.util.List;
 import java.util.Map;
 import main.Game;
 
@@ -37,7 +38,6 @@ public class Crawler extends Enemy implements Poisonable, Stunnable {
       dexterityModifier = 1;
       magicModifier = 0;
       strengthModifier = 1;
-      range = 0.5f;
       damageTypeMap.put(DamageTypes.PHYSICAL, 1f);
     }
   }
@@ -47,18 +47,18 @@ public class Crawler extends Enemy implements Poisonable, Stunnable {
       name = "Crawler Scales";
       flatAbsorption = 1;
       absorptionMap.putAll(Map.of(
-          FIRE, 0.1f,
-          ICE, 0f,
-          LIGHTNING, 0f,
-          PHYSICAL, 0.15f,
-          POISON, 0f,
-          WATER, 0.2f
+        FIRE, 0.1f,
+        ICE, 0f,
+        LIGHTNING, 0f,
+        PHYSICAL, 0.15f,
+        POISON, 0f,
+        WATER, 0.2f
       ));
     }
   }
 
   @Override
-  public boolean chooseAbility(Game game, int userIndex, Enemy[] enemies) {
+  public boolean chooseAbility(Game game, int userIndex, List<Enemy> enemies) {
     var player = Player.getInstance();
     if (player.getHp() < 50 && sp >= specials.get(0).getResourceCost()) {
       specials.get(0).use(game, userIndex, enemies);

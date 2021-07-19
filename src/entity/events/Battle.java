@@ -7,19 +7,16 @@ import static entity.events.EventConstants.RANDOM;
 import static utilities.Utilities.round;
 
 import entity.Ability;
-import entity.BattleEntity;
 import entity.Enemy;
 import entity.Event;
 import entity.Item;
 import entity.Special;
-import entity.abilities.spells.PolymorphSelf;
 import entity.interfaces.Stunnable;
 import entity.interfaces.Usable;
 import entity.player.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import main.App;
 import main.Game;
@@ -29,19 +26,18 @@ import window.Display;
  * Battle.
  */
 public class Battle extends Event {
-  private Enemy[] enemies;
+  private ArrayList<Enemy> enemies;
   private Player player = Player.getInstance();
   private boolean newTurn = true;
 
   /**
    * Creates a new battle event. Takes in the enemies as a parameter.
 
-   * @param enemies enemies to be fought. Can be an arbitary amount or array.
+   * @param enemies enemies to be fought. Can be an arbitary amount or array. (Enemy...)
    */
   public Battle(Enemy... enemies) {
     name = "Battle";
-    this.enemies = enemies;
-    (new PolymorphSelf()).use(App.getMainWindow().getGame(), 0, enemies);
+    this.enemies = new ArrayList<>(List.of(enemies));
   }
 
   @Override
@@ -51,11 +47,11 @@ public class Battle extends Event {
     }
     game.clear();
     int temp = game.addText(
-        player.getName() 
-        + "\nHP: " + player.getHp() + " / " + player.getMaxHp() 
-        + "\nMP: " + player.getMp() + " / " + player.getMaxMp() 
-        + "\nSP: " + player.getSp() + " / " + player.getMaxSp()
-        + "\n-Attack\n-Special\n-Magic\n-Items"
+      player.getName()
+      + "\nHP: " + player.getHp() + " / " + player.getMaxHp()
+      + "\nMP: " + player.getMp() + " / " + player.getMaxMp()
+      + "\nSP: " + player.getSp() + " / " + player.getMaxSp()
+      + "\n-Attack\n-Special\n-Magic\n-Items"
     );
     game.clear();
     switch (temp) {
@@ -69,7 +65,13 @@ public class Battle extends Event {
         break;
       default:App.logWrongInput(temp);
     }
-    IntStream.range(0, enemies.length).filter(i -> enemies[i].getHp() == 0 && enemies[i].getSpawnOnDeath() != null).forEach(i -> enemies[i] = (Enemy) enemies[i].getSpawnOnDeath());
+    for (var i = 0; i < enemies.size(); i++) {
+      var enemy = enemies.get(i);
+      var spawn = enemy.getSpawnOnDeath();
+      if (enemy.getHp() == 0 && spawn != null) {
+        enemies.set(i, spawn);
+      }
+    }
     if (player.getHp() == 0) {
       game.clear();
       game.addText("You were defeated");
@@ -79,10 +81,10 @@ public class Battle extends Event {
       Display.getInstance().exit(false);
       return;
     }
-    if (Stream.of(enemies).allMatch(x -> x.getHp() == 0)) {
+    if (enemies.stream().allMatch(x -> x.getHp() == 0)) {
       game.clear();
       game.addText("Victory!");
-      Stream.of(enemies).map(x -> x.getDrop(RANDOM.nextFloat())).filter(Objects::nonNull).forEach(x -> {
+      enemies.stream().map(x -> x.getDrop(RANDOM.nextFloat())).filter(Objects::nonNull).forEach(x -> {
         player.getInventory().add(x);
         game.addText("Obtained: " + x.getName());
       });
@@ -97,11 +99,12 @@ public class Battle extends Event {
   private void item(Game game) {
     game.clear();
     Item[] quickItems = player.getQuickItems();
-    int index = game.addText("Choose item to use:"
-        + "\n-" + (quickItems[0] == null ? EMPTY :  quickItems[0].getName())
-        + "\n-" + (quickItems[1] == null ? EMPTY :  quickItems[1].getName())
-        + "\n-" + (quickItems[2] == null ? EMPTY :  quickItems[2].getName())
-        + BACK_NL
+    int index = game.addText(
+      "Choose item to use:"
+      + "\n-" + (quickItems[0] == null ? EMPTY :  quickItems[0].getName())
+      + "\n-" + (quickItems[1] == null ? EMPTY :  quickItems[1].getName())
+      + "\n-" + (quickItems[2] == null ? EMPTY :  quickItems[2].getName())
+      + BACK_NL
     );
     if (index != 3 && quickItems[index] != null) {
       ((Usable) quickItems[index]).use();
@@ -112,35 +115,44 @@ public class Battle extends Event {
 
   private void newTurn() {
     newTurn = false;
-    ArrayList<BattleEntity> list = new ArrayList<>(List.of(enemies));
-    list.add(player);
-    list.stream().forEach(BattleEntity::regenerateSp);
+    for (var i = 0; i < enemies.size(); i++) {
+      var enemy = enemies.get(i);
+      if (enemy.getHp() == 0) {
+        enemies.remove(i);
+      }
+      enemy.regenerateMp();
+      enemy.regenerateSp();
+    }
+    player.regenerateMp();
+    player.regenerateSp();
   }
 
   private void attack(Game game) {
-    var sb = new StringBuilder("Choose who to attack:\n");
-    Stream.of(enemies).forEach(x -> sb.append("-" + x.getName() + " " + x.getHp() + " / " + x.getMaxHp() + "\n"));
-    int index = game.addText(sb.append(BACK).toString());
-    if (index == enemies.length) {
+    int index = selectEnemies(game, enemies, "Choose who to attack:");
+    if (index == enemies.size()) {
       return;
     }
     var weapon = player.getWeapon();
-    float damage = round(enemies[index].getArmor().absorb(weapon.calculateDamage(player), weapon.getDamageTypeMap()));
-    enemies[index].removeHp(damage);
+    var enemy = enemies.get(index);
+    float damage = round(enemy.getArmor().absorb(weapon.calculateDamage(player), weapon.getDamageTypeMap()));
+    enemy.removeHp(damage);
     game.clear();
-    game.addText("Dealt " + damage + " damage to " + enemies[index].getName());
-    game.clear();
+    game.addText("Dealt " + damage + " damage to " + enemy.getName());
     enemyAttack(game);
   }
 
   private void enemyAttack(Game game) {
+    game.clear();
     newTurn = true;
-    IntStream.range(0, enemies.length).filter(i -> enemies[i].getStatusEffects().contains(Stunnable.STUNNED) && !enemies[i].chooseAbility(game, i, enemies)).forEach(i -> {
-      var weapon = enemies[i].getWeapon();
-      float damage = round(player.getArmor().absorb(weapon.calculateDamage(enemies[i]), weapon.getDamageTypeMap()));
-      player.removeHp(damage);
-      game.addText(enemies[i].getName() + " dealt " + damage + " damage to you!\n");
-    });
+    for (var i = 0; i < enemies.size(); i++) {
+      var enemy = enemies.get(i);
+      if (!enemy.getStatusEffects().contains(Stunnable.STUNNED) && !enemy.chooseAbility(game, i, enemies)) {
+        var weapon = enemy.getWeapon();
+        float damage = round(player.getArmor().absorb(weapon.calculateDamage(enemy), weapon.getDamageTypeMap()));
+        player.removeHp(damage);
+        game.addText(enemy.getName() + " dealt " + damage + " damage to you!\n");
+      }
+    }
   }
 
   private void ability(Game game, Ability[] abilities) {
@@ -169,5 +181,16 @@ public class Battle extends Event {
     } else {
       game.addText("Not enough " + stat + ": " + resource + " / " + abilities[index].getResourceCost() + " required.");
     }
+  }
+
+  /**
+   * Adds the enemies to the screen for selection and returns the selection index.
+
+   * @return (int)
+   */
+  public static int selectEnemies(Game game, List<Enemy> enemies, String initialString) {
+    var sb = new StringBuilder(initialString + "\n");
+    enemies.forEach(x -> sb.append("-" + x.getName() + " " + x.getHp() + " / " + x.getMaxHp() + "\n"));
+    return game.addText(sb.append(BACK).toString());
   }
 }

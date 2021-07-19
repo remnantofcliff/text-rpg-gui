@@ -19,7 +19,6 @@ public class Fists extends Weapon implements Equippable {
     dexterityModifier = 1;
     magicModifier = 0;
     strengthModifier = 2;
-    range = 0.5f;
     damageTypeMap.put(DamageTypes.PHYSICAL, 1f);
   }
 
