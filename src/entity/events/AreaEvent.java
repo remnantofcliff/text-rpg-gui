@@ -70,7 +70,7 @@ public class AreaEvent extends Event {
             sb.append("\n-" + string);
           }
           int index = game.addText(sb.append(BACK_NL).toString());
-          if (index != directionList.size()) {
+          if (index != directionList.size() || index != -2) {
             nextArea = l.nextLocation(directionList.get(index));
           }
         } else {
@@ -114,7 +114,7 @@ public class AreaEvent extends Event {
       var sb = new StringBuilder();
       ArrayList<Entry<String, Integer>> entries = new ArrayList<>(inventory.getBattleItems().entrySet());
       int index = displayInvCategory(game, entries, sb);
-      if (index != entries.size()) {
+      if (index != entries.size() || index != -2) {
         quickItems[qiIndex] = inventory.getItem(entries.get(index).getKey());
       }
     }
@@ -133,7 +133,7 @@ public class AreaEvent extends Event {
     ArrayList<Entry<String, Integer>> entries = new ArrayList<>(itemMap.entrySet());
     int index = displayInvCategory(game, entries, sb);
     game.removeOverlay();
-    if (index != entries.size()) {
+    if (index != entries.size() || index != -2) {
       var item = inventory.getItem(entries.get(index).getKey());
       sb.setLength(0);
       sb.append(item.getName() + "\n");
@@ -167,7 +167,7 @@ public class AreaEvent extends Event {
       var sb = new StringBuilder("What do you want to do?");
       Stream.of(area.getEvents()).forEach(x -> sb.append("\n-" + x.getName()));
       int index = game.addText(sb.append(BACK_NL).toString());
-      if (index != area.getEvents().length) {
+      if (index != area.getEvents().length || index != -2) {
         area.getEvents()[index].event(game);
       }
     } else {
@@ -179,7 +179,7 @@ public class AreaEvent extends Event {
     game.clear();
     if (area.hasVendors()) {
       int index = game.addText(getChoosingStrings(area.getVendors(), "Who would you like to barter with?"));
-      if (index != area.getVendors().length) {
+      if (index != area.getVendors().length || index != -2) {
         var vendor = area.getVendors()[index];
         var sb = new StringBuilder(vendor.greeting());
         ArrayList<String> nameList = new ArrayList<>();
@@ -214,7 +214,7 @@ public class AreaEvent extends Event {
     game.clear();
     if (area.hasTalkers()) {
       int index = game.addText(getChoosingStrings(area.getTalkers(), "Who do you want to talk to?"));
-      if (index != area.getTalkers().length) {
+      if (index != area.getTalkers().length || index != -2) {
         game.clear();
         Stream.of(area.getTalkers()[index].getText()).forEach(game::addText);
       }

@@ -29,6 +29,7 @@ public class Battle extends Event {
   private ArrayList<Enemy> enemies;
   private Player player = Player.getInstance();
   private boolean newTurn = true;
+  private int size;
 
   /**
    * Creates a new battle event. Takes in the enemies as a parameter.
@@ -65,7 +66,7 @@ public class Battle extends Event {
         break;
       default:App.logWrongInput(temp);
     }
-    for (var i = 0; i < enemies.size(); i++) {
+    for (var i = 0; i < size; i++) {
       var enemy = enemies.get(i);
       var spawn = enemy.getSpawnOnDeath();
       if (enemy.getHp() == 0 && spawn != null) {
@@ -115,6 +116,7 @@ public class Battle extends Event {
 
   private void newTurn() {
     newTurn = false;
+    size = enemies.size();
     for (var i = 0; i < enemies.size(); i++) {
       var enemy = enemies.get(i);
       if (enemy.getHp() == 0) {
@@ -129,7 +131,7 @@ public class Battle extends Event {
 
   private void attack(Game game) {
     int index = selectEnemies(game, enemies, "Choose who to attack:");
-    if (index == enemies.size()) {
+    if (index == size || index == -2) {
       return;
     }
     var weapon = player.getWeapon();
@@ -144,7 +146,7 @@ public class Battle extends Event {
   private void enemyAttack(Game game) {
     game.clear();
     newTurn = true;
-    for (var i = 0; i < enemies.size(); i++) {
+    for (var i = 0; i < size; i++) {
       var enemy = enemies.get(i);
       if (!enemy.getStatusEffects().contains(Stunnable.STUNNED) && !enemy.chooseAbility(game, i, enemies)) {
         var weapon = enemy.getWeapon();
@@ -171,7 +173,7 @@ public class Battle extends Event {
     var sb = new StringBuilder("Choose " + choose + ":\n");
     Stream.of(abilities).forEach(x -> sb.append("-" + x.getName() + " " + x.getResourceCost() + stat + "\n"));
     int index = game.addText(sb.append(BACK).toString());
-    if (index == abilities.length) {
+    if (index == abilities.length || index == -2) {
       return;
     }
     game.clear();

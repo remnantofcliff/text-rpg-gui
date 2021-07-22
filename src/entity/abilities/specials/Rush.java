@@ -31,6 +31,9 @@ public class Rush extends Special {
       user.removeSp(resourceCost);
       game.clear();
       int index = Battle.selectEnemies(game, enemies, "Choose target:");
+      if (index == enemies.size() || index == -2) {
+        return;
+      }
       float damage = 25f + user.getStrength() * 2;
       Enemy target = enemies.get(index);
       damage = round(target.getArmor().absorb(damage, Map.of(DamageTypes.PHYSICAL, 1f)));

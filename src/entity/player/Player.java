@@ -88,8 +88,8 @@ public final class Player extends BattleEntity {
     weapon = (Weapon) inventory.getItem("Fists");
     armor = (Armor) inventory.getItem("Rags");
     specials.add(new Rush());
-    setMaxResources(100, 100, 5);
-    setStats(1, 1, 1);
+    setMaxResources(1000, 100, 5);
+    setStats(10, 1, 1);
   }
 
   public void setDifficulty(Difficulties difficulty) {

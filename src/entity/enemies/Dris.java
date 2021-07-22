@@ -49,6 +49,7 @@ public class Dris extends Enemy implements Poisonable, Stunnable {
     var dd = spells.get(1);
     if (!usedPolymorph && mp >= polymorph.getResourceCost()) {
       spells.get(0).use(game, userIndex, enemies);
+      usedPolymorph = true;
       return true;
     } else if (mp >= dd.getResourceCost()) {
       dd.use(game, userIndex, enemies);
