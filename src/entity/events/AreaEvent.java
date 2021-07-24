@@ -114,7 +114,7 @@ public class AreaEvent extends Event {
       var sb = new StringBuilder();
       ArrayList<Entry<String, Integer>> entries = new ArrayList<>(inventory.getBattleItems().entrySet());
       int index = displayInvCategory(game, entries, sb);
-      if (index != entries.size() || index != -2) {
+      if (index != entries.size() && index != -2) {
         quickItems[qiIndex] = inventory.getItem(entries.get(index).getKey());
       }
     }
@@ -152,7 +152,7 @@ public class AreaEvent extends Event {
       }
       game.clear();
       index = game.addText(sb.append(BACK).toString());
-      if (index != list.size()) {
+      if (index != list.size() && index != -2) {
         list.get(index).run();
       } else {
         invCategory(game, inventory, itemMap, catString);
@@ -167,7 +167,7 @@ public class AreaEvent extends Event {
       var sb = new StringBuilder("What do you want to do?");
       Stream.of(area.getEvents()).forEach(x -> sb.append("\n-" + x.getName()));
       int index = game.addText(sb.append(BACK_NL).toString());
-      if (index != area.getEvents().length || index != -2) {
+      if (index != area.getEvents().length && index != -2) {
         area.getEvents()[index].event(game);
       }
     } else {
@@ -179,7 +179,7 @@ public class AreaEvent extends Event {
     game.clear();
     if (area.hasVendors()) {
       int index = game.addText(getChoosingStrings(area.getVendors(), "Who would you like to barter with?"));
-      if (index != area.getVendors().length || index != -2) {
+      if (index != area.getVendors().length && index != -2) {
         var vendor = area.getVendors()[index];
         var sb = new StringBuilder(vendor.greeting());
         ArrayList<String> nameList = new ArrayList<>();
@@ -190,7 +190,7 @@ public class AreaEvent extends Event {
         }
         game.clear();
         index = game.addText(sb.append(BACK_NL).toString());
-        if (index != nameList.size()) {
+        if (index != nameList.size() && index != -2) {
           var selectedString = nameList.get(index);
           var inventory = player.getInventory();
           int itemPrice = vendor.prices().get(selectedString);
@@ -214,7 +214,7 @@ public class AreaEvent extends Event {
     game.clear();
     if (area.hasTalkers()) {
       int index = game.addText(getChoosingStrings(area.getTalkers(), "Who do you want to talk to?"));
-      if (index != area.getTalkers().length || index != -2) {
+      if (index != area.getTalkers().length && index != -2) {
         game.clear();
         Stream.of(area.getTalkers()[index].getText()).forEach(game::addText);
       }
