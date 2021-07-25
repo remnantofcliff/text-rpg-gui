@@ -18,7 +18,6 @@ import entity.items.CrawlerScale;
 import entity.player.Player;
 import java.util.List;
 import java.util.Map;
-import main.Game;
 
 /**
  * Crawler-enemy.
@@ -58,10 +57,10 @@ public class Crawler extends Enemy implements Poisonable, Stunnable {
   }
 
   @Override
-  public boolean chooseAbility(Game game, int userIndex, List<Enemy> enemies) {
+  public boolean chooseAbility(int userIndex, List<Enemy> enemies) {
     var player = Player.getInstance();
     if (player.getHp() < 50 && sp >= specials.get(0).getResourceCost()) {
-      specials.get(0).use(game, userIndex, enemies);
+      specials.get(0).use(userIndex, enemies);
       return true;
     }
     return false;

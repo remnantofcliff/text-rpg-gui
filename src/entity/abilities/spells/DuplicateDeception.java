@@ -4,10 +4,11 @@ import entity.Enemy;
 import entity.Spell;
 import entity.enemies.Duplicate;
 import entity.events.EventConstants;
+import main.Game;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
-import main.Game;
 
 /**
  * Spell that summons multiple copies of caster. When a copy is attacked, it disappears, and when the caster is attacked, all copies disappear.
@@ -19,7 +20,8 @@ public class DuplicateDeception extends Spell {
   }
 
   @Override
-  public void use(Game game, int userIndex, List<Enemy> enemies) {
+  public void use(int userIndex, List<Enemy> enemies) {
+    var game = Game.getInstance();
     if (userIndex == EventConstants.PLAYER_INDEX) {
       //
     } else {

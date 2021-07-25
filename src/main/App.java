@@ -21,23 +21,34 @@ public class App {
    */
   public static void main(String[] args) {
     try {
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      String laf = UIManager.getSystemLookAndFeelClassName();
+      UIManager.setLookAndFeel(laf);
+      LOGGER.log(Level.INFO, "Set look and feel: {0}", laf);
     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
       LOGGER.log(Level.WARNING, "Failed to set look and feel.", e);
     }
     SwingUtilities.invokeLater(() -> mainWindow = new MainWindow());
+    LOGGER.log(Level.INFO, "Swing window created.");
   }
 
   public static MainWindow getMainWindow() {
     return mainWindow;
   }
 
+  public static void logNewGameInstance() {
+    LOGGER.log(Level.INFO, "New game instance created.");
+  }
+  
   public static void logNoSaveFound() {
     LOGGER.log(Level.WARNING, "No save-game found. Starting new game.");
   }
   
   public static void logThreadExit(String name) {
     LOGGER.log(Level.INFO, "Thread interrupted.\n      Closing thread: {0}", name);
+  }
+
+  public static void logThreadStart() {
+    LOGGER.log(Level.INFO, "Started game-thread");
   }
 
   public static void logWrongInput(int input) {

@@ -6,7 +6,7 @@ import static core.DamageTypes.LIGHTNING;
 import static core.DamageTypes.PHYSICAL;
 import static core.DamageTypes.POISON;
 import static core.DamageTypes.WATER;
-import static utilities.Utilities.round;
+import static utils.Utilities.round;
 
 import core.DamageTypes;
 import entity.Armor;
@@ -25,6 +25,7 @@ import main.Game;
  * Bear-enemy.
  */
 public class Bear extends Enemy implements Poisonable, Stunnable {
+
   public Bear() {
     setDefaultValues();
   }
@@ -36,7 +37,8 @@ public class Bear extends Enemy implements Poisonable, Stunnable {
     }
 
     @Override
-    public void use(Game game, int userIndex, List<Enemy> enemies) {
+    public void use(int userIndex, List<Enemy> enemies) {
+      var game = Game.getInstance();
       game.addText("The bear bites you!\n");
       var player = Player.getInstance();
       float damage = round(player.getArmor().absorb(20, weapon.getDamageTypeMap()));
@@ -72,12 +74,12 @@ public class Bear extends Enemy implements Poisonable, Stunnable {
   }
 
   @Override
-  public boolean chooseAbility(Game game, int userIndex, List<Enemy> enemies) {
+  public boolean chooseAbility(int userIndex, List<Enemy> enemies) {
     if (sp >= specials.get(0).getResourceCost() && hp > 50) {
-      specials.get(0).use(game, userIndex, enemies);
+      specials.get(0).use(userIndex, enemies);
       return true;
     } else if (sp >= specials.get(1).getResourceCost() && hp < 50) {
-      specials.get(1).use(game, userIndex, enemies);
+      specials.get(1).use(userIndex, enemies);
       return true;
     }
     return false;

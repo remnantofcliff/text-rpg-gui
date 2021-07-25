@@ -1,7 +1,6 @@
 package entity.player;
 
 import core.Difficulties;
-import entity.Area;
 import entity.Armor;
 import entity.BattleEntity;
 import entity.Item;
@@ -24,7 +23,6 @@ public final class Player extends BattleEntity {
   private Save save = new Save();
   private int areaId = 0;
   private static Player instance;
-  private transient Area area;
   
   /**
    * Creates a new player-object.
@@ -33,10 +31,6 @@ public final class Player extends BattleEntity {
     setDefaultValues();
     inventory.add(new HealthPotion());
     inventory.add(new Antidote());
-  }
-
-  public Area getArea() {
-    return area;
   }
 
   public Difficulties getDifficulty() {
@@ -69,11 +63,6 @@ public final class Player extends BattleEntity {
   
   public void incrementMagic() {
     magic++;
-  }
-
-  public void setArea(Area area) {
-    this.area = area;
-    setAreaId(area.getId());
   }
 
   public void setAreaId(int id) {

@@ -11,6 +11,7 @@ import entity.interfaces.Droppable;
 import entity.interfaces.Equippable;
 import entity.interfaces.Leavable;
 import entity.interfaces.Usable;
+import entity.interfaces.Vendor;
 import entity.player.Player;
 import inventory.Inventory;
 import java.util.ArrayList;
@@ -25,7 +26,8 @@ import main.Game;
  */
 public class AreaEvent extends Event {
   private Area area;
-  private Player player;
+  private Player player = Player.getInstance();
+  private transient Game game = Game.getInstance();
 
   /**
    * Calls the event method with the specified area.
@@ -35,7 +37,6 @@ public class AreaEvent extends Event {
   public AreaEvent(Area area) {
     name = "Area";
     this.area = area;
-    player = Player.getInstance();
   }
 
   private String getChoosingStrings(Object[] objects, String string) {
@@ -45,22 +46,22 @@ public class AreaEvent extends Event {
   }
 
   @Override
-  public void event(Game game) {
-    player.setArea(area);
+  public void event() {
+    player.setAreaId(area.getId());
     game.clear();
     int temp = game.addText(area.getName() + " | " + area.getLocation() + "\n-Action\n-Description\n-Talk\n-Shop\n-Inventory\n-Leave");
     var nextArea = area;
     game.clear();
     switch (temp) {
-      case 0:areaEvent(game);
+      case 0:areaEvent();
         break;
       case 1:game.addText(area.getDescription());
         break;
-      case 2:areaTalk(game);
+      case 2:areaTalk();
         break;
-      case 3:areaShop(game);
+      case 3:areaShop();
         break;
-      case 4:inventory(game);
+      case 4:inventory();
         break;
       case 5: if (area instanceof Leavable l) {
           var sb = new StringBuilder("Where do you want to go next?");
@@ -80,27 +81,27 @@ public class AreaEvent extends Event {
       default:App.logWrongInput(temp);
     }
     if (game.getInput() != -2) {
-      new AreaEvent(nextArea).event(game);
+      new AreaEvent(nextArea).event();
     }
   }
 
-  private void inventory(Game game) {
+  private void inventory() {
     game.clear();
     var inventory = player.getInventory();
     switch (game.addText("Choose category:\n-Items\n-Weapons\n-Armor\n-Choose items to keep with you.\n-Back")) {
-      case 0:invCategory(game, inventory, inventory.getItems(), "Items");
+      case 0:invCategory(inventory, inventory.getItems(), "Items");
         break;
-      case 1:invCategory(game, inventory, inventory.getWeapons(), "Weapons");
+      case 1:invCategory(inventory, inventory.getWeapons(), "Weapons");
         break;
-      case 2:invCategory(game, inventory, inventory.getArmors(), "Armors");
+      case 2:invCategory(inventory, inventory.getArmors(), "Armors");
         break;
-      case 3:quickItems(game, inventory);
+      case 3:quickItems(inventory);
         break;
       default:
     }
   }
 
-  private void quickItems(Game game, Inventory inventory) {
+  private void quickItems(Inventory inventory) {
     Item[] quickItems = player.getQuickItems();
     game.clear();
     int qiIndex = game.addText("Add item to quick items:"
@@ -113,25 +114,25 @@ public class AreaEvent extends Event {
       game.clear();
       var sb = new StringBuilder();
       ArrayList<Entry<String, Integer>> entries = new ArrayList<>(inventory.getBattleItems().entrySet());
-      int index = displayInvCategory(game, entries, sb);
+      int index = displayInvCategory(entries, sb);
       if (index != entries.size() && index != -2) {
         quickItems[qiIndex] = inventory.getItem(entries.get(index).getKey());
       }
     }
   }
 
-  private int displayInvCategory(Game game, ArrayList<Entry<String, Integer>> entries, StringBuilder sb) {
+  private int displayInvCategory(ArrayList<Entry<String, Integer>> entries, StringBuilder sb) {
     entries.stream().forEach(x -> sb.append("-" + x.getKey() + " -- " + x.getValue() + "\n"));
     return game.addText(sb.append(BACK).toString());
   }
 
-  private void invCategory(Game game, Inventory inventory, Map<String, Integer> itemMap, String catString) {
+  private void invCategory(Inventory inventory, Map<String, Integer> itemMap, String catString) {
     var sb = new StringBuilder();
     game.clear();
     game.setOverlay(catString + " -- Gold: " + inventory.getGold());
     sb.append("\n");
     ArrayList<Entry<String, Integer>> entries = new ArrayList<>(itemMap.entrySet());
-    int index = displayInvCategory(game, entries, sb);
+    int index = displayInvCategory(entries, sb);
     game.removeOverlay();
     if (index != entries.size() || index != -2) {
       var item = inventory.getItem(entries.get(index).getKey());
@@ -155,27 +156,27 @@ public class AreaEvent extends Event {
       if (index != list.size() && index != -2) {
         list.get(index).run();
       } else {
-        invCategory(game, inventory, itemMap, catString);
+        invCategory(inventory, itemMap, catString);
       }
     } else {
-      inventory(game);
+      inventory();
     }
   }
 
-  private void areaEvent(Game game) {
+  private void areaEvent() {
     if (area.hasEvents()) {
       var sb = new StringBuilder("What do you want to do?");
       Stream.of(area.getEvents()).forEach(x -> sb.append("\n-" + x.getName()));
       int index = game.addText(sb.append(BACK_NL).toString());
       if (index != area.getEvents().length && index != -2) {
-        area.getEvents()[index].event(game);
+        area.getEvents()[index].event();
       }
     } else {
       game.addText("No actions available in this location.");
     }
   }
 
-  private void areaShop(Game game) {
+  private void areaShop() {
     game.clear();
     if (area.hasVendors()) {
       int index = game.addText(getChoosingStrings(area.getVendors(), "Who would you like to barter with?"));
@@ -195,14 +196,7 @@ public class AreaEvent extends Event {
           var inventory = player.getInventory();
           int itemPrice = vendor.prices().get(selectedString);
           game.clear();
-          if (inventory.hasGold(itemPrice)) {
-            var item = vendor.getItem(selectedString);
-            inventory.removeGold(itemPrice);
-            inventory.add(item);
-            game.addText("Bought one " + item.getName());
-          } else {
-            game.addText("Not enough gold.");
-          }
+          goldCheck(vendor, selectedString, inventory, itemPrice);
         }
       }
     } else {
@@ -210,7 +204,18 @@ public class AreaEvent extends Event {
     }
   }
 
-  private void areaTalk(Game game) {
+  private void goldCheck(Vendor vendor, String selectedString, Inventory inventory, int itemPrice) {
+    if (inventory.hasGold(itemPrice)) {
+      var item = vendor.getItem(selectedString);
+      inventory.removeGold(itemPrice);
+      inventory.add(item);
+      game.addText("Bought one " + item.getName());
+    } else {
+      game.addText("Not enough gold.");
+    }
+  }
+
+  private void areaTalk() {
     game.clear();
     if (area.hasTalkers()) {
       int index = game.addText(getChoosingStrings(area.getTalkers(), "Who do you want to talk to?"));

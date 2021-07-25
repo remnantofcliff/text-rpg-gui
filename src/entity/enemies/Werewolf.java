@@ -16,7 +16,6 @@ import entity.interfaces.Poisonable;
 import entity.interfaces.Stunnable;
 import java.util.List;
 import java.util.Map;
-import main.Game;
 
 /**
  * Werewolf-enemy.
@@ -55,11 +54,11 @@ public class Werewolf extends Enemy implements Poisonable, Stunnable {
   }
 
   @Override
-  public boolean chooseAbility(Game game, int userIndex, List<Enemy> enemies) {
+  public boolean chooseAbility(int userIndex, List<Enemy> enemies) {
     var spell = spells.get(0);
     if (!summonedWolves && mp >= spell.getResourceCost()) {
       summonedWolves = true;
-      spell.use(game, userIndex, enemies);
+      spell.use(userIndex, enemies);
       return true;
     }
     return false;

@@ -14,7 +14,8 @@ public class SelectDifficulty extends Event {
   }
 
   @Override
-  public void event(Game game) {
+  public void event() {
+    var game = Game.getInstance();
     game.clear();
     if (game.addText("Select difficulty:\n-Normal\n-Critical") == 1) {
       Player.getInstance().setDifficulty(Difficulties.CRITICAL);

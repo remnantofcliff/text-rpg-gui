@@ -13,7 +13,6 @@ import entity.Enemy;
 import entity.Weapon;
 import java.util.List;
 import java.util.Map;
-import main.Game;
 
 /**
  * Wolf-enemy.
@@ -50,7 +49,7 @@ public class Wolf extends Enemy {
   }
 
   @Override
-  public boolean chooseAbility(Game game, int userIndex, List<Enemy> enemies) {
+  public boolean chooseAbility(int userIndex, List<Enemy> enemies) {
     return false;
   }
 

@@ -11,6 +11,7 @@ import save.Save;
  */
 public class DretnosEvent1 extends Event {
   private Save save = Player.getInstance().getSave();
+  private transient Game game = Game.getInstance();
 
   /**
    * First event in Dretnos. "Explore cave" / "Visit the gnome in the cave" / "Visit old shack"
@@ -24,7 +25,7 @@ public class DretnosEvent1 extends Event {
   }
 
   @Override
-  public void event(Game game) {
+  public void event() {
     game.clear();
     game.addText("There is a small cave in the corner of the settlement. ");
     game.addText("The opening has old-looking wooden supports. ");
@@ -44,16 +45,16 @@ public class DretnosEvent1 extends Event {
       game.addText("In the middle of the small field, there is a small house. ");
       game.clear();
       if (game.addText("Continue?\n-Yes\n-No") == 0) {
-        afterCave(game);
+        afterCave();
       } else {
-        leave(game);
+        leave();
       }
     } else {
-      leave(game);
+      leave();
     }
   }
 
-  private void afterCave(Game game) {
+  private void afterCave() {
     game.clear();
     game.addText("You carefully try the door.. ");
     game.addText("as you do the door opens and a small man greets you. ");
@@ -65,7 +66,7 @@ public class DretnosEvent1 extends Event {
     if (game.addText("\n-Yes\n-No") == 0) {
       game.clear();
       game.addText("Well you get what you ask for! ");
-      new Battle(new Dris()).event(game);
+      new Battle(new Dris()).event();
     } else {
       save.setDretnosExploredCave(true);
       setName("Visit the gnome in the cave");
@@ -76,7 +77,7 @@ public class DretnosEvent1 extends Event {
     }
   }
 
-  private void leave(Game game) {
+  private void leave() {
     game.clear();
     game.addText("You decide to leave");
   }

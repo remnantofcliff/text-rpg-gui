@@ -106,17 +106,6 @@ public class MainWindow extends JFrame implements ActionListener {
     menuScreen();
   }
 
-  /**
-   * Saves the game.
-   */
-  public void serialize() {
-    try (var out = new ObjectOutputStream(new FileOutputStream("saves/save.ser"))) {
-      out.writeObject(Player.getInstance());
-    } catch (IOException e) {
-      App.logNoSaveFound();
-    }
-  }
-
   private void gameScreen() {
     inGame = true;
     setFocusable(true);
@@ -125,13 +114,19 @@ public class MainWindow extends JFrame implements ActionListener {
     requestFocus();
   }
 
+  private void startGame(boolean newgame) {
+    reset();
+    gameScreen();
+    game = Game.getInstance(newgame);
+    game.start();
+  }
+
   /**
-   * Empties the frame.
+   * Returns the color of the background of the frame.
+   * @return
    */
-  public void reset() {
-    getContentPane().removeAll();
-    getContentPane().revalidate();
-    getContentPane().repaint();
+  public Color getUiColor() {
+    return uiColor;
   }
 
   @Override
@@ -148,19 +143,24 @@ public class MainWindow extends JFrame implements ActionListener {
     }
   }
 
-  private void startGame(boolean newgame) {
-    reset();
-    gameScreen();
-    game = new Game(newgame);
-    game.start();
+  /**
+   * Empties the frame.
+   */
+  public void reset() {
+    getContentPane().removeAll();
+    getContentPane().revalidate();
+    getContentPane().repaint();
   }
 
-  public Color getUiColor() {
-    return uiColor;
-  }
-
-  public Game getGame() {
-    return game;
+  /**
+   * Saves the game.
+   */
+  public void serialize() {
+    try (var out = new ObjectOutputStream(new FileOutputStream("saves/save.ser"))) {
+      out.writeObject(Player.getInstance());
+    } catch (IOException e) {
+      App.logNoSaveFound();
+    }
   }
 
   /**

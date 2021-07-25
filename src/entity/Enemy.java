@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import main.Game;
+import entity.interfaces.Stunnable;
 
 /**
  * Enemy-class, subclass of BattleEntity.
@@ -35,9 +35,17 @@ public abstract class Enemy extends BattleEntity {
     return spawnOnDeath;
   }
 
+  public boolean shouldAttack(int i, List<Enemy> enemies) {
+    return !getStatusEffects().contains(Stunnable.STUNNED) && !chooseAbility(i, enemies);
+  }
+
+  public boolean shouldSpawnOnDeath() {
+    return spawnOnDeath != null && hp == 0;
+  }
+
   public void setSpawnOnDeath(Enemy spawnOnDeath) {
     this.spawnOnDeath = spawnOnDeath;
   }
 
-  public abstract boolean chooseAbility(Game game, int userIndex, List<Enemy> enemies);
+  public abstract boolean chooseAbility(int userIndex, List<Enemy> enemies);
 }

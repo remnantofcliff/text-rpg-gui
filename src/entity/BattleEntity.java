@@ -1,6 +1,6 @@
 package entity;
 
-import static utilities.Utilities.round;
+import static utils.Utilities.round;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -44,8 +44,6 @@ public abstract class BattleEntity extends Entity {
     return armor;
   }
 
-  
-
   public Special[] getSpecials() {
     return specials.toArray(new Special[0]);
   }
@@ -60,6 +58,10 @@ public abstract class BattleEntity extends Entity {
 
   public Weapon getWeapon() {
     return weapon;
+  }
+
+  public boolean isDead() {
+    return hp == 0;
   }
 
   public float getHp() {
@@ -140,24 +142,15 @@ public abstract class BattleEntity extends Entity {
   public void addSpell(Spell spell) {
     spells.add(spell);
   }
-
+  
   /**
-   * Regenerates mp for character.
+   * Regenerates mp and sp if needed.
    */
-  public void regenerateMp() {
-    if (mp < maxMp) {
-      addMp(10);
-    }
+  public void regenerate() {
+    addMp(10);
+    addSp(1);
   }
 
-  /**
-   * Regenerates sp for character.
-   */
-  public void regenerateSp() {
-    if (sp != maxSp) {
-      sp++;
-    }
-  }
   /**
    * Removes the parameter amount of hp. If smaller than 0, sets hp to 0.
 

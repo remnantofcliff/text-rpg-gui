@@ -5,7 +5,6 @@ import entity.Enemy;
 import entity.Weapon;
 import entity.items.armors.Naked;
 import java.util.List;
-import main.Game;
 
 /**
  * Giant-spider enemy.
@@ -27,7 +26,7 @@ public class GiantSpider extends Enemy {
   }
 
   @Override
-  public boolean chooseAbility(Game game, int userIndex, List<Enemy> enemies) {
+  public boolean chooseAbility(int userIndex, List<Enemy> enemies) {
     return false;
   }
 

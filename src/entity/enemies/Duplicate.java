@@ -2,7 +2,6 @@ package entity.enemies;
 
 import entity.Enemy;
 import java.util.List;
-import main.Game;
 
 /**
  * Duplicate made by the "Duplicate Deception"-spell.
@@ -16,7 +15,7 @@ public class Duplicate extends Enemy {
   }
 
   @Override
-  public boolean chooseAbility(Game game, int userIndex, List<Enemy> enemies) {
+  public boolean chooseAbility(int userIndex, List<Enemy> enemies) {
     return false;
   }
 

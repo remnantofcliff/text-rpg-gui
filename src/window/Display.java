@@ -20,6 +20,7 @@ import java.util.stream.IntStream;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import main.App;
+import main.Game;
 
 /**
  * Display for game.
@@ -116,7 +117,7 @@ public class Display extends JPanel implements MouseWheelListener {
             exit(true);
           }
         } else if (borderWidth < x && x < wdtOffset1) {
-          mw.getGame().setInput(select());
+          Game.getInstance().setInput(select());
         }
       }
 
@@ -252,14 +253,18 @@ public class Display extends JPanel implements MouseWheelListener {
     }
   }
 
+  /**
+   * Adds text to display.
+
+   * @param text The text to be added (String)
+   */
   public void addText(String text) {
     this.text.append(text);
     repaint();
   }
 
   /**
-   * Changes the current display state. If current displaystate is the same as the one it's being
-   * changed to, it gets changed back to DEFAULT.
+   * Changes the current display state. If current displaystate is the same as the one it's being changed to, it gets changed back to DEFAULT.
 
    * @param ds (DisplayStates)
    */
@@ -272,6 +277,9 @@ public class Display extends JPanel implements MouseWheelListener {
     repaint();
   }
 
+  /**
+   * Clears the display.
+   */
   public void clear() {
     text.setLength(0);
     repaint();
@@ -287,7 +295,8 @@ public class Display extends JPanel implements MouseWheelListener {
       if (serialize) {
         mw.serialize();
       }
-      mw.getGame().interrupt();
+      Game.getInstance().interrupt();
+      Game.closeInstance();
       mw.reset();
       mw.menuScreen();
     }
@@ -398,6 +407,9 @@ public class Display extends JPanel implements MouseWheelListener {
     }
   }
 
+  /**
+   * Resets the font back to default size.
+   */
   public void resetFont() {
     smallFont = smallFont.deriveFont((float) 15);
     textFont = textFont.deriveFont((float) 34);
@@ -414,15 +426,20 @@ public class Display extends JPanel implements MouseWheelListener {
     return temp1 + temp2 + 1;
   }
 
-  public void setOverlay(boolean overlay) {
-    this.overlay = overlay;
-  }
+  /**
+   * Sets a black overlay on top of the display that contains text.
 
+   * @param overlay turn overlay on or off (boolean)
+   * @param overlayText The text to be added (String)
+   */
   public void setOverlay(boolean overlay, String overlayText) {
-    setOverlay(overlay);
+    this.overlay = overlay;
     this.overlayText = overlayText;
   }
 
+  /**
+   * Next repaint of the display will calculate the ui sizes again.
+   */
   public void setup() {
     setupDone = false;
   }

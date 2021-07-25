@@ -1,6 +1,6 @@
 package core;
 
-import utilities.Utilities;
+import utils.Utilities;
 
 /**
  * Enum of damage-types.

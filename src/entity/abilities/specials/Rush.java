@@ -1,7 +1,5 @@
 package entity.abilities.specials;
 
-import static utilities.Utilities.round;
-
 import core.DamageTypes;
 import entity.BattleEntity;
 import entity.Enemy;
@@ -10,6 +8,7 @@ import entity.events.Battle;
 import entity.events.EventConstants;
 import entity.interfaces.Stunnable;
 import entity.player.Player;
+import static utils.Utilities.round;
 import java.util.List;
 import java.util.Map;
 import main.Game;
@@ -24,13 +23,14 @@ public class Rush extends Special {
   }
 
   @Override
-  public void use(Game game, int userIndex, List<Enemy> enemies) {
+  public void use(int userIndex, List<Enemy> enemies) {
+    var game = Game.getInstance();
     BattleEntity user;
     if (userIndex == EventConstants.PLAYER_INDEX) {
       user = Player.getInstance();
       user.removeSp(resourceCost);
       game.clear();
-      int index = Battle.selectEnemies(game, enemies, "Choose target:");
+      int index = Battle.selectEnemies(enemies, "Choose target:");
       if (index == enemies.size() || index == -2) {
         return;
       }

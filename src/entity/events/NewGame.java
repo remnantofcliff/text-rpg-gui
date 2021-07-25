@@ -13,7 +13,8 @@ public class NewGame extends Event {
   }
 
   @Override
-  public void event(Game game) {
+  public void event() {
+    var game = Game.getInstance();
     game.addText("You wake up... ");
     game.addText("The last thing you remember is that you were captured by the guards of Nilium. ");
     game.addText("Your memory otherwise feels hazy.");
@@ -73,8 +74,8 @@ public class NewGame extends Event {
     game.clear();
     game.addText("You can't remember your name... ");
     game.addText("How should you introduce yourself? ");
-    new NameChange().event(game);
-    new SelectDifficulty().event(game);
+    new NameChange().event();
+    new SelectDifficulty().event();
   }
   
 }

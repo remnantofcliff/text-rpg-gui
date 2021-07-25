@@ -18,6 +18,7 @@ public class Game extends Thread {
   private Player player;
   private boolean newgame;
   private int input = -1;
+  private static Game instance;
   
   
   /**
@@ -25,16 +26,12 @@ public class Game extends Thread {
 
    * @param newgame Whether to start a new game or load a game. (boolean)
    */
-  public Game(boolean newgame) {
+  private Game(boolean newgame) {
     setName("Game");
     this.newgame = newgame;
   }
 
   private int waitForInput() {
-    //Input is the selected option number. 
-    //0, 1, 2, 3... if option selected
-    //-1 does nothing
-    //-2 stops thread
     while (input == -1) {
       try {
         Thread.sleep(16, 666666);
@@ -76,6 +73,7 @@ public class Game extends Thread {
 
   @Override
   public void run() {
+    App.logThreadStart();
     if (newgame) {
       player = Player.getInstance();
       var file = new File("saves/save.ser");
@@ -86,9 +84,8 @@ public class Game extends Thread {
       } catch (IOException e) {
         e.printStackTrace();
       }
-      player.setArea(Area.loadArea(player.getAreaId()));
-      new NewGame().event(this);
-      new AreaEvent(player.getArea()).event(this);
+      new NewGame().event();
+      new AreaEvent(Area.loadArea(player.getAreaId())).event();
     } else {
       try (var in = new ObjectInputStream(new FileInputStream("saves/save.ser"))) {
         player = (Player) in.readObject();
@@ -97,23 +94,70 @@ public class Game extends Thread {
         newgame = true;
         run();
       }
-      player.setArea(Area.loadArea(player.getAreaId()));
-      new AreaEvent(player.getArea()).event(this);
+      new AreaEvent(Area.loadArea(player.getAreaId())).event();
     }
   }
 
+  /**
+   * Removes the overlay.
+   */
   public void removeOverlay() {
-    display.setOverlay(false);
+    display.setOverlay(false, "");
   }
 
+  /**
+   * Sets a black overlay on top of the display that contains text.
+
+   * @param overlayText The text to be added (String)
+   */
   public void setOverlay(String overlayText) {
     display.setOverlay(true, overlayText);
   }
 
+  /**
+   * Use to close the instance of the game.
+   */
+  public static void closeInstance() {
+    instance = null;
+  }
+
+  /**
+   * Returns singleton instance. Starts new game if instance is null.
+
+   * @return (Game)
+   */
+  public static Game getInstance() {
+    return getInstance(true);
+  }
+
+  /**
+   * Returns singleton instance. Creates new instance if instance is null.
+
+   * @param newgame (boolean)
+   * @return (Game)
+   */
+  public static Game getInstance(boolean newgame) {
+    if (instance == null) {
+      App.logNewGameInstance();
+      instance = new Game(newgame);
+    }
+    return instance;
+  }
+
+  /**
+   * Returns the value of the input variable, which is based on the selection from the display.
+
+   * @return 0 is the default and first option, 1 is second, 2 is third etc. -1 does nothing and -2 is signal to close thread (int)
+   */
   public synchronized int getInput() {
     return input;
   }
 
+  /**
+   * Sets the input variable, which selection gets made in the game, as well as continues the game.
+
+   * @param input 0 is the default and first option, 1 is second, 2 is third etc. -1 does nothing and -2 is signal to close thread (int)
+   */
   public synchronized void setInput(int input) {
     this.input = input;
   }

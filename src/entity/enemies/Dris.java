@@ -16,7 +16,6 @@ import entity.interfaces.Stunnable;
 import entity.items.weapons.Cane;
 import java.util.List;
 import java.util.Map;
-import main.Game;
 
 /**
  * Gnome in Dretnos.
@@ -44,15 +43,15 @@ public class Dris extends Enemy implements Poisonable, Stunnable {
   }
 
   @Override
-  public boolean chooseAbility(Game game, int userIndex, List<Enemy> enemies) {
+  public boolean chooseAbility(int userIndex, List<Enemy> enemies) {
     var polymorph = spells.get(0);
     var dd = spells.get(1);
     if (!usedPolymorph && mp >= polymorph.getResourceCost()) {
-      spells.get(0).use(game, userIndex, enemies);
+      spells.get(0).use(userIndex, enemies);
       usedPolymorph = true;
       return true;
     } else if (mp >= dd.getResourceCost()) {
-      dd.use(game, userIndex, enemies);
+      dd.use(userIndex, enemies);
       return true;
     }
     return false;

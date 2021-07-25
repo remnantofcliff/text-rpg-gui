@@ -19,7 +19,8 @@ public class PolymorphSelf extends Spell {
   }
 
   @Override
-  public void use(Game game, int userIndex, List<Enemy> enemies) {
+  public void use(int userIndex, List<Enemy> enemies) {
+    var game = Game.getInstance();
     if (userIndex == EventConstants.PLAYER_INDEX) {
       //
     } else {
